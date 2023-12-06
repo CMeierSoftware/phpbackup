@@ -15,9 +15,10 @@
         }
     ],
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "friendsofphp/php-cs-fixer": "^3.40"
     },
     "require": {
         "laminas/laminas-config": "^3.9"
-    }
+    }    
 }
