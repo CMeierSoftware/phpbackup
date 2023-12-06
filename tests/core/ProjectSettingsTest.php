@@ -1,9 +1,9 @@
 <?php declare(strict_types= 1);
 
-namespace Cms\Phpbackup\Tests;
+namespace CMS\Phpbackup\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Cms\PhpBackup\Core\ProjectSettings;
+use CMS\PhpBackup\Core\ProjectSettings;
 
 class ProjectSettingsTest extends TestCase
 {        
