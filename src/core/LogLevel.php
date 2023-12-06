@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This script is a simple logger that writes messages into a file.
@@ -12,15 +14,14 @@
  *     FileLogger::getInstance()->error($e->getMessage());
  * }
  *
- * @package FileLogger
  * @version 1.0.0
+ *
  * @author Christoph Meier
+ *
  * @date 19.12.2021
  */
 
 namespace CMS\PhpBackup\Core;
-
-use Exception;
 
 abstract class LogLevel
 {
@@ -33,8 +34,8 @@ abstract class LogLevel
      * Converts a log level integer value to its string representation.
      *
      * @param int $level The log level integer value to convert.
+     *
      * @return string The string representation of the log level.
-     * @throws Exception If the given log level integer value is invalid.
      */
     public static function toString(int $level): string
     {
@@ -48,7 +49,7 @@ abstract class LogLevel
             case LogLevel::INFO:
                 return 'INFO';
             default:
-                throw new Exception("Invalid log level: $level");
+                throw new \Exception("Invalid log level: $level");
         }
     }
 }

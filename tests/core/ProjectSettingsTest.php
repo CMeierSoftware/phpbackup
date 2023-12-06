@@ -1,12 +1,14 @@
-<?php declare(strict_types= 1);
+<?php
+
+declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use PHPUnit\Framework\TestCase;
 use CMS\PhpBackup\Core\ProjectSettings;
+use PHPUnit\Framework\TestCase;
 
 class ProjectSettingsTest extends TestCase
-{        
+{
     /**
      * @covers \getInstance
      */

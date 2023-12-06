@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-
 use CMS\PhpBackup\Core\LogLevel;
 use PHPUnit\Framework\TestCase;
-use Exception;
 
 /**
  * @covers \LogLevel
@@ -24,7 +24,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers toString
+     * @covers \toString
      */
     public function testToStringForOff()
     {
@@ -33,7 +33,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers toString
+     * @covers \toString
      */
     public function testToStringForError()
     {
@@ -42,7 +42,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers toString
+     * @covers \toString
      */
     public function testToStringForWarning()
     {
@@ -51,7 +51,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers toString
+     * @covers \toString
      */
     public function testToStringForInfo()
     {
@@ -60,12 +60,12 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers toString
+     * @covers \toString
      */
     public function testToStringThrowsExceptionForInvalidLogLevel()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Invalid log level: 42");
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid log level: 42');
 
         LogLevel::toString(42);
     }

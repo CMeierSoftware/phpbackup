@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
@@ -7,12 +9,12 @@ use CMS\PhpBackup\Core\LogLevel;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers CMS\PhpBackup\Core\FileLogger
+ * @covers \CMS\PhpBackup\Core\FileLogger
  */
 class FileLoggerTest extends TestCase
 {
     private FileLogger $logger;
-    private string $log_file_path = __DIR__ . "/../work/f.log";
+    private string $log_file_path = __DIR__ . '/../work/f.log';
 
     protected function setUp(): void
     {
@@ -27,7 +29,7 @@ class FileLoggerTest extends TestCase
     }
 
     /**
-     * @covers getInstance()
+     * @covers \getInstance()
      */
     public function testGetInstance()
     {
@@ -40,7 +42,7 @@ class FileLoggerTest extends TestCase
     }
 
     /**
-     * @covers setLogLevel()
+     * @covers \setLogLevel()
      */
     public function testSetLogLevel()
     {
@@ -51,21 +53,21 @@ class FileLoggerTest extends TestCase
             $this->assertStringStartsWith(LogLevel::toString(LogLevel::INFO), $log_file_content);
             $this->assertStringEndsWith("set log level to INFO\n", $log_file_content);
 
-            $this->logger->Error($message);   
-            $this->logger->Warning($message);   
+            $this->logger->Error($message);
+            $this->logger->Warning($message);
             $this->logger->Info($message);
 
             $log_file_content = file_get_contents($this->log_file_path);
             $this->assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
             $this->assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
             $this->assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
-            
+
             $this->logger->SetLogLevel(LogLevel::WARNING);
             // unlink after changing the level, because SetLogLevel will also create a Info
             unlink($this->log_file_path);
 
-            $this->logger->Error($message);   
-            $this->logger->Warning($message);   
+            $this->logger->Error($message);
+            $this->logger->Warning($message);
             $this->logger->Info($message);
             // Assert that the log entry is written to the file
             $log_file_content = file_get_contents($this->log_file_path);
@@ -78,7 +80,7 @@ class FileLoggerTest extends TestCase
     }
 
     /**
-     * @covers ActivateEchoLogs()
+     * @covers \ActivateEchoLogs()
      */
     public function testActiveEchoLogEntry()
     {
@@ -88,18 +90,18 @@ class FileLoggerTest extends TestCase
             // Capture output to check if it's echoed when echo_logs is activated
             ob_start();
             $this->logger->error($errorMessage);
-            $output = ob_get_clean();    
+            $output = ob_get_clean();
             // Assert that the log entry is written to the file
             $log_file_content = file_get_contents($this->log_file_path);
             $this->assertStringContainsString($errorMessage, $log_file_content);
-            $this->assertEquals($output,$log_file_content . '<br>');
+            $this->assertEquals($output, $log_file_content . '<br>');
         } finally {
             unlink($this->log_file_path);
         }
     }
-    
+
     /**
-     * @covers DeactivateEchoLogs()
+     * @covers \DeactivateEchoLogs()
      */
     public function testDisabledEchoLogEntry()
     {
@@ -111,7 +113,7 @@ class FileLoggerTest extends TestCase
             // Capture output to check if it's echoed when echo_logs is activated
             ob_start();
             $this->logger->error($errorMessage);
-            $output = ob_get_clean();    
+            $output = ob_get_clean();
             // Assert that the log entry is written to the file
             $this->assertEmpty($output);
             $log_file_content = file_get_contents($this->log_file_path);
@@ -120,9 +122,9 @@ class FileLoggerTest extends TestCase
             unlink($this->log_file_path);
         }
     }
-    
+
     /**
-     * @covers error()
+     * @covers \error()
      */
     public function testErrorLogEntry()
     {
@@ -138,9 +140,9 @@ class FileLoggerTest extends TestCase
             unlink($this->log_file_path);
         }
     }
-    
+
     /**
-     * @covers error()
+     * @covers \error()
      */
     public function testWarningLogEntry()
     {
@@ -156,9 +158,9 @@ class FileLoggerTest extends TestCase
             unlink($this->log_file_path);
         }
     }
-    
+
     /**
-     * @covers error()
+     * @covers \error()
      */
     public function testInfoLogEntry()
     {

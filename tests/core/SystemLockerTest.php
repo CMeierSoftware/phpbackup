@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use PHPUnit\Framework\TestCase;
-use CMS\PhpBackup\Core\SystemLocker;
 use CMS\PhpBackup\Core\SystemLockedException;
+use CMS\PhpBackup\Core\SystemLocker;
+use PHPUnit\Framework\TestCase;
 
 class SystemLockerTest extends TestCase
 {
-    private string $system_path = __DIR__ . "/../work";
+    private string $system_path = __DIR__ . '/../work';
 
     public function setUp(): void
     {
@@ -19,10 +21,11 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers lock
-     * @covers unlock
-     * @uses SystemLocker::isLocked
-     * @uses SystemLocker::readLockFile
+     * @covers \lock
+     * @covers \unlock
+     *
+     * @uses \SystemLocker::isLocked
+     * @uses \SystemLocker::readLockFile
      */
     public function testLockSystem()
     {
@@ -41,8 +44,9 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers lock
-     * @uses unlock
+     * @covers \lock
+     *
+     * @uses \unlock
      */
     public function testLockedExceptionOnDoubleLock()
     {
@@ -58,37 +62,35 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers lock
-     * @covers unlock
+     * @covers \lock
+     * @covers \unlock
      */
     public function testUnlockDoesNotAffectOtherLocks()
     {
-        $otherSystemPath =  __DIR__ . "/../work2";
+        $otherSystemPath = __DIR__ . '/../work2';
         mkdir($otherSystemPath);
         try {
             // Lock the system
             SystemLocker::lock($this->system_path);
-    
+
             // Create another instance with a different path
             SystemLocker::lock($otherSystemPath);
-            
+
             // Unlock the system with the other path
             SystemLocker::unlock($otherSystemPath);
-    
+
             // Assert that the original system is still locked
             $this->assertTrue(SystemLocker::isLocked($this->system_path));
-    
+
             // Clean up: Unlock the original system
             SystemLocker::unlock($this->system_path);
-        } finally{
+        } finally {
             rmdir($otherSystemPath);
         }
-        
     }
 
-
     /**
-     * @covers readLockFile
+     * @covers \readLockFile
      */
     public function testReadLockFileWhenLocked()
     {
@@ -106,7 +108,7 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers readLockFile
+     * @covers \readLockFile
      */
     public function testReadLockFileWhenUnlocked()
     {

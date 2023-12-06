@@ -1,28 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
-* This script locks a directory.
-* It is not locked for write or read.
-* It only create a file, which indicates that there is something running, which do not want to disturbed.
-* 
-*   try{
-*         SystemLocker::lock();
-*       // Do some thing
-*    }
-*    finally{
-*        SystemLocker::unlock();
-*    }
-*
-* @author: Christoph Meier (CMeier Software)
-* @version 1.1.1
-* @date: 25.02.2023
-*/
+ * This script locks a directory.
+ * It is not locked for write or read.
+ * It only create a file, which indicates that there is something running, which do not want to disturbed.
+ *
+ *   try{
+ *         SystemLocker::lock();
+ *       // Do some thing
+ *    }
+ *    finally{
+ *        SystemLocker::unlock();
+ *    }
+ *
+ * @author: Christoph Meier (CMeier Software)
+ *
+ * @version 1.1.1
+ *
+ * @date: 25.02.2023
+ */
+
 namespace CMS\PhpBackup\Core;
 
 use Exception;
 
 define('LOCK_TS', date('Y.m.d-H:i:s', time()));
 
-final class SystemLockedException extends Exception {}
+final class SystemLockedException extends \Exception
+{
+}
 
 abstract class SystemLocker
 {
@@ -40,8 +47,8 @@ abstract class SystemLocker
 
         $result = file_put_contents(self::getLockFilePath($system_path), LOCK_TS);
 
-        if ($result === false and !self::isLocked($system_path)) {
-            throw new Exception('System-Locker: Can not lock system.');
+        if (false === $result and !self::isLocked($system_path)) {
+            throw new \Exception('System-Locker: Can not lock system.');
         }
     }
 
@@ -60,7 +67,7 @@ abstract class SystemLocker
      */
     public static function unlock(string $system_path): void
     {
-        if (self::readLockFile($system_path) == LOCK_TS) {
+        if (LOCK_TS === self::readLockFile($system_path)) {
             unlink(self::getLockFilePath($system_path));
         }
     }
@@ -83,4 +90,3 @@ abstract class SystemLocker
         return $system_path . DIRECTORY_SEPARATOR . self::DEFAULT_LOCK_FILE;
     }
 }
-
