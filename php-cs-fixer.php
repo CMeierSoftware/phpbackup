@@ -13,6 +13,7 @@ return (new PhpCsFixer\Config())
         '@PSR12' => true,
         'align_multiline_comment' =>  ['comment_type' => 'all_multiline'],
         'phpdoc_align' => ['align' => 'left'],
+        'concat_space' => ['spacing' => 'one']
     ])
     ->setFinder($finder)
     ->setUsingCache(false);
