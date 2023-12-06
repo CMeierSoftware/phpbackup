@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
 
+namespace CMS\PhpBackup\Tests;
+
+
 use CMS\PhpBackup\Core\LogLevel;
 use PHPUnit\Framework\TestCase;
-
+use Exception;
 
 /**
  * @covers \LogLevel

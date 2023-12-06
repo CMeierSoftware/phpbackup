@@ -1,6 +1,6 @@
 <?php declare(strict_types= 1);
 
-namespace CMS\Phpbackup\Tests;
+namespace CMS\PhpBackup\Tests;
 
 use PHPUnit\Framework\TestCase;
 use CMS\PhpBackup\Core\ProjectSettings;

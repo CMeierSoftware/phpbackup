@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace CMS\PhpBackup\Tests;
+
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;
 use PHPUnit\Framework\TestCase;
@@ -10,11 +12,10 @@ use PHPUnit\Framework\TestCase;
 class FileLoggerTest extends TestCase
 {
     private FileLogger $logger;
-    private string $log_file_path;
+    private string $log_file_path = __DIR__ . "/../work/f.log";
 
     protected function setUp(): void
     {
-        $this->log_file_path = __DIR__ . "/../work/f.log";
         // clean the instance of the singleton to make mocking possible
         $ref = new \ReflectionProperty('CMS\PhpBackup\Core\FileLogger', 'instance');
         $ref->setAccessible(true);
