@@ -3,7 +3,7 @@
 namespace Cms\Phpbackup\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Cms\Phpbackup\core\ProjectSettings;
+use Cms\PhpBackup\Core\ProjectSettings;
 
 class ProjectSettingsTest extends TestCase
 {        

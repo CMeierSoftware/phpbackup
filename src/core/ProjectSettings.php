@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Cms\Phpbackup\core;
+namespace Cms\PhpBackup\Core;
 
 use Laminas\Config\Factory as LaminasConfigFactory;
 use Laminas\Config\Config;
@@ -10,7 +10,7 @@ use Laminas\Config\Config;
  *
  * A singleton class for managing project settings using laminas-config.
  *
- * @package Cms\Phpbackup\core
+ * @package Cms\PhpBackup\Core
  */
 class ProjectSettings
 {
