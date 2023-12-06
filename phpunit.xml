@@ -9,7 +9,8 @@
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
          colors="true"
-         failOnWarning="true">
+         failOnWarning="true" 
+        verbose="true">
     <testsuites>
         <testsuite name="default">
             <directory>tests</directory>
@@ -21,4 +22,10 @@
             <directory>src</directory>
         </include>
     </source>
+    
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
 </phpunit>
