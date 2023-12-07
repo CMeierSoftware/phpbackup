@@ -9,13 +9,9 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-use Exception;
+use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 
 define('LOCK_TS', date('Y.m.d-H:i:s', time()));
-
-final class SystemLockedException extends \Exception
-{
-}
 
 abstract class SystemLocker
 {
@@ -28,7 +24,7 @@ abstract class SystemLocker
     public static function lock(string $system_path): void
     {
         if (self::isLocked($system_path)) {
-            throw new SystemLockedException('System-Locker: System is locked since ' . self::readLockFile($system_path) . ' UTC.');
+            throw new SystemAlreadyLockedException('System-Locker: System is locked since ' . self::readLockFile($system_path) . ' UTC.');
         }
 
         $result = file_put_contents(self::getLockFilePath($system_path), LOCK_TS);

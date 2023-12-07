@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\SystemLockedException;
+use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 use CMS\PhpBackup\Core\SystemLocker;
 use PHPUnit\Framework\TestCase;
 
@@ -54,7 +54,7 @@ class SystemLockerTest extends TestCase
         SystemLocker::lock($this->system_path);
 
         // Attempt to lock the system again, expect SystemLockedException
-        $this->expectException(SystemLockedException::class);
+        $this->expectException(SystemAlreadyLockedException::class);
         SystemLocker::lock($this->system_path);
 
         // Clean up: Unlock the system
