@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace CMS\PhpBackup\Backup;
+
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
 
 if (!defined('ABS_PATH')) {
@@ -37,7 +38,7 @@ class DatabaseBackupCreator
     /**
      * Creates a backup of the specified MySQL database using mysqldump.
      *
-     * @param string $compression_mode 
+     * @param string $compression_mode
      *
      * @return string|false Returns the backup filename if backup was successful, false otherwise.
      */
@@ -84,9 +85,10 @@ class DatabaseBackupCreator
             throw new \Exception('Backup failed: ' . $e->getMessage());
         }
     }
-    
+
     // Function to check if mysqldump is available
-    private function isMysqldumpAvailable(): bool {
+    private function isMysqldumpAvailable(): bool
+    {
         $output = shell_exec("{$this->mysqldumpExe} --version 2>&1");
         return str_starts_with($output, 'mysqldump.exe  Ver ') || str_starts_with($output, 'mysqldump  Ver ');
     }

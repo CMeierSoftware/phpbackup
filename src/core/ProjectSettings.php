@@ -7,7 +7,6 @@ namespace CMS\PhpBackup\Core;
 use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
 
-
 if (!defined('ABS_PATH')) {
     return;
 }

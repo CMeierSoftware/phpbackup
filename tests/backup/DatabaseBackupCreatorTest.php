@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseBackupCreatorTest extends TestCase
 {
-    
     private const HOST = 'localhost';
     private const USERNAME = 'root';
     private const PASSWORD = '';
@@ -28,19 +27,19 @@ class DatabaseBackupCreatorTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->backupCreator->backupMySql('INVALID');
     }
-    
+
 
     /**
      * @covers \backupMySql
      */
     public function testMysqldumpUnavailable()
-    {        
+    {
         putenv("MYSQLDUMP_EXE=invalid");
         $backupCreator = new DatabaseBackupCreator(self::HOST, self::USERNAME, self::PASSWORD, self::DB);
         $this->expectException(ShellCommandUnavailableException::class);
         $backupCreator->backupMySql();
     }
-    
+
     /**
      * @covers \backupMySql
      */

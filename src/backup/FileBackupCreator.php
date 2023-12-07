@@ -11,7 +11,7 @@ if (!defined('ABS_PATH')) {
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 
 use PhpZip\ZipFile;
-use \PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
+use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
 
 class FileBackupCreator
 {
@@ -41,14 +41,14 @@ class FileBackupCreator
     public function backupAll(string $src): string
     {
         $srcDir = $this->prepareBackup($src);
-        
+
         $directoryIterator = new \RecursiveDirectoryIterator($srcDir);
-        
+
         $ignoreIterator = new IgnoreFilesRecursiveFilterIterator(
-            $directoryIterator, 
+            $directoryIterator,
             $this->ignoreList
         );
-        
+
         try {
             $this->archive->addFilesFromIterator($ignoreIterator);
             $this->archive->saveAsFile($this->archiveName);
@@ -66,7 +66,7 @@ class FileBackupCreator
         try {
             foreach ($files as $file) {
                 $srcFilePath = rtrim($srcDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
-    
+
                 if (file_exists($srcFilePath)) {
                     $this->archive->addFile($srcFilePath, $file);
                 }

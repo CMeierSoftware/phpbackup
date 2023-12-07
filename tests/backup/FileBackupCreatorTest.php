@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class FileBackupCreatorTest extends TestCase
 {
-    private const FIXTURES_DIR = ABS_PATH .'\tests\fixtures';
+    private const FIXTURES_DIR = ABS_PATH . '\tests\fixtures';
     private FileBackupCreator $backupCreator;
 
     protected function setUp(): void
@@ -34,14 +34,14 @@ class FileBackupCreatorTest extends TestCase
     public function testBackupIgnoreList(): void
     {
         $backupCreator = new FileBackupCreator(['file1.txt', 'picture1.png']);
-        
+
         $filename = $backupCreator->backupAll(self::FIXTURES_DIR . '\zip');
         $this->assertFileExists($filename);
         $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-        $this->assertStringEndsWith('.zip',$filename);
+        $this->assertStringEndsWith('.zip', $filename);
         // check manually if the files are not included
     }
-    
+
     /**
      * @covers FileBackupCreator->prepareBackup()
      */
@@ -51,7 +51,7 @@ class FileBackupCreatorTest extends TestCase
             $filename = $this->backupCreator->backupAll(self::FIXTURES_DIR . '\zip');
             $this->assertFileExists($filename);
             $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-            $this->assertStringEndsWith('.zip',$filename);
+            $this->assertStringEndsWith('.zip', $filename);
         } finally {
             unlink($filename);
         }
@@ -67,7 +67,7 @@ class FileBackupCreatorTest extends TestCase
         $filename = $this->backupCreator->backupOnly(self::FIXTURES_DIR . '\zip', $files);
         $this->assertFileExists($filename);
         $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-        $this->assertStringEndsWith('.zip',$filename);
+        $this->assertStringEndsWith('.zip', $filename);
 
     }
 
