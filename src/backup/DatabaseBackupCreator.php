@@ -53,7 +53,7 @@ class DatabaseBackupCreator
         }
 
         // Set the name of the backup file with timestamp
-        $backupFile = TEMP_DIR . 'backup-' . date('Y-m-d_H-i-s') . '.sql';
+        $backupFile = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
 
         $compression = '';
 

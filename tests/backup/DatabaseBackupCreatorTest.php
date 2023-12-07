@@ -49,6 +49,7 @@ class DatabaseBackupCreatorTest extends TestCase
         try {
             $backupFile = $this->backupCreator->backupMySql('None');
             // Assert that the backup file exists
+            $this->assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
             $this->assertStringEndsWith('.sql', $backupFile);
             $this->assertFileExists($backupFile);
             $this->assertNotEmpty(file_get_contents($backupFile));
