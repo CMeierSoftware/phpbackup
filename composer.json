@@ -19,6 +19,7 @@
         "friendsofphp/php-cs-fixer": "^3.40"
     },
     "require": {
-        "laminas/laminas-config": "^3.9"
+        "laminas/laminas-config": "^3.9",
+        "nelexa/zip": "^4.0"
     }    
 }
