@@ -23,6 +23,7 @@ class StepManagerTest extends TestCase
             unlink(self::STEP_FILE);
         }
     }
+    
     /**
      * @covers StepManager()
      */
@@ -31,6 +32,20 @@ class StepManagerTest extends TestCase
         $steps = [];
         $this->expectException(\LengthException::class);
         new StepManager($steps);
+    }
+    
+    /**
+     * @covers StepManager()
+     */
+    public function testInvalidStepArray()
+    {
+        // Create an array with a non-Step instance
+        $invalidStep = new \stdClass(); // Not an instance of Step
+
+        // Instantiate the StepManager with the invalid array
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('All entries in the array must be Step instances.');
+        new StepManager([$invalidStep]);
     }
 
     /**

@@ -26,6 +26,12 @@ class StepManager
             throw new \LengthException('At least one step required.');
         }
 
+        foreach ($steps as $step) {
+            if (!$step instanceof Step) {
+                throw new \InvalidArgumentException('All entries in the array must be Step instances.');
+            }
+        }
+
         $this->steps = $steps;
     }
 
