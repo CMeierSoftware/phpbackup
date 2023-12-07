@@ -10,10 +10,16 @@
          failOnRisky="true"
          colors="true"
          failOnWarning="true" 
-        verbose="true">
+         failOnNotice="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+        >
     <testsuites>
-        <testsuite name="default">
-            <directory>tests</directory>
+        <testsuite name="Core">
+            <directory>tests\core</directory>
+        </testsuite>
+        <testsuite name="Backups">
+            <directory>tests\backup</directory>
         </testsuite>
     </testsuites>
 
@@ -24,8 +30,5 @@
     </source>
     
     <coverage>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
     </coverage>
 </phpunit>
