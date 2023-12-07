@@ -1,27 +1,13 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This script locks a directory.
- * It is not locked for write or read.
- * It only create a file, which indicates that there is something running, which do not want to disturbed.
- *
- *   try{
- *         SystemLocker::lock();
- *       // Do some thing
- *    }
- *    finally{
- *        SystemLocker::unlock();
- *    }
- *
- * @author: Christoph Meier (CMeier Software)
- *
- * @version 1.1.1
- *
- * @date: 25.02.2023
- */
+
 
 namespace CMS\PhpBackup\Core;
+
+if (!defined('ABS_PATH')) {
+    return;
+}
 
 use Exception;
 

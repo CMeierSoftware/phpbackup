@@ -7,11 +7,10 @@ namespace CMS\PhpBackup\Core;
 use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
 
-/**
- * Class ProjectSettings.
- *
- * A singleton class for managing project settings using laminas-config.
- */
+
+if (!defined('ABS_PATH')) {
+    return;
+}
 class ProjectSettings
 {
     private const CONFIG_FILE = CONFIG_DIR . DIRECTORY_SEPARATOR . 'config.json';

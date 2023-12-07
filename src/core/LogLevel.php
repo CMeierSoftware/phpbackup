@@ -2,26 +2,11 @@
 
 declare(strict_types=1);
 
-/**
- * This script is a simple logger that writes messages into a file.
- *
- * Usage:
- *
- * try {
- *     FileLogger::getInstance()->info('Info Message');
- *     // Do some thing
- * } catch(Exception $e) {
- *     FileLogger::getInstance()->error($e->getMessage());
- * }
- *
- * @version 1.0.0
- *
- * @author Christoph Meier
- *
- * @date 19.12.2021
- */
-
 namespace CMS\PhpBackup\Core;
+
+if (!defined('ABS_PATH')) {
+    return;
+}
 
 abstract class LogLevel
 {
