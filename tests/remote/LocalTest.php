@@ -54,6 +54,7 @@ class LocalTest extends TestCase
     {
         self::deleteDirectory(self::WORK_DIR);
         $this->local = new Local(self::WORK_DIR);
+        $this->local->connect();
     }
 
     public function testCreateDirIfNotExists(): void
@@ -138,7 +139,6 @@ class LocalTest extends TestCase
 
     }
 
-
     public function testFileDeleteFileNotFound()
     {
         $file = 'file.txt';
@@ -164,11 +164,15 @@ class LocalTest extends TestCase
 
     public function testCreateDirectory()
     {
-        $dirs = ['a\\b\\c', 'foo\\b\\c\\', 'foo\\b\\c\\', 'bar\b\\c\\test.txt'];
+        $dirs = ['a\\b\\c', 'foo\\b\\c\\', 'foo\\b\\c\\'];
         foreach ($dirs as $dir) {
             $this->local->createDirectory($dir);
             $this->assertFileExists(self::WORK_DIR . $dir);
         }
+
+        $this->local->createDirectory('bar\b\\c\\test.txt');
+        $this->assertFileExists(self::WORK_DIR . 'bar\b\\c\\');
+        $this->assertFileDoesNotExist(self::WORK_DIR . 'bar\b\\c\\test.txt');
     }
 
 }

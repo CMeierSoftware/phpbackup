@@ -68,7 +68,7 @@ class Local extends AbstractRemoteHandler
         $absolutePath = $this->buildAbsPath($remoteFilePath);
 
         // Ensure the directory structure exists
-        if(pathinfo($absolutePath, FILEINFO_EXTENSION) !== "") {
+        if(isset(pathinfo($absolutePath)['extension'])) {
             $absolutePath = pathinfo($absolutePath, PATHINFO_DIRNAME);
         }
 
