@@ -23,7 +23,7 @@ class Local extends AbstractRemoteHandler
      */
     public function connect(): bool
     {
-        // For local storage, connection is not applicable
+        $this->connection = true;
         return true;
     }
 
@@ -32,7 +32,7 @@ class Local extends AbstractRemoteHandler
      */
     public function disconnect(): bool
     {
-        // For local storage, disconnection is not applicable
+        $this->connection = false;
         return true;
     }
 
@@ -63,7 +63,7 @@ class Local extends AbstractRemoteHandler
     /**
      * @inheritDoc
      */
-    public function createDirectory(string $remoteFilePath): bool
+    public function _createDirectory(string $remoteFilePath): bool
     {
         $absolutePath = $this->buildAbsPath($remoteFilePath);
 
@@ -83,7 +83,7 @@ class Local extends AbstractRemoteHandler
     /**
      * @inheritDoc
      */
-    public function fileExists(string $remoteFilePath): bool
+    public function _fileExists(string $remoteFilePath): bool
     {
         return file_exists($this->buildAbsPath($remoteFilePath));
     }
