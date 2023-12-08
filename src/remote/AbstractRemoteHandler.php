@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Remote;
 
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Exceptions\RemoteStorageNotConnectedException;
 
 /**
  * Class AbstractRemoteHandler - Abstract class for handling remote operations.
@@ -13,7 +14,7 @@ use CMS\PhpBackup\Exceptions\FileNotFoundException;
 abstract class AbstractRemoteHandler
 {
     /** @var bool|null The connection status. */
-    private $connection = null;
+    protected $connection = null;
 
     /**
      * Destructor to ensure disconnection upon object destruction.
@@ -47,7 +48,9 @@ abstract class AbstractRemoteHandler
      */
     public function fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
-        if (!file_exists($localFilePath)) {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        } elseif (!file_exists($localFilePath)) {
             throw new FileNotFoundException("The file '{$localFilePath}' was not found in local storage.");
         } elseif ($this->fileExists($remoteFilePath)) {
             throw new FileAlreadyExistsException("The file '{$remoteFilePath}' already exists on remote storage.");
@@ -73,7 +76,9 @@ abstract class AbstractRemoteHandler
      */
     public function fileDownload(string $localFilePath, string $remoteFilePath): bool
     {
-        if (!$this->fileExists($remoteFilePath)) {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        } elseif (!$this->fileExists($remoteFilePath)) {
             throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
         } elseif (file_exists($localFilePath)) {
             throw new FileAlreadyExistsException("The file '{$localFilePath}' already exists on local storage.");
@@ -96,7 +101,9 @@ abstract class AbstractRemoteHandler
      */
     public function fileDelete(string $remoteFilePath): bool
     {
-        if (!$this->fileExists($remoteFilePath)) {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        } elseif (!$this->fileExists($remoteFilePath)) {
             throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
         }
 
@@ -107,11 +114,38 @@ abstract class AbstractRemoteHandler
      * @see AbstractRemoteHandler::fileDelete()
      */
     abstract protected function _fileDelete(string $remoteFilePath): bool;
+    
+    /**
+     * 
+     */
+    public function fileExists(string $remoteFilePath): bool
+    {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        }
+        return $this->_fileExists($remoteFilePath);
+    }
+
+    /**
+     * @see AbstractRemoteHandler::fileExists()
+     */
+    protected abstract function _fileExists(string $remoteFilePath): bool;
 
     /**
      * Creates a directory path recursive if not already exists
      */
-    abstract public function createDirectory(string $remoteFilePath): bool;
+    public function createDirectory(string $remoteFilePath): bool
+    {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        }
+        return $this->_createDirectory($remoteFilePath);
+    }
+
+    /**
+     * @see AbstractRemoteHandler::createDirectory()
+     */
+    public abstract function _createDirectory(string $remoteFilePath): bool;
 
     /**
      * Checks if the remote handler is currently connected to the remote server.
@@ -120,6 +154,6 @@ abstract class AbstractRemoteHandler
      */
     public function isConnected(): bool
     {
-        return $this->connection ?? false;
+        return !(is_null($this->connection) || $this->connection === false);
     }
 }
