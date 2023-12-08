@@ -8,6 +8,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 use CMS\PhpBackup\Core\Step;
+
 class StepManager
 {
     private const STEP_FILE = CONFIG_DIR . DIRECTORY_SEPARATOR . 'last.step';

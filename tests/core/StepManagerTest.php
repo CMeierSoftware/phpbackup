@@ -23,7 +23,7 @@ class StepManagerTest extends TestCase
             unlink(self::STEP_FILE);
         }
     }
-    
+
     /**
      * @covers StepManager()
      */
@@ -33,7 +33,7 @@ class StepManagerTest extends TestCase
         $this->expectException(\LengthException::class);
         new StepManager($steps);
     }
-    
+
     /**
      * @covers StepManager()
      */
