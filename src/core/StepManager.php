@@ -52,11 +52,9 @@ class StepManager
 
         $result = $currentStep->execute();
 
-        $this->saveCurrentStep($result['repeat']);
+        $this->saveCurrentStep($result->repeat);
 
-
-
-        return $result['return'];
+        return $result->returnValue;
     }
 
     /**

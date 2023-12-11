@@ -6,6 +6,17 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
+final class StepResult 
+{
+    public $returnValue = null;
+    public bool $repeat = false;
+    public function __construct(mixed $returnValue, bool $repeat = false)
+    {
+        $this->returnValue = $returnValue;
+        $this->repeat = $repeat;
+    }
+}
+
 class Step
 {
     public readonly int $delay;
@@ -29,15 +40,21 @@ class Step
     /**
      * Execute the callback and return the result.
      *
-     * @return mixed The result of the callback execution.
+     * @return StepResult The result of the callback execution.
      * @throws \RuntimeException If the callback is not set.
      */
-    public function execute(): mixed
+    public function execute(): StepResult
     {
         if (!$this->callback) {
             throw new \RuntimeException('Callback is not set.');
         }
 
-        return call_user_func_array($this->callback, $this->arguments);
+        $result = call_user_func_array($this->callback, $this->arguments);
+
+        if (!($result instanceof  StepResult)) {
+            throw new \RuntimeException("the step result is not of type ". StepResult::class);
+        }
+
+        return $result;
     }
 }

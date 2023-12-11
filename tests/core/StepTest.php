@@ -3,6 +3,7 @@
 namespace CMS\PhpBackup\Tests\Core;
 
 use CMS\PhpBackup\Core\Step;
+use CMS\PhpBackup\Core\StepResult;
 use PHPUnit\Framework\TestCase;
 
 class StepTest extends TestCase
@@ -37,14 +38,15 @@ class StepTest extends TestCase
 
         // Execute the callback and assert the result
         $result = $step->execute();
-        $this->assertEquals("Result: Hello World", $result);
+        $this->assertInstanceOf(StepResult::class, $result);
+        $this->assertEquals("Result: Hello World", $result->returnValue);
+        $this->assertFalse($result->repeat);
     }
     /**
      * @covers Step->execute()
      */
     public function testExecuteWithValidCallback()
-    {
-        
+    {        
         $obj = new StaticClass();
         
         $callback = [$obj, 'exampleMethod'];
@@ -54,7 +56,9 @@ class StepTest extends TestCase
 
         // Execute the callback and assert the result
         $result = $step->execute();
-        $this->assertEquals("Result: Hello World", $result);
+        $this->assertInstanceOf(StepResult::class, $result);
+        $this->assertEquals("Result: Hello World", $result->returnValue);
+        $this->assertFalse($result->repeat);
     }
 }
 
@@ -63,6 +67,6 @@ class StaticClass
 {
     public static function exampleMethod($arg1, $arg2)
     {
-        return "Result: $arg1 $arg2";
+        return new StepResult("Result: $arg1 $arg2", false);
     }
 }

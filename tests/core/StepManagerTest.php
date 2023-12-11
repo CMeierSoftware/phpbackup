@@ -4,6 +4,7 @@ namespace CMS\PhpBackup\Tests\Core;
 
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\Step;
+use CMS\PhpBackup\Core\StepResult;
 use PHPUnit\Framework\TestCase;
 
 class StepManagerTest extends TestCase
@@ -88,6 +89,6 @@ class StepManagerTestClass
     public function exampleMethod($arg1, $arg2)
     {
         $this->repeated = ($arg2 === 9 && !$this->repeated);
-        return ['return' => "Result: $arg1 " . strval($arg2), 'repeat' => $this->repeated];
+        return new StepResult("Result: $arg1 $arg2", $this->repeated);
     }
 }
