@@ -145,7 +145,7 @@ abstract class AbstractRemoteHandler
     /**
      * @see AbstractRemoteHandler::createDirectory()
      */
-    abstract public function _createDirectory(string $remoteFilePath): bool;
+    abstract protected function _createDirectory(string $remoteFilePath): bool;
 
     /**
      * Checks if the remote handler is currently connected to the remote server.

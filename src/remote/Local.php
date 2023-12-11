@@ -64,7 +64,7 @@ class Local extends AbstractRemoteHandler
     /**
      * @inheritDoc
      */
-    public function _createDirectory(string $remoteFilePath): bool
+    protected function _createDirectory(string $remoteFilePath): bool
     {
         $absolutePath = $this->buildAbsPath($remoteFilePath);
 
@@ -84,7 +84,7 @@ class Local extends AbstractRemoteHandler
     /**
      * @inheritDoc
      */
-    public function _fileExists(string $remoteFilePath): bool
+    protected function _fileExists(string $remoteFilePath): bool
     {
         return file_exists($this->buildAbsPath($remoteFilePath));
     }
