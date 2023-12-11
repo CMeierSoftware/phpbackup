@@ -10,7 +10,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-class FileCrypt
+abstract class FileCrypt
 {
     private const METHOD = 'aes-256-cbc';
     private const CHUNK_SIZE = 4096; // 4KB

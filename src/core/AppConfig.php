@@ -14,8 +14,8 @@ class AppConfig
 {
     private const TMP_DIR = 'temp_';
     private static array $config;
-    private string $configFile;
-    private string $tempDir;
+    private readonly string $configFile;
+    private readonly string $tempDir;
 
     private function __construct(string $configFile, string $tempDir)
     {

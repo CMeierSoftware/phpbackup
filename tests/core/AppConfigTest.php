@@ -6,9 +6,6 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\AppConfig;
 use PHPUnit\Framework\TestCase;
-use Laminas\Config\Config;
-use Laminas\Config\Factory as LaminasConfigFactory;
-use ReflectionClass;
 
 class AppConfigTest extends TestCase
 {

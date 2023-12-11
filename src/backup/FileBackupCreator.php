@@ -16,7 +16,7 @@ use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
 class FileBackupCreator
 {
     private ZipFile $archive;
-    private string $srcDir;
+    private readonly string $srcDir;
     private string $archiveName;
     private array $ignoreList = [];
 

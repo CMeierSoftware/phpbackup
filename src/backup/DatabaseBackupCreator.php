@@ -12,11 +12,11 @@ if (!defined('ABS_PATH')) {
 
 class DatabaseBackupCreator
 {
-    private string $host;
-    private string $username;
-    private string $password;
-    private string $database;
-    private string $mysqldumpExe;
+    private readonly string $host;
+    private readonly string $username;
+    private readonly string $password;
+    private readonly string $database;
+    private readonly string $mysqldumpExe;
 
     /**
      * Constructs a new Backup object with the specified database connection details.

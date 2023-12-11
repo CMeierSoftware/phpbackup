@@ -11,7 +11,8 @@ use CMS\PhpBackup\Remote\AbstractRemoteHandler;
  */
 class Local extends AbstractRemoteHandler
 {
-    private string $remoteRootPath = "";
+    private readonly string $remoteRootPath;
+
     public function __construct(string $remoteRootPath)
     {
         mkdir($remoteRootPath, 0644, true);

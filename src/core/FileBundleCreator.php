@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
-class FileBundleCreator
+abstract class FileBundleCreator
 {
     /**
      * Create bundles of files from a directory based on a size limit.
