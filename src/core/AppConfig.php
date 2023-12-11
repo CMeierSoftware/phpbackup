@@ -12,13 +12,13 @@ if (!defined('ABS_PATH')) {
 }
 class AppConfig
 {
-    private static Config $config;
+    private static array $config;
     private string $config_file;
     
     private function __construct(string $config_file) 
     {
         $this->config_file = $config_file;
-        $this->config = LaminasConfigFactory::fromFile($config_file, true);
+        $this->config = LaminasConfigFactory::fromFile($config_file);
     }
 
     public static function loadAppConfig(string $app): ?AppConfig
@@ -32,11 +32,12 @@ class AppConfig
         return new self($config_file);
     }
 
-    /**
-     * Save the configuration to the file.
-     */
-    public function save(): bool
+    public function getDatabase() 
     {
-        return LaminasConfigFactory::toFile($this->config_file, $this->config);
+        return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : null;
+    }
+    public function getDirectory() 
+    {
+        return isset($this->config['backup']['directory']) ? $this->config['backup']['directory'] : null;
     }
 }
