@@ -52,9 +52,11 @@ class StepManager
 
         $result = $currentStep->execute();
 
-        $this->currentStepDone();
+        $this->saveCurrentStep($result['repeat']);
 
-        return $result;
+
+
+        return $result['return'];
     }
 
     /**
@@ -86,8 +88,12 @@ class StepManager
     /**
      * Records the completion of the current step.
      */
-    private function currentStepDone(): void
+    private function saveCurrentStep(bool $repeatCurrentStep): void
     {
+        if ($repeatCurrentStep) {
+            $this->currentStepIdx = ($this->currentStepIdx < 0 ? count($this->steps) : $this->currentStepIdx) - 1;
+        }
+
         $content = [
             'last_step_index' => $this->currentStepIdx,
             'timestamp' => time(),

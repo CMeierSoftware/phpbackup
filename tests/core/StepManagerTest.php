@@ -14,9 +14,9 @@ class StepManagerTest extends TestCase
 
     protected function setUp(): void
     {
+        $sm = new StepManagerTestClass();
         for ($i = 0; $i < 10; $i++) {
-            $step = new Step();
-            $step->setCallback([StepManagerTestClass::class, 'exampleMethod'], ['Hello', 'World ' . strval($i)]);
+            $step = new Step([$sm, 'exampleMethod'], ['Hello World', $i]);
             $this->steps[] = $step;
         }
 
@@ -59,6 +59,8 @@ class StepManagerTest extends TestCase
             $result = $stepManager->executeNextStep();
             $this->assertEquals("Result: Hello World " . strval($i), $result);
         }
+        $result = $stepManager->executeNextStep();
+        $this->assertEquals("Result: Hello World 9", $result);
     }
 
     /**
@@ -82,8 +84,10 @@ class StepManagerTest extends TestCase
 // Define a static class with a method for testing
 class StepManagerTestClass
 {
-    public static function exampleMethod($arg1, $arg2)
+    private bool $repeated = false;
+    public function exampleMethod($arg1, $arg2)
     {
-        return "Result: $arg1 $arg2";
+        $this->repeated = ($arg2 === 9 && !$this->repeated);
+        return ['return' => "Result: $arg1 " . strval($arg2), 'repeat' => $this->repeated];
     }
 }
