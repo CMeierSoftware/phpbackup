@@ -12,11 +12,11 @@ use ReflectionClass;
 
 class AppConfigTest extends TestCase
 {
-    private const TEST_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test.json';
+    private const TEST_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test.xml';
 
     protected function setUp(): void
     {
-        copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.json');
+        copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.xml');
     }
     
     public function testLoadAppConfigSuccess(): void

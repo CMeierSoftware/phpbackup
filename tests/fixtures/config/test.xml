@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <database>
+        <adapter>pdo_mysql</adapter>
+        <params>
+            <host>db.example.com</host>
+            <username>dbuser</username>
+            <password>secret</password>
+            <dbname>dbproduction</dbname>
+        </params>
+    </database>
+</config>

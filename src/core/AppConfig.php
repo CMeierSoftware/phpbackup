@@ -23,7 +23,7 @@ class AppConfig
 
     public static function loadAppConfig(string $app): ?AppConfig
     {
-        $config_file = CONFIG_DIR . DIRECTORY_SEPARATOR . $app. '.json';
+        $config_file = CONFIG_DIR . DIRECTORY_SEPARATOR . $app. '.xml';
 
         if (!file_exists($config_file)) {
             return null;
@@ -35,10 +35,8 @@ class AppConfig
     /**
      * Save the configuration to the file.
      */
-    public function save(): void
+    public function save(): bool
     {
-        if (self::$config) {
-            LaminasConfigFactory::toFile($this->config_file, self::$config);
-        }
+        return LaminasConfigFactory::toFile($this->config_file, $this->config);
     }
 }
