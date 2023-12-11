@@ -114,9 +114,9 @@ abstract class AbstractRemoteHandler
      * @see AbstractRemoteHandler::fileDelete()
      */
     abstract protected function _fileDelete(string $remoteFilePath): bool;
-    
+
     /**
-     * 
+     *
      */
     public function fileExists(string $remoteFilePath): bool
     {
@@ -129,7 +129,7 @@ abstract class AbstractRemoteHandler
     /**
      * @see AbstractRemoteHandler::fileExists()
      */
-    protected abstract function _fileExists(string $remoteFilePath): bool;
+    abstract protected function _fileExists(string $remoteFilePath): bool;
 
     /**
      * Creates a directory path recursive if not already exists
@@ -145,7 +145,7 @@ abstract class AbstractRemoteHandler
     /**
      * @see AbstractRemoteHandler::createDirectory()
      */
-    public abstract function _createDirectory(string $remoteFilePath): bool;
+    abstract public function _createDirectory(string $remoteFilePath): bool;
 
     /**
      * Checks if the remote handler is currently connected to the remote server.

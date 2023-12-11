@@ -14,8 +14,8 @@ class AppConfig
 {
     private static array $config;
     private string $config_file;
-    
-    private function __construct(string $config_file) 
+
+    private function __construct(string $config_file)
     {
         $this->config_file = $config_file;
         $this->config = LaminasConfigFactory::fromFile($config_file);
@@ -23,7 +23,7 @@ class AppConfig
 
     public static function loadAppConfig(string $app): ?AppConfig
     {
-        $config_file = CONFIG_DIR . DIRECTORY_SEPARATOR . $app. '.xml';
+        $config_file = CONFIG_DIR . DIRECTORY_SEPARATOR . $app . '.xml';
 
         if (!file_exists($config_file)) {
             return null;
@@ -32,11 +32,11 @@ class AppConfig
         return new self($config_file);
     }
 
-    public function getDatabase() 
+    public function getDatabase()
     {
         return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : null;
     }
-    public function getDirectory() 
+    public function getDirectory()
     {
         return isset($this->config['backup']['directory']) ? $this->config['backup']['directory'] : null;
     }

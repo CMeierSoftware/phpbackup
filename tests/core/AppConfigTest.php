@@ -22,7 +22,7 @@ class AppConfigTest extends TestCase
         copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.xml');
         $this->config = AppConfig::loadAppConfig('valid_app');
     }
-    
+
     public function testLoadAppConfigSuccess(): void
     {
         $appConfig = AppConfig::loadAppConfig('valid_app');
@@ -44,10 +44,10 @@ class AppConfigTest extends TestCase
             'password' => 'secret',
             'dbname' => 'dbproduction',
         ];
-    
+
         $actualDatabaseConfig = $this->config->getDatabase();
-    
-        $this->assertIsArray($actualDatabaseConfig);   
+
+        $this->assertIsArray($actualDatabaseConfig);
 
         foreach ($expectedDatabaseConfig as $key => $value) {
             $this->assertArrayHasKey($key, $actualDatabaseConfig);
@@ -61,6 +61,5 @@ class AppConfigTest extends TestCase
         $actualDatabaseConfig = $config->getDatabase();
         $this->assertNull($actualDatabaseConfig);
     }
-    
-}
 
+}

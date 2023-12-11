@@ -78,7 +78,6 @@ class FileBackupCreator
         }
 
         return $this->archiveName;
-
     }
 
     private function prepareBackup(string $src): string
