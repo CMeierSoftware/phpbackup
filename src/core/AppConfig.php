@@ -48,6 +48,10 @@ class AppConfig
     {
         return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : null;
     }
+    public function getRemoteSettings(): ?array
+    {
+        return isset($this->config['remote']) ? $this->config['remote'] : null;
+    }
 
     public function getTempDir(): string
     {

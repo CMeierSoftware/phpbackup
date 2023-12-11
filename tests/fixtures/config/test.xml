@@ -15,4 +15,9 @@
             <maxArchiveSize>5</maxArchiveSize>
         </settings>
     </backup>
+    <remote>
+        <local>
+            <rootDir></rootDir>
+        </local>
+    </remote>
 </config>

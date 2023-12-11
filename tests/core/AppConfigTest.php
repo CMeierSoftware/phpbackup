@@ -66,6 +66,21 @@ class AppConfigTest extends TestCase
             $this->assertEquals($value, $actualConfig[$key]);
         }
     }
+    public function testRemoteConfig(): void
+    {
+        $expectedConfig = [
+            'local' => ['rootDir' => ''],
+        ];
+
+        $actualConfig = $this->config->getRemoteSettings();
+
+        $this->assertIsArray($actualConfig);
+
+        foreach ($expectedConfig as $key => $value) {
+            $this->assertArrayHasKey($key, $actualConfig);
+            $this->assertEquals($value, $actualConfig[$key]);
+        }
+    }
 
     public function testDatabaseConfig(): void
     {
@@ -123,10 +138,7 @@ class AppConfigTest extends TestCase
         $this->config->saveTempData($type, $data);
     }
 
-
-    // readTempData method test cases
-
-    public function testReadTempDataSuccessfullyReadsDataFromFile()
+    public function testReadTempData()
     {
         $type = 'test';
         $data = ['key' => 'value'];
@@ -139,7 +151,7 @@ class AppConfigTest extends TestCase
         $this->assertEquals($data, $result);
     }
 
-    public function testReadTempDataThrowsFileNotFoundExceptionOnFileNotFound()
+    public function testReadTempDataThrowsFileNotFoundException()
     {
         $type = 'nonexistent';
 
@@ -147,7 +159,7 @@ class AppConfigTest extends TestCase
         $this->config->readTempData($type);
     }
 
-    public function testReadTempDataThrowsJsonExceptionOnInvalidData()
+    public function testReadTempDataThrowsJsonException()
     {
         $type = 'invalid';
 
