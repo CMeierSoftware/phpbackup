@@ -22,7 +22,7 @@ abstract class FileBundleCreator
         return self::packDirectory($directory, $sizeLimit);
     }
 
-    public static function packDirectory(string $directory, int $sizeLimit): array
+    private static function packDirectory(string $directory, int $sizeLimit): array
     {
         $content = self::listDirSortedByFileSize($directory);
 
