@@ -8,9 +8,9 @@ if (!defined('ABS_PATH')) {
 
 class Step
 {
-    public int $delay = 0;
+    public readonly int $delay;
     private $callback;
-    private $arguments = [];
+    private readonly array $arguments;
 
     public function __construct(int $delay = 0)
     {
@@ -20,22 +20,12 @@ class Step
     /**
      * Set the callback for the step with optional arguments.
      *
-     * @param string|array $callback The callback function or [class, method] array.
+     * @param callable $callback The callback function or [class, method] array.
      * @param array $arguments Optional arguments to be passed to the callback.
      * @throws \InvalidArgumentException If the callback is not callable or the function does not exist.
      */
-    public function setCallback($callback, array $arguments = []): void
+    public function setCallback(callable $callback, array $arguments = []): void
     {
-        // Check if the callback is callable
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('Invalid callback provided.');
-        }
-
-        // If the callback is an array [class, method], check if the method exists
-        if (is_array($callback) && !method_exists($callback[0], $callback[1])) {
-            throw new \InvalidArgumentException('Method does not exist in the provided class.');
-        }
-
         $this->callback = $callback;
         $this->arguments = $arguments;
     }
