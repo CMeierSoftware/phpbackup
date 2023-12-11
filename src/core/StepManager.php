@@ -11,7 +11,7 @@ use CMS\PhpBackup\Core\Step;
 
 class StepManager
 {
-    private const STEP_FILE = CONFIG_DIR . DIRECTORY_SEPARATOR . 'last.step';
+    private readonly string $stepFile;
     private readonly array $steps;
     private ?int $currentStepIdx = null;
 
@@ -21,7 +21,7 @@ class StepManager
      * @param array $steps An array of possible steps with their names and relative delay in seconds.
      * @throws \LengthException If the array of steps is empty.
      */
-    public function __construct(array $steps)
+    public function __construct(array $steps, string $systemDir)
     {
         if (count($steps) < 1) {
             throw new \LengthException('At least one step required.');
@@ -34,6 +34,7 @@ class StepManager
         }
 
         $this->steps = $steps;
+        $this->stepFile = $systemDir . DIRECTORY_SEPARATOR . 'last.step';
     }
 
     /**
@@ -93,7 +94,7 @@ class StepManager
             'step_hash' => md5(json_encode($this->steps))
         ];
 
-        file_put_contents(self::STEP_FILE, json_encode($content));
+        file_put_contents($this->stepFile, json_encode($content));
     }
 
     /**
@@ -103,10 +104,10 @@ class StepManager
      */
     private function getLastStepInfo(): ?array
     {
-        if (!file_exists(self::STEP_FILE) || filesize(self::STEP_FILE) === 0) {
+        if (!file_exists($this->stepFile) || filesize($this->stepFile) === 0) {
             return null;
         }
 
-        return json_decode(file_get_contents(self::STEP_FILE), true);
+        return json_decode(file_get_contents($this->stepFile), true);
     }
 }

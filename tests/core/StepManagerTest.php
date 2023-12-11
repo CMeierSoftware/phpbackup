@@ -8,7 +8,8 @@ use PHPUnit\Framework\TestCase;
 
 class StepManagerTest extends TestCase
 {
-    private const STEP_FILE = CONFIG_DIR . DIRECTORY_SEPARATOR . 'last.step';
+    private const SYSTEM_PATH = __DIR__ . '/../work';
+    private const STEP_FILE = self::SYSTEM_PATH . DIRECTORY_SEPARATOR . 'last.step';
     private array $steps = [];
 
     protected function setUp(): void
@@ -31,7 +32,7 @@ class StepManagerTest extends TestCase
     {
         $steps = [];
         $this->expectException(\LengthException::class);
-        new StepManager($steps);
+        new StepManager($steps, self::SYSTEM_PATH);
     }
 
     /**
@@ -45,7 +46,7 @@ class StepManagerTest extends TestCase
         // Instantiate the StepManager with the invalid array
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('All entries in the array must be Step instances.');
-        new StepManager([$invalidStep]);
+        new StepManager([$invalidStep], self::SYSTEM_PATH);
     }
 
     /**
@@ -54,7 +55,7 @@ class StepManagerTest extends TestCase
     public function testExecuteNextStep()
     {
         for ($i = 0; $i < count($this->steps); $i++) {
-            $stepManager = new StepManager($this->steps);
+            $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
             $result = $stepManager->executeNextStep();
             $this->assertEquals("Result: Hello World " . strval($i), $result);
         }
@@ -65,14 +66,14 @@ class StepManagerTest extends TestCase
      */
     public function testStepsChanged()
     {
-        $stepManager = new StepManager($this->steps);
+        $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
         $this->assertEquals("Result: Hello World 0", $result);
-        $stepManager = new StepManager($this->steps);
+        $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
         $this->assertEquals("Result: Hello World 1", $result);
         array_pop($this->steps);
-        $stepManager = new StepManager($this->steps);
+        $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
         $this->assertEquals("Result: Hello World 0", $result);
     }
