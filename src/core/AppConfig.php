@@ -27,7 +27,7 @@ class AppConfig
     public static function loadAppConfig(string $app): ?AppConfig
     {
         $config_file = CONFIG_DIR . $app . '.xml';
-        $tempDir = CONFIG_DIR . self::TMP_DIR  . $app;
+        $tempDir = CONFIG_DIR . self::TMP_DIR . $app;
 
         if (!file_exists($config_file)) {
             return null;
@@ -40,11 +40,11 @@ class AppConfig
     {
         return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : null;
     }
-    public function getBackupDirectory() :?array
+    public function getBackupDirectory(): ?array
     {
         return isset($this->config['backup']['directory']) ? $this->config['backup']['directory'] : null;
     }
-    public function getBackupSettings() :?array
+    public function getBackupSettings(): ?array
     {
         return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : null;
     }
@@ -54,6 +54,6 @@ class AppConfig
         if (!file_exists($this->tempDir)) {
             mkdir($this->tempDir, 0644, true);
         }
-        return $this->tempDir.DIRECTORY_SEPARATOR;
+        return $this->tempDir . DIRECTORY_SEPARATOR;
     }
 }

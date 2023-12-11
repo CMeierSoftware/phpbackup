@@ -93,7 +93,7 @@ class AppConfigTest extends TestCase
 
     public function testTempDir()
     {
-        $tmpDir= CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
+        $tmpDir = CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
         rmdir($tmpDir);
         $this->assertEquals($tmpDir, $this->config->getTmp());
         $this->assertFileExists($tmpDir);
