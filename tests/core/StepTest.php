@@ -31,7 +31,7 @@ class StepTest extends TestCase
      */
     public function testExecuteWithValidStaticCallback()
     {
-        
+
         $callback = [StaticClass::class, 'exampleMethod'];
         $arguments = ['Hello', 'World'];
         $step = new Step($callback, $arguments);
@@ -46,12 +46,12 @@ class StepTest extends TestCase
      * @covers Step->execute()
      */
     public function testExecuteWithValidCallback()
-    {        
+    {
         $obj = new StaticClass();
-        
+
         $callback = [$obj, 'exampleMethod'];
         $arguments = ['Hello', 'World'];
-        
+
         $step = new Step($callback, $arguments);
 
         // Execute the callback and assert the result

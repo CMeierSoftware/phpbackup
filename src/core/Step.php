@@ -6,7 +6,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-final class StepResult 
+final class StepResult
 {
     public $returnValue = null;
     public bool $repeat = false;
@@ -36,7 +36,7 @@ class Step
         $this->callback = $callback;
         $this->arguments = $arguments;
     }
-    
+
     /**
      * Execute the callback and return the result.
      *
@@ -52,7 +52,7 @@ class Step
         $result = call_user_func_array($this->callback, $this->arguments);
 
         if (!($result instanceof  StepResult)) {
-            throw new \RuntimeException("the step result is not of type ". StepResult::class);
+            throw new \RuntimeException("the step result is not of type " . StepResult::class);
         }
 
         return $result;
