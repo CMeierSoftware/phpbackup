@@ -11,5 +11,8 @@
         <directory>
             <src>.</src>
         </directory>
+        <settings>
+            <maxArchiveSize>5</maxArchiveSize>
+        </settings>
     </backup>
 </config>
