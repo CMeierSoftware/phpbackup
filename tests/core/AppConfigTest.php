@@ -32,9 +32,41 @@ class AppConfigTest extends TestCase
         $this->assertNull($nonExistentAppConfig);
     }
 
+    public function testDirectoryConfig(): void
+    {
+        $expectedConfig = [
+            'src' => '.',
+        ];
+
+        $actualConfig = $this->config->getBackupDirectory();
+
+        $this->assertIsArray($actualConfig);
+
+        foreach ($expectedConfig as $key => $value) {
+            $this->assertArrayHasKey($key, $actualConfig);
+            $this->assertEquals($value, $actualConfig[$key]);
+        }
+    }
+
+    public function testBackupSettingsConfig(): void
+    {
+        $expectedConfig = [
+            'maxArchiveSize' => '5',
+        ];
+
+        $actualConfig = $this->config->getBackupSettings();
+
+        $this->assertIsArray($actualConfig);
+
+        foreach ($expectedConfig as $key => $value) {
+            $this->assertArrayHasKey($key, $actualConfig);
+            $this->assertEquals($value, $actualConfig[$key]);
+        }
+    }
+
     public function testDatabaseConfig(): void
     {
-        $expectedDatabaseConfig = [
+        $expectedConfig = [
             'adapter' => 'pdo_mysql',
             'host' => 'db.example.com',
             'username' => 'dbuser',
@@ -42,20 +74,20 @@ class AppConfigTest extends TestCase
             'dbname' => 'dbproduction',
         ];
 
-        $actualDatabaseConfig = $this->config->getDatabase();
+        $actualConfig = $this->config->getBackupDatabase();
 
-        $this->assertIsArray($actualDatabaseConfig);
+        $this->assertIsArray($actualConfig);
 
-        foreach ($expectedDatabaseConfig as $key => $value) {
-            $this->assertArrayHasKey($key, $actualDatabaseConfig);
-            $this->assertEquals($value, $actualDatabaseConfig[$key]);
+        foreach ($expectedConfig as $key => $value) {
+            $this->assertArrayHasKey($key, $actualConfig);
+            $this->assertEquals($value, $actualConfig[$key]);
         }
     }
 
     public function testNoDatabaseDefined()
     {
         $config = AppConfig::loadAppConfig('empty_app');
-        $actualDatabaseConfig = $config->getDatabase();
+        $actualDatabaseConfig = $config->getBackupDatabase();
         $this->assertNull($actualDatabaseConfig);
     }
 

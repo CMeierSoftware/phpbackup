@@ -36,13 +36,17 @@ class AppConfig
         return new self($config_file, $tempDir);
     }
 
-    public function getDatabase(): ?array
+    public function getBackupDatabase(): ?array
     {
         return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : null;
     }
-    public function getDirectory() :?array
+    public function getBackupDirectory() :?array
     {
         return isset($this->config['backup']['directory']) ? $this->config['backup']['directory'] : null;
+    }
+    public function getBackupSettings() :?array
+    {
+        return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : null;
     }
 
     public function getTmp(): string
