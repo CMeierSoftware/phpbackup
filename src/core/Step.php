@@ -12,24 +12,20 @@ class Step
     private $callback;
     private readonly array $arguments;
 
-    public function __construct(int $delay = 0)
-    {
-        $this->delay = $delay;
-    }
-
     /**
      * Set the callback for the step with optional arguments.
      *
      * @param callable $callback The callback function or [class, method] array.
      * @param array $arguments Optional arguments to be passed to the callback.
-     * @throws \InvalidArgumentException If the callback is not callable or the function does not exist.
+     * @param int $delay Delay between this and the previous step.
      */
-    public function setCallback(callable $callback, array $arguments = []): void
+    public function __construct(callable $callback, array $arguments = [], int $delay = 0)
     {
+        $this->delay = $delay;
         $this->callback = $callback;
         $this->arguments = $arguments;
     }
-
+    
     /**
      * Execute the callback and return the result.
      *

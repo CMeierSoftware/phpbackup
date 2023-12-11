@@ -12,9 +12,8 @@ class StepTest extends TestCase
      */
     public function testSetCallbackWithInvalidCallback()
     {
-        $step = new Step();
         $this->expectException(\TypeError::class);
-        $step->setCallback('invalidCallback');
+        $step = new Step('invalidCallback');
     }
 
     /**
@@ -22,9 +21,8 @@ class StepTest extends TestCase
      */
     public function testSetCallbackWithNonexistentMethod()
     {
-        $step = new Step();
         $this->expectException(\TypeError::class);
-        $step->setCallback([StaticClass::class, 'nonexistentMethod']);
+        $step = new Step([StaticClass::class, 'nonexistentMethod']);
     }
 
     /**
@@ -32,12 +30,10 @@ class StepTest extends TestCase
      */
     public function testExecuteWithValidStaticCallback()
     {
-        $step = new Step();
-
+        
         $callback = [StaticClass::class, 'exampleMethod'];
         $arguments = ['Hello', 'World'];
-
-        $step->setCallback($callback, $arguments);
+        $step = new Step($callback, $arguments);
 
         // Execute the callback and assert the result
         $result = $step->execute();
@@ -48,29 +44,17 @@ class StepTest extends TestCase
      */
     public function testExecuteWithValidCallback()
     {
-        $step = new Step();
-
+        
         $obj = new StaticClass();
-
+        
         $callback = [$obj, 'exampleMethod'];
         $arguments = ['Hello', 'World'];
-
-        $step->setCallback($callback, $arguments);
+        
+        $step = new Step($callback, $arguments);
 
         // Execute the callback and assert the result
         $result = $step->execute();
         $this->assertEquals("Result: Hello World", $result);
-    }
-
-    /**
-     * @covers Step->execute()
-     */
-    public function testExecuteWithoutSettingCallback()
-    {
-        $step = new Step();
-
-        $this->expectException(\RuntimeException::class);
-        $step->execute();
     }
 }
 
