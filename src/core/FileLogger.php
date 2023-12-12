@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
+use CMS\PhpBackup\Helper\FileHelper;
+
 if (!defined('ABS_PATH')) {
     return;
 }
@@ -26,9 +28,14 @@ class FileLogger
      */
     protected function __construct(string $log_file, int $log_level, bool $echo_logs)
     {
-        $this->log_file = $log_file;
-        $this->log_level = $log_level;
-        $this->echo_logs = $echo_logs;
+        $this->SetLogFile($log_file);
+        $this->SetLogLevel($log_level);
+
+        if ($echo_logs) {
+            $this->ActivateEchoLogs();
+        } else {
+            $this->DeactivateEchoLogs();
+        }
     }
 
     /**
@@ -64,6 +71,7 @@ class FileLogger
     public function SetLogFile(string $log_file)
     {
         $this->log_file = $log_file;
+        FileHelper::makeDir(dirname($log_file));
         FileLogger::GetInstance()->Info("set log file to $log_file");
     }
 

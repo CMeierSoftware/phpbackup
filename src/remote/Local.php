@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Remote;
 
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 /**
@@ -15,7 +16,7 @@ class Local extends AbstractRemoteHandler
 
     public function __construct(string $remoteRootPath)
     {
-        mkdir($remoteRootPath, 0644, true);
+        FileHelper::makeDir($remoteRootPath);
         $this->remoteRootPath = realpath($remoteRootPath);
     }
 
@@ -73,9 +74,9 @@ class Local extends AbstractRemoteHandler
             $absolutePath = pathinfo($absolutePath, PATHINFO_DIRNAME);
         }
 
-        if (!is_dir($absolutePath)) {
+        if (!FileHelper::doesDirExists($absolutePath)) {
             // Create the directory and its parents if they don't exist
-            return mkdir($absolutePath, 0644, true);
+            FileHelper::makeDir($absolutePath);
         }
         return true;
     }

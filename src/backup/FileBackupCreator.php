@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Backup;
 
+use CMS\PhpBackup\Helper\FileHelper;
+
 if (!defined('ABS_PATH')) {
     return;
 }
@@ -83,7 +85,7 @@ class FileBackupCreator
     private function prepareBackup(string $src): string
     {
         $srcDir = realpath($src);
-        if (!$srcDir || !file_exists($srcDir)) {
+        if (!$srcDir || !FileHelper::doesDirExists($srcDir)) {
             throw new FileNotFoundException("Can not find '{$srcDir}'.");
         }
 
