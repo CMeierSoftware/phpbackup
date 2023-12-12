@@ -90,7 +90,7 @@ class AppConfig
     public function readTempData(string $type): mixed
     {
         $filePath = $this->getTempDir() . $type . '.xml';
-        
+
         if (!file_exists($filePath)) {
             throw new FileNotFoundException("Can not find {$filePath}.");
         }

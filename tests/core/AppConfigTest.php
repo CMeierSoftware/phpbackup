@@ -143,7 +143,7 @@ class AppConfigTest extends TestCase
         $type = 'test';
         $data = ['key' => 'value'];
 
-         $this->config->saveTempData($type, $data);
+        $this->config->saveTempData($type, $data);
 
         $filePath = self::TEST_TEMP_DIR . $type . '.xml';
         $this->assertFileExists($filePath);
@@ -157,7 +157,7 @@ class AppConfigTest extends TestCase
 
         $this->expectException(\TypeError::class);
         $this->config->saveTempData($type, $data);
-        
+
         $data = 'string';
         $this->expectException(\TypeError::class);
         $this->config->saveTempData($type, $data);
