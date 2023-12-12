@@ -18,6 +18,7 @@ abstract class FileBundleCreator
     {
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
         $directory = rtrim($directory, "/");
+        $directory = rtrim($directory, "\\");
 
         return self::packDirectory($directory, $sizeLimit);
     }
