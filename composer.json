@@ -21,6 +21,7 @@
     "require": {
         "laminas/laminas-config": "^3.9",
         "nelexa/zip": "^4.0",
-        "pcloud/pcloud-php-sdk": "^3.0"
+        "pcloud/pcloud-php-sdk": "^3.0",
+        "defuse/php-encryption": "^2.4"
     }    
 }
