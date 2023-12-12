@@ -75,6 +75,7 @@ class AppConfigTest extends TestCase
     {
         $expectedConfig = [
             'maxArchiveSize' => '5',
+            'encryptionKey' => 'some_random_Key',
         ];
 
         $actualConfig = $this->config->getBackupSettings();

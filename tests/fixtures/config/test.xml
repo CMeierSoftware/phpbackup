@@ -13,6 +13,7 @@
         </directory>
         <settings>
             <maxArchiveSize>5</maxArchiveSize>
+            <encryptionKey>some_random_Key</encryptionKey>
         </settings>
     </backup>
     <remote>
