@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "010b223cdb9f69a0248b25cd9271f8ff",
+    "content-hash": "7ef7f609dda3791f2745063ca4568eae",
     "packages": [
         {
             "name": "laminas/laminas-config",
@@ -205,6 +205,44 @@
                 "source": "https://github.com/Ne-Lexa/php-zip/tree/4.0.2"
             },
             "time": "2022-06-17T11:17:46+00:00"
+        },
+        {
+            "name": "pcloud/pcloud-php-sdk",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pCloud/pcloud-sdk-php.git",
+                "reference": "61fb9b98ca2db11ead4423ef16ce0ac5ea16225b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pCloud/pcloud-sdk-php/zipball/61fb9b98ca2db11ead4423ef16ce0ac5ea16225b",
+                "reference": "61fb9b98ca2db11ead4423ef16ce0ac5ea16225b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "9.5.11"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "pCloud\\Sdk\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "pCloud SDK for PHP",
+            "support": {
+                "issues": "https://github.com/pCloud/pcloud-sdk-php/issues",
+                "source": "https://github.com/pCloud/pcloud-sdk-php/tree/v3"
+            },
+            "time": "2022-10-06T13:02:11+00:00"
         },
         {
             "name": "psr/container",
