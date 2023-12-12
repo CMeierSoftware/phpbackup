@@ -14,7 +14,7 @@ class StepTest extends TestCase
     public function testSetCallbackWithInvalidCallback()
     {
         $this->expectException(\TypeError::class);
-        $step = new Step('invalidCallback');
+        new Step('invalidCallback');
     }
 
     /**
@@ -23,7 +23,7 @@ class StepTest extends TestCase
     public function testSetCallbackWithNonexistentMethod()
     {
         $this->expectException(\TypeError::class);
-        $step = new Step([StaticClass::class, 'nonexistentMethod']);
+        new Step([StaticClass::class, 'nonexistentMethod']);
     }
 
     /**

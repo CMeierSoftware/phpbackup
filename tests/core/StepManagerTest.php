@@ -5,11 +5,12 @@ namespace CMS\PhpBackup\Tests\Core;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\Step;
 use CMS\PhpBackup\Core\StepResult;
+use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 class StepManagerTest extends TestCase
 {
-    private const SYSTEM_PATH = __DIR__ . '/../work';
+    private const SYSTEM_PATH = ABS_PATH . 'tests\\work';
     private const STEP_FILE = self::SYSTEM_PATH . DIRECTORY_SEPARATOR . 'last.step';
     private array $steps = [];
 
@@ -21,9 +22,14 @@ class StepManagerTest extends TestCase
             $this->steps[] = $step;
         }
 
-        if (file_exists(self::STEP_FILE)) {
-            unlink(self::STEP_FILE);
-        }
+        FileHelper::makeDir(self::SYSTEM_PATH);
+        $this->assertFileExists(self::SYSTEM_PATH);
+        $this->assertFileDoesNotExist(self::STEP_FILE);
+    }
+
+    public function tearDown(): void
+    {
+        FileHelper::deleteDirectory(self::SYSTEM_PATH);
     }
 
     /**

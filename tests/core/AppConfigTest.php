@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 class AppConfigTest extends TestCase
@@ -20,7 +21,17 @@ class AppConfigTest extends TestCase
     {
         copy(self::TEST_EMPTY_CONFIG_FILE, CONFIG_DIR . '\\empty_app.xml');
         copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.xml');
+        $this->assertFileExists(self::TEST_CONFIG_FILE);
+        $this->assertFileExists(self::TEST_EMPTY_CONFIG_FILE);
+
         $this->config = AppConfig::loadAppConfig('valid_app');
+    }
+
+    public function tearDown(): void
+    {
+        FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        unlink(CONFIG_DIR . '\\empty_app.xml');
+        unlink(CONFIG_DIR . '\\valid_app.xml');
     }
 
     public function testLoadAppConfigSuccess(): void
@@ -66,6 +77,7 @@ class AppConfigTest extends TestCase
             $this->assertEquals($value, $actualConfig[$key]);
         }
     }
+
     public function testRemoteConfig(): void
     {
         $expectedConfig = [
@@ -111,7 +123,8 @@ class AppConfigTest extends TestCase
 
     public function testTempDir()
     {
-        rmdir(self::TEST_TEMP_DIR);
+        FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        $this->assertFileDoesNotExist(self::TEST_TEMP_DIR);
         $this->assertEquals(self::TEST_TEMP_DIR, $this->config->getTempDir());
         $this->assertFileExists(self::TEST_TEMP_DIR);
     }
@@ -164,7 +177,7 @@ class AppConfigTest extends TestCase
         $type = 'invalid';
 
         // Save invalid data to file for testing
-        file_put_contents($this->config->getTempDir() . $type . '.json', 'invalid_json_data');
+        file_put_contents($this->config->getTempDir() . $type . '.xml', 'invalid_json_data');
 
         $this->expectException(\JsonException::class);
         $this->config->readTempData($type);

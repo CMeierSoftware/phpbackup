@@ -76,9 +76,9 @@ class FileHelperTest extends TestCase
     {
         $this->assertFileExists(self::TEST_FILE);
         $this->assertFileExists(self::TEST_DIR);
-        
+
         FileHelper::deleteDirectory(self::TEST_DIR);
-        
+
         $this->assertFileDoesNotExist(self::TEST_FILE);
         $this->assertFileDoesNotExist(self::TEST_DIR);
     }

@@ -6,18 +6,24 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 use CMS\PhpBackup\Core\SystemLocker;
+use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 class SystemLockerTest extends TestCase
 {
-    private string $system_path = __DIR__ . '/../work';
+    private const TEST_DIR = ABS_PATH . 'tests\\work\\';
+    private const TEST_DIR2 = ABS_PATH . 'tests\\work2\\';
 
     public function setUp(): void
     {
-        // Clean up before each test
-        if (file_exists($this->system_path . '/.lock_system')) {
-            unlink($this->system_path . '/.lock_system');
-        }
+        FileHelper::makeDir(self::TEST_DIR);
+
+        $this->assertFileExists(self::TEST_DIR);
+    }
+
+    public function tearDown(): void
+    {
+        FileHelper::deleteDirectory(self::TEST_DIR);
     }
 
     /**
@@ -29,18 +35,14 @@ class SystemLockerTest extends TestCase
      */
     public function testLockSystem()
     {
-        // Lock the system
-        SystemLocker::lock($this->system_path);
+        SystemLocker::lock(self::TEST_DIR);
 
-        // Assert that the system is locked
-        $this->assertTrue(SystemLocker::isLocked($this->system_path));
+        $this->assertTrue(SystemLocker::isLocked(self::TEST_DIR));
 
-        // Assert that reading the lock file returns a timestamp
-        $lockTimestamp = SystemLocker::readLockFile($this->system_path);
+        $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
         $this->assertNotEmpty($lockTimestamp);
 
-        // Clean up: Unlock the system
-        SystemLocker::unlock($this->system_path);
+        SystemLocker::unlock(self::TEST_DIR);
     }
 
     /**
@@ -50,15 +52,12 @@ class SystemLockerTest extends TestCase
      */
     public function testLockedExceptionOnDoubleLock()
     {
-        // Lock the system
-        SystemLocker::lock($this->system_path);
+        SystemLocker::lock(self::TEST_DIR);
 
-        // Attempt to lock the system again, expect SystemLockedException
         $this->expectException(SystemAlreadyLockedException::class);
-        SystemLocker::lock($this->system_path);
+        SystemLocker::lock(self::TEST_DIR);
 
-        // Clean up: Unlock the system
-        SystemLocker::unlock($this->system_path);
+        SystemLocker::unlock(self::TEST_DIR);
     }
 
     /**
@@ -67,25 +66,21 @@ class SystemLockerTest extends TestCase
      */
     public function testUnlockDoesNotAffectOtherLocks()
     {
-        $otherSystemPath = __DIR__ . '/../work2';
-        mkdir($otherSystemPath);
+        FileHelper::makeDir(self::TEST_DIR2);
+        $this->assertFileExists(self::TEST_DIR2);
         try {
-            // Lock the system
-            SystemLocker::lock($this->system_path);
+            SystemLocker::lock(self::TEST_DIR);
 
-            // Create another instance with a different path
-            SystemLocker::lock($otherSystemPath);
+            SystemLocker::lock(self::TEST_DIR2);
+            $this->assertTrue(SystemLocker::isLocked(self::TEST_DIR));
 
-            // Unlock the system with the other path
-            SystemLocker::unlock($otherSystemPath);
+            SystemLocker::unlock(self::TEST_DIR2);
 
-            // Assert that the original system is still locked
-            $this->assertTrue(SystemLocker::isLocked($this->system_path));
+            $this->assertTrue(SystemLocker::isLocked(self::TEST_DIR));
 
-            // Clean up: Unlock the original system
-            SystemLocker::unlock($this->system_path);
+            SystemLocker::unlock(self::TEST_DIR);
         } finally {
-            rmdir($otherSystemPath);
+            FileHelper::deleteDirectory(self::TEST_DIR2);
         }
     }
 
@@ -94,17 +89,13 @@ class SystemLockerTest extends TestCase
      */
     public function testReadLockFileWhenLocked()
     {
-        // Lock the system
-        SystemLocker::lock($this->system_path);
+        SystemLocker::lock(self::TEST_DIR);
 
-        // Read the lock file
-        $lockTimestamp = SystemLocker::readLockFile($this->system_path);
+        $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
 
-        // Assert that the lock timestamp is not empty
         $this->assertNotEmpty($lockTimestamp);
 
-        // Clean up: Unlock the system
-        SystemLocker::unlock($this->system_path);
+        SystemLocker::unlock(self::TEST_DIR);
     }
 
     /**
@@ -112,10 +103,8 @@ class SystemLockerTest extends TestCase
      */
     public function testReadLockFileWhenUnlocked()
     {
-        // Read the lock file when the system is not locked
-        $lockTimestamp = SystemLocker::readLockFile($this->system_path);
+        $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
 
-        // Assert that the lock timestamp is empty
         $this->assertEmpty($lockTimestamp);
     }
 }
