@@ -32,7 +32,7 @@ abstract class FileHelper
      */
     public static function makeDir(string $path, int $mode = 0644): void
     {
-        if (!is_dir($path) && !mkdir($path, $mode, true)) {
+        if ($path === '.' || !is_dir($path) && !mkdir($path, $mode, true)) {
             throw new Exception("Cannot create $path.");
         }
     }
@@ -45,6 +45,10 @@ abstract class FileHelper
      */
     public static function deleteDirectory(string $dirname)
     {
+        if (!self::doesDirExists($dirname)) {
+            return;
+        }
+
         $files = iterator_to_array(new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($dirname, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::CHILD_FIRST
