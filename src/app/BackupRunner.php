@@ -14,6 +14,7 @@ use CMS\PhpBackup\Backup\DatabaseBackupCreator;
 use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileBundleCreator;
+use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Core\Step;
 use CMS\PhpBackup\Core\StepResult;
 use CMS\PhpBackup\Remote\Local;
@@ -72,6 +73,8 @@ class BackupRunner extends AbstractRunner
         $result = $f->backupOnly($this->config->getBackupDirectory()['src'], $bundles[$idx]);
         $this->logger->Info("Archive files to '$result'");
 
+        FileCrypt::encryptFile($result, $this->config->getBackupSettings()["encryptionKey"]);
+
         $result = $this->copyToTempDir($result, "archive_part_{$idx}.zip");
 
         $archives[$result] = $bundles[$idx];
@@ -93,6 +96,8 @@ class BackupRunner extends AbstractRunner
             } else {
                 $this->logger->Info("Database dump to '$result'");
             }
+
+            FileCrypt::encryptFile($result, $this->config->getBackupSettings()["encryptionKey"]);
 
             $result = $this->copyToTempDir($result, basename($result));
 
@@ -120,6 +125,8 @@ class BackupRunner extends AbstractRunner
             $local->fileUpload($archivePath, $backupDirName);
             $uploadedFiles[basename($archivePath)] = $content;
         }
+
+        # todo: save uploadedFiles in remote storage
 
         return new StepResult('', false);
     }
