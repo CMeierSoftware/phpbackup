@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use Laminas\Config\Writer\Xml as XmlWriter;
+use Laminas\Config\Reader\Xml as XmlReader;
+use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
 
 if (!defined('ABS_PATH')) {
@@ -69,16 +72,12 @@ class AppConfig
      *
      * @return bool True on success, false on failure.
      */
-    public function saveTempData(string $type, mixed $data): bool
+    public function saveTempData(string $type, array $data): void
     {
-        $filePath = $this->getTempDir() . $type . '.json';
-        $jsonEncodedData = json_encode($data, JSON_PRETTY_PRINT);
-
-        if ($jsonEncodedData === false) {
-            throw new \JsonException('Could not encode data to json.');
-        }
-
-        return file_put_contents($filePath, $jsonEncodedData) !== false;
+        $filePath = $this->getTempDir() . $type . '.xml';
+        $config = new Config($data, false);
+        $writer = new XmlWriter();
+        $writer->toFile($filePath, $config);
     }
 
     /**
@@ -90,20 +89,13 @@ class AppConfig
      */
     public function readTempData(string $type): mixed
     {
-        $filePath = $this->getTempDir() . $type . '.json';
-
+        $filePath = $this->getTempDir() . $type . '.xml';
+        
         if (!file_exists($filePath)) {
             throw new FileNotFoundException("Can not find {$filePath}.");
         }
-
-        $jsonData = file_get_contents($filePath);
-        $decodedData = json_decode($jsonData, true);
-
-        if ($decodedData === null) {
-            throw new \JsonException('Could not decode data to json.');
-
-        }
-
-        return $decodedData;
+        $reader = new XmlReader();
+        $data   = $reader->fromFile($filePath);
+        return $data;
     }
 }

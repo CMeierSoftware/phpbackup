@@ -7,10 +7,12 @@ namespace CMS\PhpBackup\Tests;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
+use Laminas\Config\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 class AppConfigTest extends TestCase
 {
+    private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\temp_test.xml';
     private const TEST_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test.xml';
     private const TEST_EMPTY_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\empty_config.xml';
     private const TEST_TEMP_DIR = CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
@@ -29,7 +31,7 @@ class AppConfigTest extends TestCase
 
     public function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        //FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
         unlink(CONFIG_DIR . '\\empty_app.xml');
         unlink(CONFIG_DIR . '\\valid_app.xml');
     }
@@ -43,6 +45,13 @@ class AppConfigTest extends TestCase
     public function testLoadAppConfigFailure(): void
     {
         $nonExistentAppConfig = AppConfig::loadAppConfig('non_existent_app');
+        $this->assertNull($nonExistentAppConfig);
+    }
+
+    public function testLoadAppConfigWrongFileFormat(): void
+    {
+        rename(CONFIG_DIR . '\\valid_app.xml', CONFIG_DIR . '\\valid_app.json');
+        $nonExistentAppConfig = AppConfig::loadAppConfig('valid_app');
         $this->assertNull($nonExistentAppConfig);
     }
 
@@ -134,12 +143,11 @@ class AppConfigTest extends TestCase
         $type = 'test';
         $data = ['key' => 'value'];
 
-        $result = $this->config->saveTempData($type, $data);
+         $this->config->saveTempData($type, $data);
 
-        $this->assertTrue($result);
-        $filePath = self::TEST_TEMP_DIR . $type . '.json';
+        $filePath = self::TEST_TEMP_DIR . $type . '.xml';
         $this->assertFileExists($filePath);
-        $this->assertJsonStringEqualsJsonFile($filePath, json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertXmlFileEqualsXmlFile(self::TEST_TEMP_TEST_RESULT, $filePath);
     }
 
     public function testSaveTempDataThrowsJsonExceptionOnInvalidData()
@@ -147,7 +155,11 @@ class AppConfigTest extends TestCase
         $type = 'invalid';
         $data = fopen('php://stdin', 'r');
 
-        $this->expectException(\JsonException::class);
+        $this->expectException(\TypeError::class);
+        $this->config->saveTempData($type, $data);
+        
+        $data = 'string';
+        $this->expectException(\TypeError::class);
         $this->config->saveTempData($type, $data);
     }
 
@@ -177,9 +189,9 @@ class AppConfigTest extends TestCase
         $type = 'invalid';
 
         // Save invalid data to file for testing
-        file_put_contents($this->config->getTempDir() . $type . '.xml', 'invalid_json_data');
+        file_put_contents($this->config->getTempDir() . $type . '.xml', 'invalid_xml_data');
 
-        $this->expectException(\JsonException::class);
+        $this->expectException(RuntimeException::class);
         $this->config->readTempData($type);
     }
 
