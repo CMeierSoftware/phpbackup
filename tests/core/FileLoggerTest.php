@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;
+use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,12 +14,15 @@ use PHPUnit\Framework\TestCase;
  */
 class FileLoggerTest extends TestCase
 {
-    private const LOG_FILE_PATH = ABS_PATH . 'tests\\work\\f.log';
+    private const WORK_PATH = ABS_PATH . 'tests\\work';
+    private const LOG_FILE_PATH = self::WORK_PATH . '\\f.log';
 
     private FileLogger $logger;
 
     protected function setUp(): void
     {
+        FileHelper::makeDir(self::WORK_PATH);
+        $this->assertFileExists(self::WORK_PATH);
         // clean the instance of the singleton to make mocking possible
         $ref = new \ReflectionProperty('CMS\PhpBackup\Core\FileLogger', 'instance');
         $ref->setAccessible(true);
@@ -31,7 +35,7 @@ class FileLoggerTest extends TestCase
 
     public function tearDown(): void
     {
-        unlink(self::LOG_FILE_PATH);
+        FileHelper::deleteDirectory(self::WORK_PATH);
     }
 
     /**

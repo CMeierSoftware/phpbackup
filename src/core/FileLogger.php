@@ -15,9 +15,9 @@ class FileLogger
     public const DEFAULT_LOG_FILE = './logs.txt';
 
     protected static ?FileLogger $instance = null;
-    private string $log_file;
-    private int $log_level;
-    private bool $echo_logs;
+    private string $log_file = self::DEFAULT_LOG_FILE;
+    private int $log_level = LogLevel::WARNING;
+    private bool $echo_logs = false;
 
     /**
      * Constructs the logger instance.
@@ -28,6 +28,7 @@ class FileLogger
      */
     protected function __construct(string $log_file, int $log_level, bool $echo_logs)
     {
+        // $this->log_file = $log_file;
         $this->SetLogFile($log_file);
         $this->SetLogLevel($log_level);
 
@@ -72,7 +73,7 @@ class FileLogger
     {
         $this->log_file = $log_file;
         FileHelper::makeDir(dirname($log_file));
-        FileLogger::GetInstance()->Info("set log file to $log_file");
+        $this->Info("set log file to $log_file");
     }
 
     /**
@@ -98,7 +99,7 @@ class FileLogger
      */
     public function SetLogLevel(int $log_level): void
     {
-        self::GetInstance()->Info('set log level to ' . LogLevel::toString($log_level));
+        $this->Info('set log level to ' . LogLevel::toString($log_level));
         $this->log_level = $log_level;
     }
 
