@@ -65,10 +65,8 @@ class FileHelperTest extends TestCase
 
     public function testMakeDirCurrentDirectory()
     {
-        // Attempt to create the current directory, which should not be allowed
+        // Attempt to create the current directory, which should just be ignored
         $currentDir = '.';
-
-        $this->expectException(Exception::class);
         FileHelper::makeDir($currentDir);
     }
 

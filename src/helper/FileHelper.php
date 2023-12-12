@@ -32,7 +32,10 @@ abstract class FileHelper
      */
     public static function makeDir(string $path, int $mode = 0644): void
     {
-        if ($path === '.' || !is_dir($path) && !mkdir($path, $mode, true)) {
+        if ($path === '.') {
+            return;
+        }
+        if (!is_dir($path) && !mkdir($path, $mode, true)) {
             throw new Exception("Cannot create $path.");
         }
     }
