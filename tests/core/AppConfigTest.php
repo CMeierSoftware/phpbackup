@@ -92,6 +92,7 @@ class AppConfigTest extends TestCase
     {
         $expectedConfig = [
             'local' => ['rootDir' => ''],
+            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name'],
         ];
 
         $actualConfig = $this->config->getRemoteSettings();

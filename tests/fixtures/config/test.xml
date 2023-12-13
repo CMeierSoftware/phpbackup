@@ -20,5 +20,10 @@
         <local>
             <rootDir></rootDir>
         </local>
+        <backblaze>
+            <accountId>some_id</accountId>
+            <applicationKey>some_key</applicationKey>
+            <bucketName>some_name</bucketName>
+        </backblaze>
     </remote>
 </config>
