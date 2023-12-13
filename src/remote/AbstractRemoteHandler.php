@@ -7,13 +7,14 @@ namespace CMS\PhpBackup\Remote;
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\RemoteStorageNotConnectedException;
+use CMS\PhpBackup\Helper\FileHelper;
 
 /**
  * Class AbstractRemoteHandler - Abstract class for handling remote operations.
  */
 abstract class AbstractRemoteHandler
 {
-    /** @var bool|null The connection status. */
+    /** @var mixed|null The connection status. */
     protected $connection = null;
 
     /**
@@ -83,6 +84,8 @@ abstract class AbstractRemoteHandler
         } elseif (file_exists($localFilePath)) {
             throw new FileAlreadyExistsException("The file '{$localFilePath}' already exists on local storage.");
         }
+
+        FileHelper::makeDir(dirname($localFilePath));
 
         return $this->_fileDownload($localFilePath, $remoteFilePath);
     }
