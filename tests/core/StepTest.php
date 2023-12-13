@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\Step
  */
-class StepTest extends TestCase
+final class StepTest extends TestCase
 {
     /**
      * @covers \CMS\PhpBackup\Core\Step::setCallback()
@@ -44,9 +44,9 @@ class StepTest extends TestCase
 
         // Execute the callback and assert the result
         $result = $step->execute();
-        $this->assertInstanceOf(StepResult::class, $result);
-        $this->assertEquals('Result: Hello World', $result->returnValue);
-        $this->assertFalse($result->repeat);
+        self::assertInstanceOf(StepResult::class, $result);
+        self::assertSame('Result: Hello World', $result->returnValue);
+        self::assertFalse($result->repeat);
     }
 
     /**
@@ -63,9 +63,9 @@ class StepTest extends TestCase
 
         // Execute the callback and assert the result
         $result = $step->execute();
-        $this->assertInstanceOf(StepResult::class, $result);
-        $this->assertEquals('Result: Hello World', $result->returnValue);
-        $this->assertFalse($result->repeat);
+        self::assertInstanceOf(StepResult::class, $result);
+        self::assertSame('Result: Hello World', $result->returnValue);
+        self::assertFalse($result->repeat);
     }
 }
 

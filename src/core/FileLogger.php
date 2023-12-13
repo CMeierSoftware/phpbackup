@@ -53,7 +53,7 @@ class FileLogger
      *
      * @return FileLogger the singleton instance of the logger
      */
-    public static function getInstance(string $log_file = self::DEFAULT_LOG_FILE, int $log_level = LogLevel::WARNING, bool $echo_logs = false): FileLogger
+    public static function getInstance(string $log_file = self::DEFAULT_LOG_FILE, int $log_level = LogLevel::WARNING, bool $echo_logs = false): self
     {
         if (null === self::$instance) {
             self::$instance = new self($log_file, $log_level, $echo_logs);

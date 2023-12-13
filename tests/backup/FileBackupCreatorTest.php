@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Backup\FileBackupCreator
  */
-class FileBackupCreatorTest extends TestCase
+final class FileBackupCreatorTest extends TestCase
 {
     private const FIXTURES_DIR = ABS_PATH . '\tests\fixtures';
     private FileBackupCreator $backupCreator;
@@ -40,9 +40,9 @@ class FileBackupCreatorTest extends TestCase
         $backupCreator = new FileBackupCreator(['file1.txt', 'picture1.png']);
 
         $filename = $backupCreator->backupAll(self::FIXTURES_DIR . '\zip');
-        $this->assertFileExists($filename);
-        $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-        $this->assertStringEndsWith('.zip', $filename);
+        self::assertFileExists($filename);
+        self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+        self::assertStringEndsWith('.zip', $filename);
         // check manually if the files are not included
     }
 
@@ -53,9 +53,9 @@ class FileBackupCreatorTest extends TestCase
     {
         try {
             $filename = $this->backupCreator->backupAll(self::FIXTURES_DIR . '\zip');
-            $this->assertFileExists($filename);
-            $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-            $this->assertStringEndsWith('.zip', $filename);
+            self::assertFileExists($filename);
+            self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+            self::assertStringEndsWith('.zip', $filename);
         } finally {
             unlink($filename);
         }
@@ -68,8 +68,8 @@ class FileBackupCreatorTest extends TestCase
     {
         $files = ['file1.txt', 'pictures\\pics1.txt', 'pictures\\others\\others.1.txt', 'pictures\\others\\others2.txt'];
         $filename = $this->backupCreator->backupOnly(self::FIXTURES_DIR . '\zip', $files);
-        $this->assertFileExists($filename);
-        $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-        $this->assertStringEndsWith('.zip', $filename);
+        self::assertFileExists($filename);
+        self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+        self::assertStringEndsWith('.zip', $filename);
     }
 }

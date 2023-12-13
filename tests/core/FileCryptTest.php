@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\FileCrypt
  */
-class FileCryptTest extends TestCase
+final class FileCryptTest extends TestCase
 {
     private const TEST_KEY = 'your_secret_key';
     private const TEST_WORK_DIR = ABS_PATH . 'tests\\work\\';
@@ -27,11 +27,11 @@ class FileCryptTest extends TestCase
         copy(ABS_PATH . 'tests\\fixtures\\zip\\file1.txt', self::TEST_FILE_PLAIN);
         copy(ABS_PATH . 'tests\\fixtures\\encryption\\encrypted_file1.txt', self::TEST_FILE_ENCRYPTED);
 
-        $this->assertFileExists(self::TEST_FILE_PLAIN);
-        $this->assertFileExists(self::TEST_FILE_ENCRYPTED);
+        self::assertFileExists(self::TEST_FILE_PLAIN);
+        self::assertFileExists(self::TEST_FILE_ENCRYPTED);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::TEST_WORK_DIR);
     }
@@ -54,8 +54,8 @@ class FileCryptTest extends TestCase
     public function testFileEncryption()
     {
         FileCrypt::encryptFile(self::TEST_FILE_PLAIN, self::TEST_KEY);
-        $this->assertFileExists(self::TEST_FILE_PLAIN);
-        $this->assertFileNotEquals(self::TEST_FILE_PLAIN, ABS_PATH . 'tests\\fixtures\\zip\\file1.txt');
+        self::assertFileExists(self::TEST_FILE_PLAIN);
+        self::assertFileNotEquals(self::TEST_FILE_PLAIN, ABS_PATH . 'tests\\fixtures\\zip\\file1.txt');
     }
 
     /** * @covers \CMS\PhpBackup\Core\FileCrypt::decryptFile
@@ -64,7 +64,7 @@ class FileCryptTest extends TestCase
     public function testFileDecryption()
     {
         FileCrypt::decryptFile(self::TEST_FILE_ENCRYPTED, self::TEST_KEY);
-        $this->assertFileExists(self::TEST_FILE_ENCRYPTED);
-        $this->assertFileEquals(self::TEST_FILE_PLAIN, self::TEST_FILE_ENCRYPTED);
+        self::assertFileExists(self::TEST_FILE_ENCRYPTED);
+        self::assertFileEquals(self::TEST_FILE_PLAIN, self::TEST_FILE_ENCRYPTED);
     }
 }

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\FileLogger
  */
-class FileLoggerTest extends TestCase
+final class FileLoggerTest extends TestCase
 {
     private const WORK_PATH = ABS_PATH . 'tests\\work';
     private const LOG_FILE_PATH = self::WORK_PATH . '\\f.log';
@@ -24,7 +24,7 @@ class FileLoggerTest extends TestCase
     protected function setUp(): void
     {
         FileHelper::makeDir(self::WORK_PATH);
-        $this->assertFileExists(self::WORK_PATH);
+        self::assertFileExists(self::WORK_PATH);
         // clean the instance of the singleton to make mocking possible
         $ref = new \ReflectionProperty('CMS\PhpBackup\Core\FileLogger', 'instance');
         $ref->setAccessible(true);
@@ -35,7 +35,7 @@ class FileLoggerTest extends TestCase
         $this->logger->SetLogLevel(LogLevel::INFO);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::WORK_PATH);
     }
@@ -48,9 +48,9 @@ class FileLoggerTest extends TestCase
         $instance1 = FileLogger::getInstance();
         $instance2 = FileLogger::getInstance();
 
-        $this->assertInstanceOf(FileLogger::class, $instance1);
-        $this->assertInstanceOf(FileLogger::class, $instance2);
-        $this->assertEquals($instance1, $instance2);
+        self::assertInstanceOf(FileLogger::class, $instance1);
+        self::assertInstanceOf(FileLogger::class, $instance2);
+        self::assertSame($instance1, $instance2);
     }
 
     /**
@@ -67,17 +67,17 @@ class FileLoggerTest extends TestCase
         $message = 'This is a message';
         $this->logger->setLogLevel(LogLevel::INFO);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringStartsWith(LogLevel::toString(LogLevel::INFO), $log_file_content);
-        $this->assertStringEndsWith("set log level to INFO\n", $log_file_content);
+        self::assertStringStartsWith(LogLevel::toString(LogLevel::INFO), $log_file_content);
+        self::assertStringEndsWith("set log level to INFO\n", $log_file_content);
 
         $this->logger->Error($message);
         $this->logger->Warning($message);
         $this->logger->Info($message);
 
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
-        $this->assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
-        $this->assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
+        self::assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
+        self::assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
+        self::assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
 
         $this->logger->SetLogLevel(LogLevel::WARNING);
         // unlink after changing the level, because SetLogLevel will also create a Info
@@ -88,9 +88,9 @@ class FileLoggerTest extends TestCase
         $this->logger->Info($message);
         // Assert that the log entry is written to the file
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
-        $this->assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
-        $this->assertStringNotContainsString(LogLevel::toString(LogLevel::INFO), $log_file_content);
+        self::assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
+        self::assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
+        self::assertStringNotContainsString(LogLevel::toString(LogLevel::INFO), $log_file_content);
     }
 
     /**
@@ -108,10 +108,10 @@ class FileLoggerTest extends TestCase
         $this->logger->Error($errorMessage);
         $output = ob_get_clean();
         // Assert that the log entry is written to the file
-        $this->assertFileExists(self::LOG_FILE_PATH);
+        self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringContainsString($errorMessage, $log_file_content);
-        $this->assertEquals($output, $log_file_content . '<br>');
+        self::assertStringContainsString($errorMessage, $log_file_content);
+        self::assertSame($output, $log_file_content . '<br>');
     }
 
     /**
@@ -131,10 +131,10 @@ class FileLoggerTest extends TestCase
         $this->logger->error($errorMessage);
         $output = ob_get_clean();
         // Assert that the log entry is written to the file
-        $this->assertEmpty($output);
-        $this->assertFileExists(self::LOG_FILE_PATH);
+        self::assertEmpty($output);
+        self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringContainsString($errorMessage, $log_file_content);
+        self::assertStringContainsString($errorMessage, $log_file_content);
     }
 
     /**
@@ -149,10 +149,10 @@ class FileLoggerTest extends TestCase
         $this->logger->error($errorMessage);
 
         // Assert that the log entry is written to the file
-        $this->assertFileExists(self::LOG_FILE_PATH);
+        self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringStartsWith(LogLevel::toString(LogLevel::ERROR), $log_file_content);
-        $this->assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringStartsWith(LogLevel::toString(LogLevel::ERROR), $log_file_content);
+        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
     }
 
     /**
@@ -167,10 +167,10 @@ class FileLoggerTest extends TestCase
         $this->logger->Warning($errorMessage);
 
         // Assert that the log entry is written to the file
-        $this->assertFileExists(self::LOG_FILE_PATH);
+        self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringStartsWith(LogLevel::toString(LogLevel::WARNING), $log_file_content);
-        $this->assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringStartsWith(LogLevel::toString(LogLevel::WARNING), $log_file_content);
+        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
     }
 
     /**
@@ -185,9 +185,9 @@ class FileLoggerTest extends TestCase
         $this->logger->Info($errorMessage);
 
         // Assert that the log entry is written to the file
-        $this->assertFileExists(self::LOG_FILE_PATH);
+        self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        $this->assertStringStartsWith(LogLevel::toString(LogLevel::INFO), $log_file_content);
-        $this->assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringStartsWith(LogLevel::toString(LogLevel::INFO), $log_file_content);
+        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
     }
 }

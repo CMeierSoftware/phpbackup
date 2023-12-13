@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Helper\FileHelper
  */
-class FileHelperTest extends TestCase
+final class FileHelperTest extends TestCase
 {
     private const FIXTURES_DIR = ABS_PATH . '\\tests\\fixtures\\';
     private const TEST_DIR = ABS_PATH . 'tests\\work\\test_directory\\';
@@ -23,8 +23,8 @@ class FileHelperTest extends TestCase
         // Create a temporary test directory for the tests
         FileHelper::makeDir(self::TEST_DIR);
         copy(self::FIXTURES_DIR . 'zip\\file1.txt', self::TEST_FILE);
-        $this->assertFileExists(self::TEST_DIR);
-        $this->assertFileExists(self::TEST_FILE);
+        self::assertFileExists(self::TEST_DIR);
+        self::assertFileExists(self::TEST_FILE);
     }
 
     protected function tearDown(): void
@@ -44,9 +44,9 @@ class FileHelperTest extends TestCase
 
         FileHelper::moveFile(self::TEST_FILE, $dest);
 
-        $this->assertFileExists($dest);
-        $this->assertFileDoesNotExist(self::TEST_FILE);
-        $this->assertTrue(is_file($dest));
+        self::assertFileExists($dest);
+        self::assertFileDoesNotExist(self::TEST_FILE);
+        self::assertTrue(is_file($dest));
     }
 
     /**
@@ -70,8 +70,8 @@ class FileHelperTest extends TestCase
 
         FileHelper::makeDir($newDir);
 
-        $this->assertFileExists($newDir);
-        $this->assertTrue(is_dir($newDir));
+        self::assertFileExists($newDir);
+        self::assertTrue(is_dir($newDir));
     }
 
     /**
@@ -89,13 +89,13 @@ class FileHelperTest extends TestCase
      */
     public function testDeleteDirectorySuccess()
     {
-        $this->assertFileExists(self::TEST_FILE);
-        $this->assertFileExists(self::TEST_DIR);
+        self::assertFileExists(self::TEST_FILE);
+        self::assertFileExists(self::TEST_DIR);
 
         FileHelper::deleteDirectory(self::TEST_DIR);
 
-        $this->assertFileDoesNotExist(self::TEST_FILE);
-        $this->assertFileDoesNotExist(self::TEST_DIR);
+        self::assertFileDoesNotExist(self::TEST_FILE);
+        self::assertFileDoesNotExist(self::TEST_DIR);
     }
 
     /**
@@ -103,9 +103,9 @@ class FileHelperTest extends TestCase
      */
     public function testDeleteDirectoryNotExists()
     {
-        $this->assertFileDoesNotExist(self::TEST_DIR . 'Invalid');
+        self::assertFileDoesNotExist(self::TEST_DIR . 'Invalid');
         FileHelper::deleteDirectory(self::TEST_DIR . 'Invalid');
-        $this->assertFileDoesNotExist(self::TEST_DIR . 'Invalid');
+        self::assertFileDoesNotExist(self::TEST_DIR . 'Invalid');
     }
 
     /**
@@ -113,10 +113,10 @@ class FileHelperTest extends TestCase
      */
     public function testDoesDirExists()
     {
-        $this->assertTrue(FileHelper::doesDirExists(self::TEST_DIR));
+        self::assertTrue(FileHelper::doesDirExists(self::TEST_DIR));
 
         $nonExistingDir = self::TEST_DIR . '/nonexistent_directory';
-        $this->assertFalse(FileHelper::doesDirExists($nonExistingDir));
+        self::assertFalse(FileHelper::doesDirExists($nonExistingDir));
     }
 
     /**
@@ -126,7 +126,7 @@ class FileHelperTest extends TestCase
     {
         $filePath = self::TEST_DIR . '/file.txt';
         touch($filePath);
-        $this->assertFileExists($filePath);
+        self::assertFileExists($filePath);
 
         FileHelper::changePermission($filePath, 0o755);
 
@@ -148,6 +148,6 @@ class FileHelperTest extends TestCase
     {
         $actualMode = fileperms($filePath) & 0o777;
 
-        $this->assertEquals($expectedMode, $actualMode, "File permission mismatch for {$filePath}");
+        self::assertSame($expectedMode, $actualMode, "File permission mismatch for {$filePath}");
     }
 }

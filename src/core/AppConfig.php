@@ -28,7 +28,7 @@ class AppConfig
         $this->tempDir = $tempDir;
     }
 
-    public static function loadAppConfig(string $app): ?AppConfig
+    public static function loadAppConfig(string $app): ?self
     {
         $config_file = CONFIG_DIR . $app . '.xml';
         $tempDir = CONFIG_DIR . self::TMP_DIR . $app;

@@ -64,7 +64,7 @@ class Backblaze extends AbstractRemoteHandler
             'FileName' => $remoteFilePath,
             'BucketName' => $this->bucketName,
             'BucketId' => $this->bucketId,
-            'Body' => fopen($localFilePath, 'rb'),
+            'Body' => fopen($localFilePath, 'r'),
         ];
 
         $file = $this->connection->upload($options);

@@ -14,19 +14,19 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\SystemLocker
  */
-class SystemLockerTest extends TestCase
+final class SystemLockerTest extends TestCase
 {
     private const TEST_DIR = ABS_PATH . 'tests\\work\\';
     private const TEST_DIR2 = ABS_PATH . 'tests\\work2\\';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         FileHelper::makeDir(self::TEST_DIR);
 
-        $this->assertFileExists(self::TEST_DIR);
+        self::assertFileExists(self::TEST_DIR);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::TEST_DIR);
     }
@@ -41,10 +41,10 @@ class SystemLockerTest extends TestCase
     {
         SystemLocker::lock(self::TEST_DIR);
 
-        $this->assertTrue(SystemLocker::isLocked(self::TEST_DIR));
+        self::assertTrue(SystemLocker::isLocked(self::TEST_DIR));
 
         $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
-        $this->assertNotEmpty($lockTimestamp);
+        self::assertNotEmpty($lockTimestamp);
 
         SystemLocker::unlock(self::TEST_DIR);
     }
@@ -70,17 +70,17 @@ class SystemLockerTest extends TestCase
     public function testUnlockDoesNotAffectOtherLocks()
     {
         FileHelper::makeDir(self::TEST_DIR2);
-        $this->assertFileExists(self::TEST_DIR2);
+        self::assertFileExists(self::TEST_DIR2);
 
         try {
             SystemLocker::lock(self::TEST_DIR);
 
             SystemLocker::lock(self::TEST_DIR2);
-            $this->assertTrue(SystemLocker::isLocked(self::TEST_DIR));
+            self::assertTrue(SystemLocker::isLocked(self::TEST_DIR));
 
             SystemLocker::unlock(self::TEST_DIR2);
 
-            $this->assertTrue(SystemLocker::isLocked(self::TEST_DIR));
+            self::assertTrue(SystemLocker::isLocked(self::TEST_DIR));
 
             SystemLocker::unlock(self::TEST_DIR);
         } finally {
@@ -97,7 +97,7 @@ class SystemLockerTest extends TestCase
 
         $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
 
-        $this->assertNotEmpty($lockTimestamp);
+        self::assertNotEmpty($lockTimestamp);
 
         SystemLocker::unlock(self::TEST_DIR);
     }
@@ -109,6 +109,6 @@ class SystemLockerTest extends TestCase
     {
         $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
 
-        $this->assertEmpty($lockTimestamp);
+        self::assertEmpty($lockTimestamp);
     }
 }

@@ -12,7 +12,7 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
-        '@PhpCsFixer' => true,
+        '@PhpCsFixer:risky' => true,
         'align_multiline_comment' => ['comment_type' => 'all_multiline'],
         'phpdoc_align' => ['align' => 'left'],
         'concat_space' => ['spacing' => 'one'],
@@ -26,6 +26,8 @@ return (new PhpCsFixer\Config())
         'trim_array_spaces' => true,
         'octal_notation' => true,
         'declare_strict_types' => true,
+        'native_constant_invocation' => false,
+        'native_function_invocation' => false,
     ])
     ->setFinder($finder)
     ->setUsingCache(false)

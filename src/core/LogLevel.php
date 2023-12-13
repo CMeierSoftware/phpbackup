@@ -25,16 +25,16 @@ abstract class LogLevel
     public static function toString(int $level): string
     {
         switch ($level) {
-            case LogLevel::OFF:
+            case self::OFF:
                 return 'OFF';
 
-            case LogLevel::ERROR:
+            case self::ERROR:
                 return 'ERROR';
 
-            case LogLevel::WARNING:
+            case self::WARNING:
                 return 'WARNING';
 
-            case LogLevel::INFO:
+            case self::INFO:
                 return 'INFO';
 
             default:

@@ -136,7 +136,7 @@ abstract class AbstractRemoteHandler
      */
     public function isConnected(): bool
     {
-        return !(is_null($this->connection) || false === $this->connection);
+        return !(null === $this->connection || false === $this->connection);
     }
 
     /**

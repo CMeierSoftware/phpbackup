@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator
  */
-class DatabaseBackupCreatorTest extends TestCase
+final class DatabaseBackupCreatorTest extends TestCase
 {
     private const HOST = 'localhost';
     private const USERNAME = 'root';
@@ -52,10 +52,10 @@ class DatabaseBackupCreatorTest extends TestCase
         try {
             $backupFile = $this->backupCreator->backupMySql('None');
             // Assert that the backup file exists
-            $this->assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
-            $this->assertStringEndsWith('.sql', $backupFile);
-            $this->assertFileExists($backupFile);
-            $this->assertNotEmpty(file_get_contents($backupFile));
+            self::assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
+            self::assertStringEndsWith('.sql', $backupFile);
+            self::assertFileExists($backupFile);
+            self::assertNotEmpty(file_get_contents($backupFile));
         } finally {
             unlink($backupFile);
         }

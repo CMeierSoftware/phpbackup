@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\StepManager
  */
-class StepManagerTest extends TestCase
+final class StepManagerTest extends TestCase
 {
     private const SYSTEM_PATH = ABS_PATH . 'tests\\work';
     private const STEP_FILE = self::SYSTEM_PATH . DIRECTORY_SEPARATOR . 'last.step';
@@ -30,11 +30,11 @@ class StepManagerTest extends TestCase
         }
 
         FileHelper::makeDir(self::SYSTEM_PATH);
-        $this->assertFileExists(self::SYSTEM_PATH);
-        $this->assertFileDoesNotExist(self::STEP_FILE);
+        self::assertFileExists(self::SYSTEM_PATH);
+        self::assertFileDoesNotExist(self::STEP_FILE);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::SYSTEM_PATH);
     }
@@ -71,10 +71,10 @@ class StepManagerTest extends TestCase
         for ($i = 0; $i < count($this->steps); ++$i) {
             $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
             $result = $stepManager->executeNextStep();
-            $this->assertEquals('Result: Hello World ' . strval($i), $result);
+            self::assertSame('Result: Hello World ' . (string) $i, $result);
         }
         $result = $stepManager->executeNextStep();
-        $this->assertEquals('Result: Hello World 9', $result);
+        self::assertSame('Result: Hello World 9', $result);
     }
 
     /**
@@ -84,14 +84,14 @@ class StepManagerTest extends TestCase
     {
         $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
-        $this->assertEquals('Result: Hello World 0', $result);
+        self::assertSame('Result: Hello World 0', $result);
         $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
-        $this->assertEquals('Result: Hello World 1', $result);
+        self::assertSame('Result: Hello World 1', $result);
         array_pop($this->steps);
         $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
-        $this->assertEquals('Result: Hello World 0', $result);
+        self::assertSame('Result: Hello World 0', $result);
     }
 }
 

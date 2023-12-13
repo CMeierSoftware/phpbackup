@@ -28,12 +28,12 @@ abstract class SystemLocker
 
         $result = file_put_contents(self::getLockFilePath($system_path), LOCK_TS);
 
-        if (false === $result and !self::isLocked($system_path)) {
+        if (false === $result && !self::isLocked($system_path)) {
             throw new \Exception('System-Locker: Can not lock system.');
         }
     }
 
-    /*
+    /**
      * Function checks if the system is locked.
      * @return bool is system locked
      */
@@ -53,9 +53,9 @@ abstract class SystemLocker
         }
     }
 
-    /*
+    /**
      * Function reads content of the lock file
-     * @return The entire file in a string, FALSE on failure
+     * @return string The entire file in a string, FALSE on failure
      */
     public static function readLockFile(string $system_path): string
     {

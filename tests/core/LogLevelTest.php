@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\LogLevel
  */
-class LogLevelTest extends TestCase
+final class LogLevelTest extends TestCase
 {
     /**
      * @covers \CMS\PhpBackup\Core\LogLevel::ERROR
@@ -22,10 +22,10 @@ class LogLevelTest extends TestCase
      */
     public function testLogLevelsConstants()
     {
-        $this->assertEquals(0, LogLevel::OFF);
-        $this->assertEquals(1, LogLevel::ERROR);
-        $this->assertEquals(2, LogLevel::WARNING);
-        $this->assertEquals(3, LogLevel::INFO);
+        self::assertSame(0, LogLevel::OFF);
+        self::assertSame(1, LogLevel::ERROR);
+        self::assertSame(2, LogLevel::WARNING);
+        self::assertSame(3, LogLevel::INFO);
     }
 
     /**
@@ -34,7 +34,7 @@ class LogLevelTest extends TestCase
     public function testToStringForOff()
     {
         $result = LogLevel::toString(LogLevel::OFF);
-        $this->assertEquals('OFF', $result);
+        self::assertSame('OFF', $result);
     }
 
     /**
@@ -43,7 +43,7 @@ class LogLevelTest extends TestCase
     public function testToStringForError()
     {
         $result = LogLevel::toString(LogLevel::ERROR);
-        $this->assertEquals('ERROR', $result);
+        self::assertSame('ERROR', $result);
     }
 
     /**
@@ -52,7 +52,7 @@ class LogLevelTest extends TestCase
     public function testToStringForWarning()
     {
         $result = LogLevel::toString(LogLevel::WARNING);
-        $this->assertEquals('WARNING', $result);
+        self::assertSame('WARNING', $result);
     }
 
     /**
@@ -61,7 +61,7 @@ class LogLevelTest extends TestCase
     public function testToStringForInfo()
     {
         $result = LogLevel::toString(LogLevel::INFO);
-        $this->assertEquals('INFO', $result);
+        self::assertSame('INFO', $result);
     }
 
     /**

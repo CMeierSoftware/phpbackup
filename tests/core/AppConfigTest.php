@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\AppConfig
  */
-class AppConfigTest extends TestCase
+final class AppConfigTest extends TestCase
 {
     private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\temp_test.xml';
     private const TEST_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test.xml';
@@ -28,13 +28,13 @@ class AppConfigTest extends TestCase
     {
         copy(self::TEST_EMPTY_CONFIG_FILE, CONFIG_DIR . '\\empty_app.xml');
         copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.xml');
-        $this->assertFileExists(self::TEST_CONFIG_FILE);
-        $this->assertFileExists(self::TEST_EMPTY_CONFIG_FILE);
+        self::assertFileExists(self::TEST_CONFIG_FILE);
+        self::assertFileExists(self::TEST_EMPTY_CONFIG_FILE);
 
         $this->config = AppConfig::loadAppConfig('valid_app');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         // FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
         unlink(CONFIG_DIR . '\\empty_app.xml');
@@ -47,7 +47,7 @@ class AppConfigTest extends TestCase
     public function testLoadAppConfigSuccess(): void
     {
         $appConfig = AppConfig::loadAppConfig('valid_app');
-        $this->assertInstanceOf(AppConfig::class, $appConfig);
+        self::assertInstanceOf(AppConfig::class, $appConfig);
     }
 
     /**
@@ -56,7 +56,7 @@ class AppConfigTest extends TestCase
     public function testLoadAppConfigFailure(): void
     {
         $nonExistentAppConfig = AppConfig::loadAppConfig('non_existent_app');
-        $this->assertNull($nonExistentAppConfig);
+        self::assertNull($nonExistentAppConfig);
     }
 
     /**
@@ -66,7 +66,7 @@ class AppConfigTest extends TestCase
     {
         rename(CONFIG_DIR . '\\valid_app.xml', CONFIG_DIR . '\\valid_app.json');
         $nonExistentAppConfig = AppConfig::loadAppConfig('valid_app');
-        $this->assertNull($nonExistentAppConfig);
+        self::assertNull($nonExistentAppConfig);
     }
 
     /**
@@ -80,11 +80,11 @@ class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getBackupDirectory();
 
-        $this->assertIsArray($actualConfig);
+        self::assertIsArray($actualConfig);
 
         foreach ($expectedConfig as $key => $value) {
-            $this->assertArrayHasKey($key, $actualConfig);
-            $this->assertEquals($value, $actualConfig[$key]);
+            self::assertArrayHasKey($key, $actualConfig);
+            self::assertSame($value, $actualConfig[$key]);
         }
     }
 
@@ -100,11 +100,11 @@ class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getBackupSettings();
 
-        $this->assertIsArray($actualConfig);
+        self::assertIsArray($actualConfig);
 
         foreach ($expectedConfig as $key => $value) {
-            $this->assertArrayHasKey($key, $actualConfig);
-            $this->assertEquals($value, $actualConfig[$key]);
+            self::assertArrayHasKey($key, $actualConfig);
+            self::assertSame($value, $actualConfig[$key]);
         }
     }
 
@@ -120,11 +120,11 @@ class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getRemoteSettings();
 
-        $this->assertIsArray($actualConfig);
+        self::assertIsArray($actualConfig);
 
         foreach ($expectedConfig as $key => $value) {
-            $this->assertArrayHasKey($key, $actualConfig);
-            $this->assertEquals($value, $actualConfig[$key]);
+            self::assertArrayHasKey($key, $actualConfig);
+            self::assertSame($value, $actualConfig[$key]);
         }
     }
 
@@ -143,11 +143,11 @@ class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getBackupDatabase();
 
-        $this->assertIsArray($actualConfig);
+        self::assertIsArray($actualConfig);
 
         foreach ($expectedConfig as $key => $value) {
-            $this->assertArrayHasKey($key, $actualConfig);
-            $this->assertEquals($value, $actualConfig[$key]);
+            self::assertArrayHasKey($key, $actualConfig);
+            self::assertSame($value, $actualConfig[$key]);
         }
     }
 
@@ -160,7 +160,7 @@ class AppConfigTest extends TestCase
     {
         $config = AppConfig::loadAppConfig('empty_app');
         $actualDatabaseConfig = $config->getBackupDatabase();
-        $this->assertNull($actualDatabaseConfig);
+        self::assertNull($actualDatabaseConfig);
     }
 
     /**
@@ -169,9 +169,9 @@ class AppConfigTest extends TestCase
     public function testTempDir()
     {
         FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
-        $this->assertFileDoesNotExist(self::TEST_TEMP_DIR);
-        $this->assertEquals(self::TEST_TEMP_DIR, $this->config->getTempDir());
-        $this->assertFileExists(self::TEST_TEMP_DIR);
+        self::assertFileDoesNotExist(self::TEST_TEMP_DIR);
+        self::assertSame(self::TEST_TEMP_DIR, $this->config->getTempDir());
+        self::assertFileExists(self::TEST_TEMP_DIR);
     }
 
     /**
@@ -185,8 +185,8 @@ class AppConfigTest extends TestCase
         $this->config->saveTempData($type, $data);
 
         $filePath = self::TEST_TEMP_DIR . $type . '.xml';
-        $this->assertFileExists($filePath);
-        $this->assertXmlFileEqualsXmlFile(self::TEST_TEMP_TEST_RESULT, $filePath);
+        self::assertFileExists($filePath);
+        self::assertXmlFileEqualsXmlFile(self::TEST_TEMP_TEST_RESULT, $filePath);
     }
 
     /**
@@ -220,7 +220,7 @@ class AppConfigTest extends TestCase
 
         $result = $this->config->readTempData($type);
 
-        $this->assertEquals($data, $result);
+        self::assertSame($data, $result);
     }
 
     /**

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Remote\Backblaze
  */
-class BackblazeTest extends TestCase
+final class BackblazeTest extends TestCase
 {
     private const WORK_DIR_LOCAL = ABS_PATH . 'tests\\work\\Local\\';
     private const TEST_FILE_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
@@ -38,10 +38,10 @@ class BackblazeTest extends TestCase
         $this->assertRemoteFileExists($this->workDir);
 
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
-        $this->assertFileExists(self::WORK_DIR_LOCAL);
+        self::assertFileExists(self::WORK_DIR_LOCAL);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::WORK_DIR_LOCAL);
         // $this->remote->fileDelete($this->testFileDest);
@@ -53,8 +53,8 @@ class BackblazeTest extends TestCase
     public function testFileExists()
     {
         $file = 'fixtures/file1.txt';
-        $this->assertTrue($this->remote->fileExists($file));
-        $this->assertFalse($this->remote->fileExists($file . 'invalid.txt'));
+        self::assertTrue($this->remote->fileExists($file));
+        self::assertFalse($this->remote->fileExists($file . 'invalid.txt'));
     }
 
     /**
@@ -63,11 +63,11 @@ class BackblazeTest extends TestCase
     public function testDirExists()
     {
         $dir = 'fixtures';
-        $this->assertTrue($this->remote->fileExists($dir));
+        self::assertTrue($this->remote->fileExists($dir));
         $dir = 'fixtures/sub';
-        $this->assertTrue($this->remote->fileExists($dir));
+        self::assertTrue($this->remote->fileExists($dir));
         $dir = 'invalid';
-        $this->assertFalse($this->remote->fileExists($dir));
+        self::assertFalse($this->remote->fileExists($dir));
     }
 
     /**
@@ -98,7 +98,7 @@ class BackblazeTest extends TestCase
     public function testFileUploadSuccess()
     {
         $this->assertRemoteFileDoesNotExist($this->remoteFileDest);
-        $this->assertTrue($this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest));
+        self::assertTrue($this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest));
         $this->assertRemoteFileExists($this->remoteFileDest);
     }
 
@@ -110,7 +110,7 @@ class BackblazeTest extends TestCase
         $dirs = ['a/', '/b', 'foo/b/c/'];
         foreach ($dirs as $dir) {
             $this->assertRemoteFileDoesNotExist($this->workDir . $dir);
-            $this->assertTrue($this->remote->createDirectory($this->workDir . $dir));
+            self::assertTrue($this->remote->createDirectory($this->workDir . $dir));
             $this->assertRemoteFileExists($this->workDir . $dir);
         }
 
@@ -137,7 +137,7 @@ class BackblazeTest extends TestCase
         $file = 'file1.txt';
 
         copy(self::TEST_FILE_SRC, self::WORK_DIR_LOCAL . $file);
-        $this->assertFileExists(self::WORK_DIR_LOCAL . $file);
+        self::assertFileExists(self::WORK_DIR_LOCAL . $file);
 
         $this->expectException(FileAlreadyExistsException::class);
         $this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, 'fixtures/' . $file);
@@ -150,9 +150,9 @@ class BackblazeTest extends TestCase
     {
         $file = 'file1.txt';
 
-        $this->assertTrue($this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, 'fixtures/' . $file));
-        $this->assertFileExists(self::WORK_DIR_LOCAL . $file);
-        $this->assertFileEquals(self::TEST_FILE_SRC, self::WORK_DIR_LOCAL . $file);
+        self::assertTrue($this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, 'fixtures/' . $file));
+        self::assertFileExists(self::WORK_DIR_LOCAL . $file);
+        self::assertFileEquals(self::TEST_FILE_SRC, self::WORK_DIR_LOCAL . $file);
     }
 
     /**
@@ -171,20 +171,20 @@ class BackblazeTest extends TestCase
      */
     public function testFileDelete()
     {
-        $this->assertTrue($this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest));
+        self::assertTrue($this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest));
         $this->assertRemoteFileExists($this->remoteFileDest);
 
-        $this->assertTrue($this->remote->fileDelete($this->remoteFileDest));
+        self::assertTrue($this->remote->fileDelete($this->remoteFileDest));
         $this->assertRemoteFileDoesNotExist($this->remoteFileDest);
     }
 
     public function assertRemoteFileExists(string $file)
     {
-        $this->assertTrue($this->remote->fileExists($file), "{$file} does not exist on remote storage.");
+        self::assertTrue($this->remote->fileExists($file), "{$file} does not exist on remote storage.");
     }
 
     public function assertRemoteFileDoesNotExist(string $file)
     {
-        $this->assertFalse($this->remote->fileExists($file), "{$file} exists on remote storage.");
+        self::assertFalse($this->remote->fileExists($file), "{$file} exists on remote storage.");
     }
 }

@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Core\FileBundleCreator
  */
-class FileBundleCreatorTest extends TestCase
+final class FileBundleCreatorTest extends TestCase
 {
     private const TEST_DIR = ABS_PATH . 'tests\\work\\test_directory\\';
 
@@ -33,7 +33,7 @@ class FileBundleCreatorTest extends TestCase
             self::TEST_DIR . 'sub\test_file_1.txt',
         ];
         foreach ($files as $file) {
-            $this->assertFileExists($file);
+            self::assertFileExists($file);
         }
     }
 
@@ -73,9 +73,9 @@ class FileBundleCreatorTest extends TestCase
         // Call the static function to create file bundles
         $fileBundles = FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB);
         // Assert that at least one bundle is created
-        $this->assertNotEmpty($fileBundles);
-        $this->assertCount(5, $fileBundles);
-        $this->assertEquals($expectedResult, $fileBundles);
+        self::assertNotEmpty($fileBundles);
+        self::assertCount(5, $fileBundles);
+        self::assertSame($expectedResult, $fileBundles);
     }
 
     private function createTestFiles(string $directory): void

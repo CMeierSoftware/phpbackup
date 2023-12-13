@@ -79,7 +79,7 @@ class BackupRunner extends AbstractRunner
 
         $archives[$result] = $bundles[$idx];
 
-        return new StepResult($result, count($bundles) == count($archives));
+        return new StepResult($result, count($bundles) === count($archives));
     }
 
     public function makeSqlBackup(): StepResult
