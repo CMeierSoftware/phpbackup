@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Remote\Backblaze;
-use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Remote\Backblaze;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class BackblazeTest extends TestCase
 {
+    private const WORK_DIR_LOCAL = ABS_PATH . 'tests\\work\\Local\\';
+    private const TEST_FILE_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
     private Backblaze $remote;
     private readonly string $workDir;
     private readonly string $remoteFileDest;
-    private const WORK_DIR_LOCAL = ABS_PATH . 'tests\\work\\Local\\';
-    private const TEST_FILE_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
 
     public function __construct(string $name)
     {
@@ -24,6 +29,7 @@ class BackblazeTest extends TestCase
         $this->workDir = 'work/' . uniqid() . '/';
         $this->remoteFileDest = $this->workDir . 'file.txt';
     }
+
     protected function setUp(): void
     {
         $this->remote = new Backblaze('', '', '');
@@ -38,7 +44,7 @@ class BackblazeTest extends TestCase
     public function tearDown(): void
     {
         FileHelper::deleteDirectory(self::WORK_DIR_LOCAL);
-        //$this->remote->fileDelete($this->testFileDest);
+        // $this->remote->fileDelete($this->testFileDest);
     }
 
     public function testFileExists()
@@ -143,6 +149,7 @@ class BackblazeTest extends TestCase
     {
         $this->assertTrue($this->remote->fileExists($file), "{$file} does not exist on remote storage.");
     }
+
     public function assertRemoteFileDoesNotExist(string $file)
     {
         $this->assertFalse($this->remote->fileExists($file), "{$file} exists on remote storage.");

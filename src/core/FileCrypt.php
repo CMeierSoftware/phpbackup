@@ -25,6 +25,7 @@ abstract class FileCrypt
             File::encryptFileWithPassword($inputFile, $tempFile, $key);
         } catch (\Exception $th) {
             unlink($tempFile);
+
             throw $th;
         }
 
@@ -45,10 +46,12 @@ abstract class FileCrypt
         }
 
         $tempFile = $inputFile . uniqid();
+
         try {
             File::decryptFileWithPassword($inputFile, $tempFile, $key);
         } catch (\Exception $th) {
             unlink($tempFile);
+
             throw $th;
         }
 

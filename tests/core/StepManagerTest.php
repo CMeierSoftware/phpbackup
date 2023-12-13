@@ -1,13 +1,18 @@
 <?php
 
-namespace CMS\PhpBackup\Tests\Core;
+namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\Step;
+use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\StepResult;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class StepManagerTest extends TestCase
 {
     private const SYSTEM_PATH = ABS_PATH . 'tests\\work';
@@ -17,7 +22,7 @@ class StepManagerTest extends TestCase
     protected function setUp(): void
     {
         $sm = new StepManagerTestClass();
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $step = new Step([$sm, 'exampleMethod'], ['Hello World', $i]);
             $this->steps[] = $step;
         }
@@ -33,7 +38,7 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers StepManager()
+     * @covers \StepManager()
      */
     public function testNoSteps()
     {
@@ -43,7 +48,7 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers StepManager()
+     * @covers \StepManager()
      */
     public function testInvalidStepArray()
     {
@@ -57,34 +62,34 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers StepManager::executeNextStep
+     * @covers \StepManager::executeNextStep
      */
     public function testExecuteNextStep()
     {
-        for ($i = 0; $i < count($this->steps); $i++) {
+        for ($i = 0; $i < count($this->steps); ++$i) {
             $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
             $result = $stepManager->executeNextStep();
-            $this->assertEquals("Result: Hello World " . strval($i), $result);
+            $this->assertEquals('Result: Hello World ' . strval($i), $result);
         }
         $result = $stepManager->executeNextStep();
-        $this->assertEquals("Result: Hello World 9", $result);
+        $this->assertEquals('Result: Hello World 9', $result);
     }
 
     /**
-     * @covers StepManager::executeNextStep
+     * @covers \StepManager::executeNextStep
      */
     public function testStepsChanged()
     {
         $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
-        $this->assertEquals("Result: Hello World 0", $result);
+        $this->assertEquals('Result: Hello World 0', $result);
         $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
-        $this->assertEquals("Result: Hello World 1", $result);
+        $this->assertEquals('Result: Hello World 1', $result);
         array_pop($this->steps);
         $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
         $result = $stepManager->executeNextStep();
-        $this->assertEquals("Result: Hello World 0", $result);
+        $this->assertEquals('Result: Hello World 0', $result);
     }
 }
 
@@ -92,9 +97,11 @@ class StepManagerTest extends TestCase
 class StepManagerTestClass
 {
     private bool $repeated = false;
+
     public function exampleMethod($arg1, $arg2)
     {
-        $this->repeated = ($arg2 === 9 && !$this->repeated);
-        return new StepResult("Result: $arg1 $arg2", $this->repeated);
+        $this->repeated = (9 === $arg2 && !$this->repeated);
+
+        return new StepResult("Result: {$arg1} {$arg2}", $this->repeated);
     }
 }

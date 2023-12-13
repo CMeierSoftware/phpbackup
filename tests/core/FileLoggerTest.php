@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \CMS\PhpBackup\Core\FileLogger
+ *
+ * @internal
  */
 class FileLoggerTest extends TestCase
 {
@@ -83,7 +85,6 @@ class FileLoggerTest extends TestCase
         $this->assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
         $this->assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
         $this->assertStringNotContainsString(LogLevel::toString(LogLevel::INFO), $log_file_content);
-
     }
 
     /**
@@ -102,7 +103,6 @@ class FileLoggerTest extends TestCase
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         $this->assertStringContainsString($errorMessage, $log_file_content);
         $this->assertEquals($output, $log_file_content . '<br>');
-
     }
 
     /**
@@ -138,7 +138,6 @@ class FileLoggerTest extends TestCase
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         $this->assertStringStartsWith(LogLevel::toString(LogLevel::ERROR), $log_file_content);
         $this->assertStringEndsWith($errorMessage . "\n", $log_file_content);
-
     }
 
     /**
@@ -154,7 +153,6 @@ class FileLoggerTest extends TestCase
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         $this->assertStringStartsWith(LogLevel::toString(LogLevel::WARNING), $log_file_content);
         $this->assertStringEndsWith($errorMessage . "\n", $log_file_content);
-
     }
 
     /**

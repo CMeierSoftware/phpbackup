@@ -8,7 +8,4 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-
-final class RemoteStorageNotConnectedException extends \Exception
-{
-}
+final class RemoteStorageNotConnectedException extends \Exception {}

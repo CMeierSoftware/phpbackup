@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Helper;
 
 use Exception;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 
 abstract class FileHelper
 {
@@ -15,12 +13,13 @@ abstract class FileHelper
      *
      * @param string $src source path
      * @param string $dest destination path
-     * @throws Exception if the file cannot be moved
+     *
+     * @throws \Exception if the file cannot be moved
      */
     public static function moveFile(string $src, string $dest)
     {
         if (!rename($src, $dest)) {
-            throw new Exception("Cannot move $src to $dest.");
+            throw new \Exception("Cannot move {$src} to {$dest}.");
         }
     }
 
@@ -28,15 +27,16 @@ abstract class FileHelper
      * Function creates a new directory if it does not exist.
      *
      * @param string $path path to create, e.g. "foo/bar/exists/new_dir". Missing parent path will be also added
-     * @throws Exception if the directory cannot be created
+     *
+     * @throws \Exception if the directory cannot be created
      */
-    public static function makeDir(string $path, int $mode = 0644): void
+    public static function makeDir(string $path, int $mode = 0o644): void
     {
-        if ($path === '.') {
+        if ('.' === $path) {
             return;
         }
         if (!is_dir($path) && !mkdir($path, $mode, true)) {
-            throw new Exception("Cannot create $path.");
+            throw new \Exception("Cannot create {$path}.");
         }
     }
 
@@ -52,9 +52,9 @@ abstract class FileHelper
             return;
         }
 
-        $files = iterator_to_array(new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dirname, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
+        $files = iterator_to_array(new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
         ));
 
         foreach (array_reverse($files) as $file) {
@@ -71,8 +71,9 @@ abstract class FileHelper
     /**
      * Checks if a directory exists.
      *
-     * @param string $dir The path of the directory to check.
-     * @return bool TRUE if the directory exists, FALSE otherwise.
+     * @param string $dir the path of the directory to check
+     *
+     * @return bool TRUE if the directory exists, FALSE otherwise
      */
     public static function doesDirExists(string $dir): bool
     {
@@ -82,14 +83,15 @@ abstract class FileHelper
     /**
      * Changes the permissions of a file.
      *
-     * @param string $file The path of the file to change permissions on.
-     * @param int $chmod The new permissions to set on the file.
-     * @throws Exception If there is a problem changing the file permissions.
+     * @param string $file the path of the file to change permissions on
+     * @param int $chmod the new permissions to set on the file
+     *
+     * @throws \Exception if there is a problem changing the file permissions
      */
     public static function changePermission(string $file, int $chmod)
     {
         if (!chmod($file, $chmod)) {
-            throw new Exception("Failed to set permissions on file $file");
+            throw new \Exception("Failed to set permissions on file {$file}");
         }
     }
 }

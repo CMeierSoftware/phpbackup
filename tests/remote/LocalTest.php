@@ -4,30 +4,24 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
+use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
-use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class LocalTest extends TestCase
 {
-    private Local $local;
     private const WORK_DIR_LOCAL = ABS_PATH . 'tests\\work\\Local\\';
     private const WORK_DIR_REMOTE = ABS_PATH . 'tests\\work\\Remote\\';
     private const TEST_FILE1_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
     private const TEST_FILE2_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file2.xls';
-
-    private function setupRemoteStorage(string $file): void
-    {
-        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);
-        $this->assertFileExists(self::WORK_DIR_REMOTE . $file);
-
-        FileHelper::makeDir(self::WORK_DIR_REMOTE . 'sub');
-        $this->assertFileExists(self::WORK_DIR_REMOTE . 'sub');
-        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . 'sub\\' . $file);
-        $this->assertFileExists(self::WORK_DIR_REMOTE . 'sub\\' . $file);
-    }
+    private Local $local;
 
     protected function setUp(): void
     {
@@ -78,7 +72,6 @@ class LocalTest extends TestCase
         $this->expectException(FileNotFoundException::class);
         $this->local->fileUpload($srcFile, $destFile);
         $this->assertFileDoesNotExist(self::WORK_DIR_REMOTE . $destFile);
-
     }
 
     public function testFileUploadDestFileAlreadyExists()
@@ -187,4 +180,14 @@ class LocalTest extends TestCase
         $this->assertFileDoesNotExist(self::WORK_DIR_REMOTE . 'bar\b\\c\\test.txt');
     }
 
+    private function setupRemoteStorage(string $file): void
+    {
+        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);
+        $this->assertFileExists(self::WORK_DIR_REMOTE . $file);
+
+        FileHelper::makeDir(self::WORK_DIR_REMOTE . 'sub');
+        $this->assertFileExists(self::WORK_DIR_REMOTE . 'sub');
+        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . 'sub\\' . $file);
+        $this->assertFileExists(self::WORK_DIR_REMOTE . 'sub\\' . $file);
+    }
 }

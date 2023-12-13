@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \LogLevel
+ *
+ * @internal
  */
 class LogLevelTest extends TestCase
 {

@@ -8,7 +8,4 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-
-final class FileAlreadyExistsException extends \Exception
-{
-}
+final class FileAlreadyExistsException extends \Exception {}

@@ -10,6 +10,11 @@ use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class AppConfigTest extends TestCase
 {
     private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\temp_test.xml';
@@ -31,7 +36,7 @@ class AppConfigTest extends TestCase
 
     public function tearDown(): void
     {
-        //FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        // FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
         unlink(CONFIG_DIR . '\\empty_app.xml');
         unlink(CONFIG_DIR . '\\valid_app.xml');
     }
@@ -196,5 +201,4 @@ class AppConfigTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->config->readTempData($type);
     }
-
 }

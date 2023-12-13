@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
-use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use PHPUnit\Framework\TestCase;
-use Exception;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileHelperTest extends TestCase
 {
     private const FIXTURES_DIR = ABS_PATH . '\\tests\\fixtures\\';
@@ -49,7 +51,7 @@ class FileHelperTest extends TestCase
         $src = self::TEST_DIR . '/nonexistent_source.txt';
         $dest = self::TEST_DIR . '/destination.txt';
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         FileHelper::moveFile($src, $dest);
     }
 
@@ -110,14 +112,14 @@ class FileHelperTest extends TestCase
     {
         $nonExistentFile = self::TEST_DIR . '/nonexistent_file.txt';
 
-        $this->expectException(Exception::class);
-        FileHelper::changePermission($nonExistentFile, 0777);
+        $this->expectException(\Exception::class);
+        FileHelper::changePermission($nonExistentFile, 0o777);
     }
 
     private function assertFileMode($filePath, $expectedMode)
     {
-        $actualMode = fileperms($filePath) & 0777;
+        $actualMode = fileperms($filePath) & 0o777;
 
-        $this->assertEquals($expectedMode, $actualMode, "File permission mismatch for $filePath");
+        $this->assertEquals($expectedMode, $actualMode, "File permission mismatch for {$filePath}");
     }
 }

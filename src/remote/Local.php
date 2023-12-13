@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Remote;
 
 use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 /**
  * Class Local - Handles local storage operations.
@@ -20,57 +19,41 @@ class Local extends AbstractRemoteHandler
         $this->remoteRootPath = realpath($remoteRootPath);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function connect(): bool
     {
         $this->connection = true;
+
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function disconnect(): bool
     {
         $this->connection = false;
+
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
         return copy($localFilePath, $this->buildAbsPath($remoteFilePath));
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function _fileDownload(string $localFilePath, string $remoteFilePath): bool
     {
         return copy($this->buildAbsPath($remoteFilePath), $localFilePath);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function _fileDelete(string $remoteFilePath): bool
     {
         return unlink($this->buildAbsPath($remoteFilePath));
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function _createDirectory(string $remoteFilePath): bool
     {
         $absolutePath = $this->buildAbsPath($remoteFilePath);
 
         // Ensure the directory structure exists
-        if(isset(pathinfo($absolutePath)['extension'])) {
+        if (isset(pathinfo($absolutePath)['extension'])) {
             $absolutePath = pathinfo($absolutePath, PATHINFO_DIRNAME);
         }
 
@@ -78,13 +61,10 @@ class Local extends AbstractRemoteHandler
             // Create the directory and its parents if they don't exist
             FileHelper::makeDir($absolutePath);
         }
+
         return true;
     }
 
-
-    /**
-     * @inheritDoc
-     */
     protected function _fileExists(string $remoteFilePath): bool
     {
         return file_exists($this->buildAbsPath($remoteFilePath));

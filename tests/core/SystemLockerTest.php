@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 use CMS\PhpBackup\Core\SystemLocker;
+use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class SystemLockerTest extends TestCase
 {
     private const TEST_DIR = ABS_PATH . 'tests\\work\\';
@@ -68,6 +73,7 @@ class SystemLockerTest extends TestCase
     {
         FileHelper::makeDir(self::TEST_DIR2);
         $this->assertFileExists(self::TEST_DIR2);
+
         try {
             SystemLocker::lock(self::TEST_DIR);
 

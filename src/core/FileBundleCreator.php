@@ -9,16 +9,16 @@ abstract class FileBundleCreator
     /**
      * Create bundles of files from a directory based on a size limit.
      *
-     * @param string $directory The path to the directory.
-     * @param int $sizeLimitInMB The size limit for each bundle in megabytes.
+     * @param string $directory the path to the directory
+     * @param int $sizeLimitInMB the size limit for each bundle in megabytes
      *
-     * @return array An array of arrays, where each inner array represents a bundle of files within the size limit.
+     * @return array an array of arrays, where each inner array represents a bundle of files within the size limit
      */
     public static function createFileBundles(string $directory, int $sizeLimitInMB): array
     {
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
-        $directory = rtrim($directory, "/");
-        $directory = rtrim($directory, "\\");
+        $directory = rtrim($directory, '/');
+        $directory = rtrim($directory, '\\');
 
         return self::packDirectory($directory, $sizeLimit);
     }
@@ -95,7 +95,7 @@ abstract class FileBundleCreator
         foreach (scandir($dir) as $file) {
             $filePath = $dir . DIRECTORY_SEPARATOR . $file;
 
-            if ($file === "." || $file === "..") {
+            if ('.' === $file || '..' === $file) {
                 continue;
             }
             if (is_dir($filePath)) {
@@ -105,6 +105,7 @@ abstract class FileBundleCreator
             }
         }
         asort($files);
+
         return [array_reverse($files), $folders];
     }
 }

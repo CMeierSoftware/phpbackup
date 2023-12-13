@@ -7,7 +7,6 @@ namespace CMS\PhpBackup\Core;
 if (!defined('ABS_PATH')) {
     return;
 }
-use CMS\PhpBackup\Core\Step;
 
 class StepManager
 {
@@ -18,8 +17,9 @@ class StepManager
     /**
      * Constructs a StepManager instance with an array of possible steps.
      *
-     * @param array $steps An array of possible steps with their names and relative delay in seconds.
-     * @throws \LengthException If the array of steps is empty.
+     * @param array $steps an array of possible steps with their names and relative delay in seconds
+     *
+     * @throws \LengthException if the array of steps is empty
      */
     public function __construct(array $steps, string $systemDir)
     {
@@ -40,13 +40,13 @@ class StepManager
     /**
      * Executes the next step and returns the result.
      *
-     * @return mixed The result of executing the next step.
+     * @return mixed the result of executing the next step
      */
     public function executeNextStep(): mixed
     {
         $currentStep = $this->getNextStep();
 
-        if ($currentStep === null) {
+        if (null === $currentStep) {
             return 'No next step.';
         }
 
@@ -60,15 +60,16 @@ class StepManager
     /**
      * Determines the next step to be executed based on the previous step information.
      *
-     * @return Step|null The next step to be executed, or null if there is no next step.
+     * @return null|Step the next step to be executed, or null if there is no next step
      */
     private function getNextStep(): ?Step
     {
         $prevStepInfo = $this->getLastStepInfo();
 
         // Check if there is no previous step information or if steps have changed
-        if ($prevStepInfo === null || $prevStepInfo["step_hash"] !== md5(json_encode($this->steps))) {
+        if (null === $prevStepInfo || $prevStepInfo['step_hash'] !== md5(json_encode($this->steps))) {
             $this->currentStepIdx = 0;
+
             return $this->steps[0];
         }
 
@@ -95,7 +96,7 @@ class StepManager
         $content = [
             'last_step_index' => $this->currentStepIdx,
             'timestamp' => time(),
-            'step_hash' => md5(json_encode($this->steps))
+            'step_hash' => md5(json_encode($this->steps)),
         ];
 
         file_put_contents($this->stepFile, json_encode($content));
@@ -104,11 +105,11 @@ class StepManager
     /**
      * Gets information about the last executed step from the step file.
      *
-     * @return array|null The information about the last executed step, or null if no information is available.
+     * @return null|array the information about the last executed step, or null if no information is available
      */
     private function getLastStepInfo(): ?array
     {
-        if (!file_exists($this->stepFile) || filesize($this->stepFile) === 0) {
+        if (!file_exists($this->stepFile) || 0 === filesize($this->stepFile)) {
             return null;
         }
 

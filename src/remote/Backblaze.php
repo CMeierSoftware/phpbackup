@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Remote;
 
-use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use obregonco\B2\Client;
-use obregonco\B2\File;
 
 class Backblaze extends AbstractRemoteHandler
 {
@@ -24,9 +22,6 @@ class Backblaze extends AbstractRemoteHandler
         $this->bucketName = $bucketName;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function connect(): bool
     {
         $this->connection = new Client($this->accountId, ['keyId' => $this->keyId, 'applicationKey' => $this->applicationKey]);
@@ -35,25 +30,34 @@ class Backblaze extends AbstractRemoteHandler
         $this->connection->largeFileLimit = 3000000000;
 
         $this->bucketId = $this->connection->getBucketIdFromName($this->bucketName);
-        if ($this->bucketId === null) {
+        if (null === $this->bucketId) {
             $this->connection = null;
         }
 
-        return $this->connection !== null;
+        return null !== $this->connection;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function disconnect(): bool
     {
         // For local storage, disconnection is not applicable
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
+    public function _createDirectory(string $remoteDirectoryPath): bool
+    {
+        $emptyFilePath = rtrim(ltrim($remoteDirectoryPath, '/'), '/') . '/.bzEmpty';
+        $localEmptyFilePath = TEMP_DIR . 'temp.txt';
+        touch($localEmptyFilePath);
+
+        try {
+            $result = $this->_fileUpload($localEmptyFilePath, $emptyFilePath);
+        } finally {
+            unlink($localEmptyFilePath);
+        }
+
+        return $result;
+    }
+
     protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
         $options = [
@@ -68,9 +72,6 @@ class Backblaze extends AbstractRemoteHandler
         return !empty($file);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function _fileDownload(string $localFilePath, string $remoteFilePath): bool
     {
         $options = [
@@ -85,9 +86,6 @@ class Backblaze extends AbstractRemoteHandler
         return file_exists($localFilePath);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function _fileDelete(string $remoteFilePath): bool
     {
         $options = [
@@ -99,27 +97,6 @@ class Backblaze extends AbstractRemoteHandler
         return $this->connection->deleteFile($options);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function _createDirectory(string $remoteDirectoryPath): bool
-    {
-        $emptyFilePath = rtrim(ltrim($remoteDirectoryPath, '/'), '/') . '/.bzEmpty';
-        $localEmptyFilePath = TEMP_DIR . 'temp.txt';
-        touch($localEmptyFilePath);
-        try {
-            $result = $this->_fileUpload($localEmptyFilePath, $emptyFilePath);
-        } finally {
-            unlink($localEmptyFilePath);
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * @inheritDoc
-     */
     protected function _fileExists(string $remoteFilePath): bool
     {
         $options = [
@@ -134,7 +111,7 @@ class Backblaze extends AbstractRemoteHandler
         $fileList = $this->connection->listFiles($options);
 
         foreach ($fileList as $file) {
-            if (strpos($file->getFileName(), $remoteFilePath) === 0) {
+            if (0 === strpos($file->getFileName(), $remoteFilePath)) {
                 return true;
             }
         }
@@ -147,6 +124,6 @@ class Backblaze extends AbstractRemoteHandler
         $lastDotPosition = strrpos($path, '.');
 
         // Check if a dot was found and it is not the last character in the path
-        return $lastDotPosition !== false && $lastDotPosition < strlen($path) - 1;
+        return false !== $lastDotPosition && $lastDotPosition < strlen($path) - 1;
     }
 }

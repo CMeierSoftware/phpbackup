@@ -8,7 +8,4 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-
-final class ShellCommandUnavailableException extends \Exception
-{
-}
+final class ShellCommandUnavailableException extends \Exception {}

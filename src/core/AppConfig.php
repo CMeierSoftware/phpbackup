@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
-use Laminas\Config\Writer\Xml as XmlWriter;
-use Laminas\Config\Reader\Xml as XmlReader;
 use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
+use Laminas\Config\Reader\Xml as XmlReader;
+use Laminas\Config\Writer\Xml as XmlWriter;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -43,14 +44,17 @@ class AppConfig
     {
         return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : null;
     }
+
     public function getBackupDirectory(): ?array
     {
         return isset($this->config['backup']['directory']) ? $this->config['backup']['directory'] : null;
     }
+
     public function getBackupSettings(): ?array
     {
         return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : null;
     }
+
     public function getRemoteSettings(): ?array
     {
         return isset($this->config['remote']) ? $this->config['remote'] : null;
@@ -59,18 +63,19 @@ class AppConfig
     public function getTempDir(): string
     {
         if (!file_exists($this->tempDir)) {
-            mkdir($this->tempDir, 0644, true);
+            FileHelper::makeDir($this->tempDir);
         }
+
         return $this->tempDir . DIRECTORY_SEPARATOR;
     }
 
     /**
      * Write data to a file in JSON format.
      *
-     * @param string $type The name of the file without extension.
-     * @param mixed $data The data to be written to the file.
+     * @param string $type the name of the file without extension
+     * @param mixed $data the data to be written to the file
      *
-     * @return bool True on success, false on failure.
+     * @return bool true on success, false on failure
      */
     public function saveTempData(string $type, array $data): void
     {
@@ -83,9 +88,9 @@ class AppConfig
     /**
      * Read data from a file in JSON format.
      *
-     * @param string $type The name of the file without extension.
+     * @param string $type the name of the file without extension
      *
-     * @return mixed|null The decoded data, or null on failure.
+     * @return null|mixed the decoded data, or null on failure
      */
     public function readTempData(string $type): mixed
     {
@@ -95,7 +100,7 @@ class AppConfig
             throw new FileNotFoundException("Can not find {$filePath}.");
         }
         $reader = new XmlReader();
-        $data   = $reader->fromFile($filePath);
-        return $data;
+
+        return $reader->fromFile($filePath);
     }
 }

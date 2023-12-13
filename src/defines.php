@@ -11,14 +11,16 @@ if (!defined('CONFIG_DIR')) {
     define('CONFIG_DIR', ABS_PATH . 'config' . DIRECTORY_SEPARATOR);
 }
 if (!file_exists(CONFIG_DIR)) {
-    mkdir(CONFIG_DIR, 0644, true);
+    mkdir(CONFIG_DIR, 0o644, true);
 }
 
 if (!defined('TEMP_DIR')) {
     define('TEMP_DIR', ABS_PATH . 'temp' . DIRECTORY_SEPARATOR);
 }
 if (!file_exists(TEMP_DIR)) {
-    mkdir(TEMP_DIR, 0644, true);
+    mkdir(TEMP_DIR, 0o644, true);
 }
 
 require_once ABS_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+// Set an environment variable

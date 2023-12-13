@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\FileBundleCreator;
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileBundleCreatorTest extends TestCase
 {
     private const TEST_DIR = ABS_PATH . 'tests\\work\\test_directory\\';
@@ -25,8 +29,7 @@ class FileBundleCreatorTest extends TestCase
             self::TEST_DIR . 'test_file_1.txt',
             self::TEST_DIR . 'test_file_4.txt',
             self::TEST_DIR . 'test_file_5.txt',
-            self::TEST_DIR . 'sub\test_file_3.txt',
-            self::TEST_DIR . 'sub\test_file_2.txt',
+            self::TEST_DIR . 'sub\test_file_3.txt', self::TEST_DIR . 'sub\test_file_2.txt',
             self::TEST_DIR . 'sub\test_file_1.txt',
         ];
         foreach ($files as $file) {
@@ -43,7 +46,7 @@ class FileBundleCreatorTest extends TestCase
     public function testCreateFileBundles(): void
     {
         $expectedResult = [
-            [self::TEST_DIR . 'test_file_large.txt',],
+            [self::TEST_DIR . 'test_file_large.txt'],
             [
                 self::TEST_DIR . 'test_file_3.txt',
                 self::TEST_DIR . 'test_file_2.txt',
@@ -58,7 +61,7 @@ class FileBundleCreatorTest extends TestCase
                 self::TEST_DIR . 'sub\test_file_2.txt',
             ],
             [
-                self::TEST_DIR . 'sub\test_file_1.txt'
+                self::TEST_DIR . 'sub\test_file_1.txt',
             ],
         ];
 
@@ -79,20 +82,19 @@ class FileBundleCreatorTest extends TestCase
         }
 
         // Create 5 test files with random content
-        for ($i = 1; $i <= 3; $i++) {
-            file_put_contents($directory . "test_file_$i.txt", random_bytes(500 * 1024));
+        for ($i = 1; $i <= 3; ++$i) {
+            file_put_contents($directory . "test_file_{$i}.txt", random_bytes(500 * 1024));
         }
         file_put_contents($directory . 'test_file_4.txt', random_bytes(150 * 1024));
         file_put_contents($directory . 'test_file_5.txt', random_bytes(140 * 1024));
         file_put_contents($directory . 'test_file_large.txt', random_bytes(2000 * 1024));
 
-
         if (!is_dir($directory . 'sub')) {
             FileHelper::makeDir($directory . 'sub');
         }
         // Create 5 test files with random content
-        for ($i = 1; $i <= 3; $i++) {
-            file_put_contents($directory . "sub/test_file_$i.txt", random_bytes(500 * 1024));
+        for ($i = 1; $i <= 3; ++$i) {
+            file_put_contents($directory . "sub/test_file_{$i}.txt", random_bytes(500 * 1024));
         }
     }
 }

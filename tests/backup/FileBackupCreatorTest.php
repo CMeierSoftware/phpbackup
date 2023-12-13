@@ -6,6 +6,11 @@ use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileBackupCreatorTest extends TestCase
 {
     private const FIXTURES_DIR = ABS_PATH . '\tests\fixtures';
@@ -17,7 +22,7 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers FileBackupCreator->prepareBackup()
+     * @covers \FileBackupCreator->prepareBackup()
      */
     public function testBackupInvalidDir(): void
     {
@@ -28,8 +33,9 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers FileBackupCreator->backupAll()
-     * @uses FileBackupCreator->prepareBackup()
+     * @covers \FileBackupCreator->backupAll()
+     *
+     * @uses \FileBackupCreator->prepareBackup()
      */
     public function testBackupIgnoreList(): void
     {
@@ -43,7 +49,7 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers FileBackupCreator->prepareBackup()
+     * @covers \FileBackupCreator->prepareBackup()
      */
     public function testBackupFileName(): void
     {
@@ -55,11 +61,10 @@ class FileBackupCreatorTest extends TestCase
         } finally {
             unlink($filename);
         }
-
     }
 
     /**
-     * @covers FileBackupCreator->backupOnly()
+     * @covers \FileBackupCreator->backupOnly()
      */
     public function testBackupOnly(): void
     {
@@ -68,7 +73,5 @@ class FileBackupCreatorTest extends TestCase
         $this->assertFileExists($filename);
         $this->assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
         $this->assertStringEndsWith('.zip', $filename);
-
     }
-
 }

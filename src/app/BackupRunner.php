@@ -8,8 +8,6 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
-use CMS\PhpBackup\App\AbstractRunner;
 use CMS\PhpBackup\Backup\DatabaseBackupCreator;
 use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Core\AppConfig;
@@ -17,6 +15,7 @@ use CMS\PhpBackup\Core\FileBundleCreator;
 use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Core\Step;
 use CMS\PhpBackup\Core\StepResult;
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Remote\Local;
 
 class BackupRunner extends AbstractRunner
@@ -53,7 +52,7 @@ class BackupRunner extends AbstractRunner
         $this->logger->Info("Split {$srcDir} into {$cntBundles} parts (size limit: {$limit}).");
 
         $this->misc['backup_folder'] = TEMP_DIR . DIRECTORY_SEPARATOR . 'backup_' . date('_Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
-        mkdir($this->misc['backup_folder'], 0644, true);
+        mkdir($this->misc['backup_folder'], 0o644, true);
         $this->logger->Info('Create backup folder: ' . $this->misc['backup_folder']);
 
         return new StepResult('', false);
@@ -62,6 +61,7 @@ class BackupRunner extends AbstractRunner
     public function makeDirectoryBackup(): StepResult
     {
         $bundles = $this->config->readTempData(self::BUNDLES_FILE);
+
         try {
             $archives = $this->config->readTempData(self::ARCHIVES_FILE);
         } catch (FileNotFoundException $th) {
@@ -71,15 +71,15 @@ class BackupRunner extends AbstractRunner
         $f = new FileBackupCreator();
 
         $result = $f->backupOnly($this->config->getBackupDirectory()['src'], $bundles[$idx]);
-        $this->logger->Info("Archive files to '$result'");
+        $this->logger->Info("Archive files to '{$result}'");
 
-        FileCrypt::encryptFile($result, $this->config->getBackupSettings()["encryptionKey"]);
+        FileCrypt::encryptFile($result, $this->config->getBackupSettings()['encryptionKey']);
 
         $result = $this->copyToTempDir($result, "archive_part_{$idx}.zip");
 
         $archives[$result] = $bundles[$idx];
 
-        return new StepResult($result, (count($bundles) == count($archives)));
+        return new StepResult($result, count($bundles) == count($archives));
     }
 
     public function makeSqlBackup(): StepResult
@@ -94,10 +94,10 @@ class BackupRunner extends AbstractRunner
             if (!$result) {
                 $this->logger->Warning('Database dump could not be created.');
             } else {
-                $this->logger->Info("Database dump to '$result'");
+                $this->logger->Info("Database dump to '{$result}'");
             }
 
-            FileCrypt::encryptFile($result, $this->config->getBackupSettings()["encryptionKey"]);
+            FileCrypt::encryptFile($result, $this->config->getBackupSettings()['encryptionKey']);
 
             $result = $this->copyToTempDir($result, basename($result));
 
@@ -105,10 +105,10 @@ class BackupRunner extends AbstractRunner
             $files[$result] = 'Database dump';
             $this->config->saveTempData(self::ARCHIVES_FILE, $files);
         } else {
-            $this->logger->Info("No database defined in config.");
+            $this->logger->Info('No database defined in config.');
         }
-        return new StepResult($result, false);
 
+        return new StepResult($result, false);
     }
 
     public function sendLocal(): StepResult
@@ -126,17 +126,15 @@ class BackupRunner extends AbstractRunner
             $uploadedFiles[basename($archivePath)] = $content;
         }
 
-        # todo: save uploadedFiles in remote storage
+        // todo: save uploadedFiles in remote storage
 
         return new StepResult('', false);
     }
 
     public function cleanUp(): StepResult
     {
-
         return new StepResult('', false);
     }
-
 
     protected function setupSteps(): void
     {

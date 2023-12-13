@@ -11,6 +11,4 @@ if (!defined('ABS_PATH')) {
 /**
  * Exception is thrown when a system is already locked.
  */
-final class SystemAlreadyLockedException extends \Exception
-{
-}
+final class SystemAlreadyLockedException extends \Exception {}

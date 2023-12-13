@@ -22,9 +22,9 @@ class FileLogger
     /**
      * Constructs the logger instance.
      *
-     * @param string $log_file The path to the log file.
-     * @param int $log_level The log level to use.
-     * @param bool $echo_logs Whether to echo log messages in HTML format.
+     * @param string $log_file the path to the log file
+     * @param int $log_level the log level to use
+     * @param bool $echo_logs whether to echo log messages in HTML format
      */
     protected function __construct(string $log_file, int $log_level, bool $echo_logs)
     {
@@ -42,18 +42,16 @@ class FileLogger
     /**
      * Clones the logger instance (disallowed).
      */
-    protected function __clone()
-    {
-    }
+    protected function __clone() {}
 
     /**
      * Gets the singleton instance of the logger.
      *
      * @param string $log_file The path to the log file (optional, default: `logs.txt`).
-     * @param int $log_level The log level to use (optional, default: `LogLevel::WARNING`).
-     * @param bool $echo_logs Whether to echo log messages in HTML format (optional, default: `false`).
+     * @param int $log_level the log level to use (optional, default: `LogLevel::WARNING`)
+     * @param bool $echo_logs whether to echo log messages in HTML format (optional, default: `false`)
      *
-     * @return FileLogger The singleton instance of the logger.
+     * @return FileLogger the singleton instance of the logger
      */
     public static function getInstance(string $log_file = self::DEFAULT_LOG_FILE, int $log_level = LogLevel::WARNING, bool $echo_logs = false): FileLogger
     {
@@ -66,14 +64,12 @@ class FileLogger
 
     /**
      * Function sets a new path to a log file. This new file will be created if it still not exists.
-     *
-     * @param $log_file: path to the new log file. WARNING: The directory must already exists.
      */
     public function SetLogFile(string $log_file)
     {
         $this->log_file = $log_file;
         FileHelper::makeDir(dirname($log_file));
-        $this->Info("set log file to $log_file");
+        $this->Info("set log file to {$log_file}");
     }
 
     /**
@@ -95,7 +91,7 @@ class FileLogger
 
     /**
      * Set the Log level
-     * Type must be from 'LogLevel'
+     * Type must be from 'LogLevel'.
      */
     public function SetLogLevel(int $log_level): void
     {
@@ -104,7 +100,7 @@ class FileLogger
     }
 
     /**
-     * Writes a message of the level 'Error'
+     * Writes a message of the level 'Error'.
      */
     public function Error(string $message): void
     {
@@ -112,7 +108,7 @@ class FileLogger
     }
 
     /**
-     * Writes a message of the level 'Warning'
+     * Writes a message of the level 'Warning'.
      */
     public function Warning(string $message)
     {
@@ -162,7 +158,6 @@ class FileLogger
      * Writes a log entry to the file and optionally echoes it to the screen.
      *
      * @param string $entry The log entry to be written to the file
-     *
      */
     private function WriteToFile(string $entry)
     {

@@ -8,7 +8,4 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-
-final class FileNotFoundException extends \Exception
-{
-}
+final class FileNotFoundException extends \Exception {}

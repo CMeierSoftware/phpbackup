@@ -1,15 +1,20 @@
 <?php
 
-namespace CMS\PhpBackup\Tests\Core;
+namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\Step;
 use CMS\PhpBackup\Core\StepResult;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class StepTest extends TestCase
 {
     /**
-     * @covers Step->setCallback()
+     * @covers \Step->setCallback()
      */
     public function testSetCallbackWithInvalidCallback()
     {
@@ -18,7 +23,7 @@ class StepTest extends TestCase
     }
 
     /**
-     * @covers Step->setCallback()
+     * @covers \Step->setCallback()
      */
     public function testSetCallbackWithNonexistentMethod()
     {
@@ -27,11 +32,10 @@ class StepTest extends TestCase
     }
 
     /**
-     * @covers Step->execute()
+     * @covers \Step->execute()
      */
     public function testExecuteWithValidStaticCallback()
     {
-
         $callback = [StaticClass::class, 'exampleMethod'];
         $arguments = ['Hello', 'World'];
         $step = new Step($callback, $arguments);
@@ -39,11 +43,12 @@ class StepTest extends TestCase
         // Execute the callback and assert the result
         $result = $step->execute();
         $this->assertInstanceOf(StepResult::class, $result);
-        $this->assertEquals("Result: Hello World", $result->returnValue);
+        $this->assertEquals('Result: Hello World', $result->returnValue);
         $this->assertFalse($result->repeat);
     }
+
     /**
-     * @covers Step->execute()
+     * @covers \Step->execute()
      */
     public function testExecuteWithValidCallback()
     {
@@ -57,7 +62,7 @@ class StepTest extends TestCase
         // Execute the callback and assert the result
         $result = $step->execute();
         $this->assertInstanceOf(StepResult::class, $result);
-        $this->assertEquals("Result: Hello World", $result->returnValue);
+        $this->assertEquals('Result: Hello World', $result->returnValue);
         $this->assertFalse($result->repeat);
     }
 }
@@ -67,6 +72,6 @@ class StaticClass
 {
     public static function exampleMethod($arg1, $arg2)
     {
-        return new StepResult("Result: $arg1 $arg2", false);
+        return new StepResult("Result: {$arg1} {$arg2}", false);
     }
 }

@@ -11,9 +11,8 @@ if (!defined('ABS_PATH')) {
 }
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
-
-use PhpZip\ZipFile;
 use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
+use PhpZip\ZipFile;
 
 class FileBackupCreator
 {
@@ -29,7 +28,7 @@ class FileBackupCreator
      */
     public function __construct(array $ignoreList = null)
     {
-        if ($ignoreList !== null) {
+        if (null !== $ignoreList) {
             $this->ignoreList = $ignoreList;
         }
         $this->archive = new ZipFile();
@@ -74,7 +73,6 @@ class FileBackupCreator
                 }
             }
             $this->archive->saveAsFile($this->archiveName);
-
         } finally {
             $this->archive->close();
         }

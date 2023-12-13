@@ -9,6 +9,11 @@ use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileCryptTest extends TestCase
 {
     private const TEST_KEY = 'your_secret_key';
@@ -32,8 +37,8 @@ class FileCryptTest extends TestCase
     }
 
     /**
-     * @covers FileCrypt::encryptFile
-     * @covers FileCrypt::decryptFile
+     * @covers \FileCrypt::decryptFile
+     * @covers \FileCrypt::encryptFile
      */
     public function testFileNotFound()
     {
@@ -44,7 +49,7 @@ class FileCryptTest extends TestCase
     }
 
     /**
-     * @covers FileCrypt::encryptFile
+     * @covers \FileCrypt::encryptFile
      */
     public function testFileEncryption()
     {
@@ -54,7 +59,7 @@ class FileCryptTest extends TestCase
     }
 
     /**
-     * @covers FileCrypt::decryptFile
+     * @covers \FileCrypt::decryptFile
      */
     public function testFileDecryption()
     {

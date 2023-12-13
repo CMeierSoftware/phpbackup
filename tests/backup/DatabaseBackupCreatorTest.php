@@ -6,6 +6,11 @@ use CMS\PhpBackup\Backup\DatabaseBackupCreator;
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class DatabaseBackupCreatorTest extends TestCase
 {
     private const HOST = 'localhost';
@@ -28,13 +33,12 @@ class DatabaseBackupCreatorTest extends TestCase
         $this->backupCreator->backupMySql('INVALID');
     }
 
-
     /**
      * @covers \backupMySql
      */
     public function testMysqldumpUnavailable()
     {
-        putenv("MYSQLDUMP_EXE=invalid");
+        putenv('MYSQLDUMP_EXE=invalid');
         $backupCreator = new DatabaseBackupCreator(self::HOST, self::USERNAME, self::PASSWORD, self::DB);
         $this->expectException(ShellCommandUnavailableException::class);
         $backupCreator->backupMySql();
