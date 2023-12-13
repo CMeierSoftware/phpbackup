@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Core\SystemLocker
  */
 class SystemLockerTest extends TestCase
 {
@@ -32,11 +32,10 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers \lock
-     * @covers \unlock
-     *
-     * @uses \SystemLocker::isLocked
-     * @uses \SystemLocker::readLockFile
+     * @covers \CMS\PhpBackup\Core\SystemLocker::isLocked()
+     * @covers \CMS\PhpBackup\Core\SystemLocker::lock()
+     * @covers \CMS\PhpBackup\Core\SystemLocker::readLockFile()
+     * @covers \CMS\PhpBackup\Core\SystemLocker::unlock()
      */
     public function testLockSystem()
     {
@@ -51,9 +50,8 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers \lock
-     *
-     * @uses \unlock
+     * @covers \CMS\PhpBackup\Core\SystemLocker::lock()
+     * @covers \CMS\PhpBackup\Core\SystemLocker::unlock()
      */
     public function testLockedExceptionOnDoubleLock()
     {
@@ -66,8 +64,8 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers \lock
-     * @covers \unlock
+     * @covers \CMS\PhpBackup\Core\SystemLocker::lock()
+     * @covers \CMS\PhpBackup\Core\SystemLocker::unlock()
      */
     public function testUnlockDoesNotAffectOtherLocks()
     {
@@ -91,7 +89,7 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers \readLockFile
+     * @covers \CMS\PhpBackup\Core\SystemLocker::readLockFile()
      */
     public function testReadLockFileWhenLocked()
     {
@@ -105,7 +103,7 @@ class SystemLockerTest extends TestCase
     }
 
     /**
-     * @covers \readLockFile
+     * @covers \CMS\PhpBackup\Core\SystemLocker::readLockFile()
      */
     public function testReadLockFileWhenUnlocked()
     {

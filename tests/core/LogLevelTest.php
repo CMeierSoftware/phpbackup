@@ -8,14 +8,17 @@ use CMS\PhpBackup\Core\LogLevel;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \LogLevel
- *
  * @internal
+ *
+ * @covers \CMS\PhpBackup\Core\LogLevel
  */
 class LogLevelTest extends TestCase
 {
     /**
-     * @codeCoverageIgnore
+     * @covers \CMS\PhpBackup\Core\LogLevel::ERROR
+     * @covers \CMS\PhpBackup\Core\LogLevel::INFO
+     * @covers \CMS\PhpBackup\Core\LogLevel::OFF
+     * @covers \CMS\PhpBackup\Core\LogLevel::WARNING
      */
     public function testLogLevelsConstants()
     {
@@ -26,7 +29,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers \toString
+     * @covers \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testToStringForOff()
     {
@@ -35,7 +38,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers \toString
+     * @covers \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testToStringForError()
     {
@@ -44,7 +47,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers \toString
+     * @covers \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testToStringForWarning()
     {
@@ -53,7 +56,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers \toString
+     * @covers \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testToStringForInfo()
     {
@@ -62,7 +65,7 @@ class LogLevelTest extends TestCase
     }
 
     /**
-     * @covers \toString
+     * @covers \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testToStringThrowsExceptionForInvalidLogLevel()
     {

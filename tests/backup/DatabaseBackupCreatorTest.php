@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator
  */
 class DatabaseBackupCreatorTest extends TestCase
 {
@@ -25,7 +25,7 @@ class DatabaseBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \backupMySql
+     * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator::backupMySql()
      */
     public function testInvalidCompressionMode()
     {
@@ -34,7 +34,7 @@ class DatabaseBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \backupMySql
+     * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator::backupMySql()
      */
     public function testMysqldumpUnavailable()
     {
@@ -45,7 +45,7 @@ class DatabaseBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \backupMySql
+     * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator::backupMySql()
      */
     public function testBackup()
     {
@@ -62,7 +62,7 @@ class DatabaseBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \backupMySql
+     * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator::backupMySql()
      */
     public function testDatabaseConnectionFailed()
     {

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Backup\FileBackupCreator
  */
 class FileBackupCreatorTest extends TestCase
 {
@@ -22,7 +22,7 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \FileBackupCreator->prepareBackup()
+     * @covers \CMS\PhpBackup\Backup\FileBackupCreator::backupAll()
      */
     public function testBackupInvalidDir(): void
     {
@@ -33,9 +33,7 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \FileBackupCreator->backupAll()
-     *
-     * @uses \FileBackupCreator->prepareBackup()
+     * @covers \CMS\PhpBackup\Backup\FileBackupCreator::backupAll()
      */
     public function testBackupIgnoreList(): void
     {
@@ -49,7 +47,7 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \FileBackupCreator->prepareBackup()
+     * @covers \CMS\PhpBackup\Backup\FileBackupCreator::backupAll()
      */
     public function testBackupFileName(): void
     {
@@ -64,7 +62,7 @@ class FileBackupCreatorTest extends TestCase
     }
 
     /**
-     * @covers \FileBackupCreator->backupOnly()
+     * @covers \CMS\PhpBackup\Backup\FileBackupCreator::backupOnly()
      */
     public function testBackupOnly(): void
     {

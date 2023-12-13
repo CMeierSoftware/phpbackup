@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Helper\FileHelper
  */
 class FileHelperTest extends TestCase
 {
@@ -35,6 +35,9 @@ class FileHelperTest extends TestCase
         }
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::moveFile()
+     */
     public function testMoveFileSuccess()
     {
         $dest = self::TEST_DIR . 'destination.txt';
@@ -46,6 +49,9 @@ class FileHelperTest extends TestCase
         $this->assertTrue(is_file($dest));
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::moveFile()
+     */
     public function testMoveFileFailure()
     {
         $src = self::TEST_DIR . '/nonexistent_source.txt';
@@ -55,6 +61,9 @@ class FileHelperTest extends TestCase
         FileHelper::moveFile($src, $dest);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::makeDir()
+     */
     public function testMakeDirSuccess()
     {
         $newDir = self::TEST_DIR . '/new_directory';
@@ -65,6 +74,9 @@ class FileHelperTest extends TestCase
         $this->assertTrue(is_dir($newDir));
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::makeDir()
+     */
     public function testMakeDirCurrentDirectory()
     {
         // Attempt to create the current directory, which should just be ignored
@@ -72,6 +84,9 @@ class FileHelperTest extends TestCase
         FileHelper::makeDir($currentDir);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::deleteDirectory()
+     */
     public function testDeleteDirectorySuccess()
     {
         $this->assertFileExists(self::TEST_FILE);
@@ -83,6 +98,9 @@ class FileHelperTest extends TestCase
         $this->assertFileDoesNotExist(self::TEST_DIR);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::deleteDirectory()
+     */
     public function testDeleteDirectoryNotExists()
     {
         $this->assertFileDoesNotExist(self::TEST_DIR . 'Invalid');
@@ -90,6 +108,9 @@ class FileHelperTest extends TestCase
         $this->assertFileDoesNotExist(self::TEST_DIR . 'Invalid');
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::doesDirExists()
+     */
     public function testDoesDirExists()
     {
         $this->assertTrue(FileHelper::doesDirExists(self::TEST_DIR));
@@ -98,16 +119,23 @@ class FileHelperTest extends TestCase
         $this->assertFalse(FileHelper::doesDirExists($nonExistingDir));
     }
 
-    // public function testChangePermissionSuccess()
-    // {
-    //     $filePath = self::TEST_DIR . '/file.txt';
-    //     touch($filePath);
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::changePermission()
+     */
+    public function testChangePermissionSuccess()
+    {
+        $filePath = self::TEST_DIR . '/file.txt';
+        touch($filePath);
+        $this->assertFileExists($filePath);
 
-    //     FileHelper::changePermission($filePath, 0777);
+        FileHelper::changePermission($filePath, 0o755);
 
-    //     $this->assertFileMode($filePath, 0777);
-    // }
+        $this->assertFileMode($filePath, 0o777);
+    }
 
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::changePermission()
+     */
     public function testChangePermissionFailure()
     {
         $nonExistentFile = self::TEST_DIR . '/nonexistent_file.txt';
@@ -116,7 +144,7 @@ class FileHelperTest extends TestCase
         FileHelper::changePermission($nonExistentFile, 0o777);
     }
 
-    private function assertFileMode($filePath, $expectedMode)
+    private function assertFileMode(string $filePath, int $expectedMode)
     {
         $actualMode = fileperms($filePath) & 0o777;
 

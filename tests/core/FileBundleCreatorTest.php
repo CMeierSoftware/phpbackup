@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Core\FileBundleCreator
  */
 class FileBundleCreatorTest extends TestCase
 {
@@ -43,6 +43,9 @@ class FileBundleCreatorTest extends TestCase
         FileHelper::deleteDirectory(self::TEST_DIR);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\FileBundleCreator::createFileBundles()
+     */
     public function testCreateFileBundles(): void
     {
         $expectedResult = [

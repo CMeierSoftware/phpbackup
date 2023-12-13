@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\Step;
@@ -11,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Core\StepManager
  */
 class StepManagerTest extends TestCase
 {
@@ -38,7 +40,7 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers \StepManager()
+     * @covers \CMS\PhpBackup\Core\StepManager::__construct()
      */
     public function testNoSteps()
     {
@@ -48,7 +50,7 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers \StepManager()
+     * @covers \CMS\PhpBackup\Core\StepManager::__construct()
      */
     public function testInvalidStepArray()
     {
@@ -62,7 +64,7 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers \StepManager::executeNextStep
+     * @covers \CMS\PhpBackup\Core\StepManager::executeNextStep()
      */
     public function testExecuteNextStep()
     {
@@ -76,7 +78,7 @@ class StepManagerTest extends TestCase
     }
 
     /**
-     * @covers \StepManager::executeNextStep
+     * @covers \CMS\PhpBackup\Core\StepManager::executeNextStep()
      */
     public function testStepsChanged()
     {

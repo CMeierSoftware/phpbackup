@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Core\AppConfig
  */
 class AppConfigTest extends TestCase
 {
@@ -41,18 +41,27 @@ class AppConfigTest extends TestCase
         unlink(CONFIG_DIR . '\\valid_app.xml');
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     */
     public function testLoadAppConfigSuccess(): void
     {
         $appConfig = AppConfig::loadAppConfig('valid_app');
         $this->assertInstanceOf(AppConfig::class, $appConfig);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     */
     public function testLoadAppConfigFailure(): void
     {
         $nonExistentAppConfig = AppConfig::loadAppConfig('non_existent_app');
         $this->assertNull($nonExistentAppConfig);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     */
     public function testLoadAppConfigWrongFileFormat(): void
     {
         rename(CONFIG_DIR . '\\valid_app.xml', CONFIG_DIR . '\\valid_app.json');
@@ -60,6 +69,9 @@ class AppConfigTest extends TestCase
         $this->assertNull($nonExistentAppConfig);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getBackupDirectory()
+     */
     public function testDirectoryConfig(): void
     {
         $expectedConfig = [
@@ -76,6 +88,9 @@ class AppConfigTest extends TestCase
         }
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getBackupSettings()
+     */
     public function testBackupSettingsConfig(): void
     {
         $expectedConfig = [
@@ -93,6 +108,9 @@ class AppConfigTest extends TestCase
         }
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
+     */
     public function testRemoteConfig(): void
     {
         $expectedConfig = [
@@ -110,6 +128,9 @@ class AppConfigTest extends TestCase
         }
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getBackupDatabase()
+     */
     public function testDatabaseConfig(): void
     {
         $expectedConfig = [
@@ -130,6 +151,11 @@ class AppConfigTest extends TestCase
         }
     }
 
+    /**
+     * @uses \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     *
+     * @covers \CMS\PhpBackup\Core\AppConfig::getBackupDatabase()
+     */
     public function testNoDatabaseDefined()
     {
         $config = AppConfig::loadAppConfig('empty_app');
@@ -137,6 +163,9 @@ class AppConfigTest extends TestCase
         $this->assertNull($actualDatabaseConfig);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getTempDir()
+     */
     public function testTempDir()
     {
         FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
@@ -145,6 +174,9 @@ class AppConfigTest extends TestCase
         $this->assertFileExists(self::TEST_TEMP_DIR);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
+     */
     public function testSaveTempDataSuccessfullySavesDataToFile()
     {
         $type = 'test';
@@ -157,6 +189,9 @@ class AppConfigTest extends TestCase
         $this->assertXmlFileEqualsXmlFile(self::TEST_TEMP_TEST_RESULT, $filePath);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
+     */
     public function testSaveTempDataThrowsJsonExceptionOnInvalidData()
     {
         $type = 'invalid';
@@ -170,6 +205,11 @@ class AppConfigTest extends TestCase
         $this->config->saveTempData($type, $data);
     }
 
+    /**
+     * @uses \CMS\PhpBackup\Core\AppConfig::saveTempData()
+     *
+     * @covers \CMS\PhpBackup\Core\AppConfig::readTempData()
+     */
     public function testReadTempData()
     {
         $type = 'test';
@@ -183,6 +223,9 @@ class AppConfigTest extends TestCase
         $this->assertEquals($data, $result);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::readTempData()
+     */
     public function testReadTempDataThrowsFileNotFoundException()
     {
         $type = 'nonexistent';
@@ -191,7 +234,12 @@ class AppConfigTest extends TestCase
         $this->config->readTempData($type);
     }
 
-    public function testReadTempDataThrowsJsonException()
+    /**
+     * @uses \CMS\PhpBackup\Core\AppConfig::getTempDir()
+     *
+     * @covers \CMS\PhpBackup\Core\AppConfig::readTempData()
+     */
+    public function testReadTempDataThrowsRuntimeException()
     {
         $type = 'invalid';
 

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Core\FileCrypt
  */
 class FileCryptTest extends TestCase
 {
@@ -37,8 +37,8 @@ class FileCryptTest extends TestCase
     }
 
     /**
-     * @covers \FileCrypt::decryptFile
-     * @covers \FileCrypt::encryptFile
+     * @covers \CMS\PhpBackup\Core\FileCrypt::decryptFile
+     * @covers \CMS\PhpBackup\Core\FileCrypt::encryptFile
      */
     public function testFileNotFound()
     {
@@ -49,7 +49,7 @@ class FileCryptTest extends TestCase
     }
 
     /**
-     * @covers \FileCrypt::encryptFile
+     * @covers \CMS\PhpBackup\Core\FileCrypt::encryptFile
      */
     public function testFileEncryption()
     {
@@ -58,8 +58,8 @@ class FileCryptTest extends TestCase
         $this->assertFileNotEquals(self::TEST_FILE_PLAIN, ABS_PATH . 'tests\\fixtures\\zip\\file1.txt');
     }
 
-    /**
-     * @covers \FileCrypt::decryptFile
+    /** * @covers \CMS\PhpBackup\Core\FileCrypt::decryptFile
+     *
      */
     public function testFileDecryption()
     {

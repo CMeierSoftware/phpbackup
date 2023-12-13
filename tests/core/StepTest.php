@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\Step;
@@ -9,12 +11,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \CMS\PhpBackup\Core\Step
  */
 class StepTest extends TestCase
 {
     /**
-     * @covers \Step->setCallback()
+     * @covers \CMS\PhpBackup\Core\Step::setCallback()
      */
     public function testSetCallbackWithInvalidCallback()
     {
@@ -23,7 +25,7 @@ class StepTest extends TestCase
     }
 
     /**
-     * @covers \Step->setCallback()
+     * @covers \CMS\PhpBackup\Core\Step::setCallback()
      */
     public function testSetCallbackWithNonexistentMethod()
     {
@@ -32,7 +34,7 @@ class StepTest extends TestCase
     }
 
     /**
-     * @covers \Step->execute()
+     * @covers \CMS\PhpBackup\Core\Step::execute()
      */
     public function testExecuteWithValidStaticCallback()
     {
@@ -48,7 +50,7 @@ class StepTest extends TestCase
     }
 
     /**
-     * @covers \Step->execute()
+     * @covers \CMS\PhpBackup\Core\Step::execute()
      */
     public function testExecuteWithValidCallback()
     {
