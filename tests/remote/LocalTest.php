@@ -46,7 +46,7 @@ class LocalTest extends TestCase
         FileHelper::deleteDirectory(self::WORK_DIR_REMOTE);
     }
 
-    public function testCreateDirIfNotExists(): void
+    public function testCreateRootDirIfNotExists(): void
     {
         FileHelper::deleteDirectory(self::WORK_DIR_REMOTE);
         $this->assertFileDoesNotExist(self::WORK_DIR_REMOTE);
