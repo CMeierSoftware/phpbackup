@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CMS\PhpBackup\Core;
 
 if (!defined('ABS_PATH')) {

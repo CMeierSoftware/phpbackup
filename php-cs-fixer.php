@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $finder = (new PhpCsFixer\Finder())
     ->in(__DIR__)
     ->exclude([
@@ -23,7 +25,9 @@ return (new PhpCsFixer\Config())
         'no_multiline_whitespace_around_double_arrow' => true,
         'trim_array_spaces' => true,
         'octal_notation' => true,
+        'declare_strict_types' => true,
     ])
     ->setFinder($finder)
     ->setUsingCache(false)
+    ->setRiskyAllowed(true)
 ;

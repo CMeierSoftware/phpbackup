@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
-use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
 use Laminas\Config\Reader\Xml as XmlReader;
