@@ -10,14 +10,20 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
-        '@PSR12' => true,
-        'align_multiline_comment' =>  ['comment_type' => 'all_multiline'],
+        '@PhpCsFixer' => true,
+        'align_multiline_comment' => ['comment_type' => 'all_multiline'],
         'phpdoc_align' => ['align' => 'left'],
         'concat_space' => ['spacing' => 'one'],
-        'return_type_declaration' => ['space_before' => 'none']
+        'return_type_declaration' => ['space_before' => 'none'],
+        'no_unused_imports' => true,
+        'single_import_per_statement' => ['group_to_single_imports' => true],
+        'ordered_imports' => ['sort_algorithm' => 'alpha'],
+        'no_mixed_echo_print' => ['use' => 'echo'],
+        'array_syntax' => ['syntax' => 'short'],
+        'no_multiline_whitespace_around_double_arrow' => true,
+        'trim_array_spaces' => true,
+        'octal_notation' => true,
     ])
     ->setFinder($finder)
-    ->setUsingCache(false);
-// ->setIndent("    ")
-// ->setLineEnding("\r\n")
+    ->setUsingCache(false)
 ;
