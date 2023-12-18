@@ -32,6 +32,11 @@ abstract class AbstractRunner
         $this->stepManager = new StepManager($this->steps, $this->config->getTempDir());
     }
 
+    public function __destruct()
+    {
+        $this->unlockBackupDir();
+    }
+
     public function run(): void
     {
         try {
@@ -44,8 +49,6 @@ abstract class AbstractRunner
             $this->logger->Error($e->getMessage());
 
             throw new \Exception($e->getMessage());
-        } finally {
-            $this->unlockBackupDir();
         }
 
         $this->logger->Info('Backup done.');
@@ -56,7 +59,6 @@ abstract class AbstractRunner
      */
     public function lockBackupDir(): void
     {
-        $this->logger->Info('lock the system.');
         SystemLocker::lock($this->config->getBackupDirectory()['src']);
     }
 
@@ -65,7 +67,6 @@ abstract class AbstractRunner
      */
     public function unlockBackupDir(): void
     {
-        $this->logger->Info('unlock the system.');
         SystemLocker::unlock($this->config->getBackupDirectory()['src']);
     }
 

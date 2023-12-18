@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Helper;
 
+use CMS\PhpBackup\Core\FileLogger;
 use Exception;
 
 abstract class FileHelper
@@ -18,6 +19,8 @@ abstract class FileHelper
      */
     public static function moveFile(string $src, string $dest)
     {
+        FileLogger::getInstance()->Info("Move '{$src}' to {'$dest}.");
+
         if (!rename($src, $dest)) {
             throw new \Exception("Cannot move {$src} to {$dest}.");
         }
@@ -35,6 +38,7 @@ abstract class FileHelper
         if ('.' === $path) {
             return;
         }
+        FileLogger::getInstance()->Info("Create directory {$path}.");
         if (!is_dir($path) && !mkdir($path, $mode, true)) {
             throw new \Exception("Cannot create {$path}.");
         }
@@ -51,6 +55,9 @@ abstract class FileHelper
         if (!self::doesDirExists($dirname)) {
             return;
         }
+
+        FileLogger::getInstance()->Info("Delete directory {$dirname} recursively.");
+
 
         $files = iterator_to_array(new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),

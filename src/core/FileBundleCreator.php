@@ -19,8 +19,15 @@ abstract class FileBundleCreator
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
         $directory = rtrim($directory, '/');
         $directory = rtrim($directory, '\\');
+        $directory = rtrim($directory, DIRECTORY_SEPARATOR);
 
-        return self::packDirectory($directory, $sizeLimit);
+        FileLogger::getInstance()->Info("Calculate bundles for '{$directory}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
+
+        $bundles = self::packDirectory($directory, $sizeLimit);
+        $cnt = count($bundles);
+        FileLogger::getInstance()->Info("Calculated {$cnt} bundles for '{$directory}'.");
+
+        return $bundles;
     }
 
     private static function packDirectory(string $directory, int $sizeLimit): array
