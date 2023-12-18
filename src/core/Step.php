@@ -53,6 +53,8 @@ class Step
             throw new \RuntimeException('Callback is not set.');
         }
 
+        FileLogger::getInstance()->Info("Execute {$this}");
+
         $result = call_user_func_array($this->callback, $this->arguments);
 
         if (!$result instanceof StepResult) {
@@ -61,4 +63,19 @@ class Step
 
         return $result;
     }
+
+    public function __toString(): string
+    {
+        if (is_array($this->callback)) {
+            [$class, $method] = $this->callback;
+            $cls = is_object($class) ? $class::class : $class;
+            return "Callable: [$cls, $method]";
+        } elseif (is_object($this->callback)) {
+            return "Callable: " . get_class($this->callback);
+        } elseif (is_string($this->callback)) {
+            return "Callable: {$this->callback}";
+        }
+        throw new \UnexpectedValueException("Unsupported callable type");
+    }
+    
 }

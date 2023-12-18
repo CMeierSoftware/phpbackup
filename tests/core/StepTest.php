@@ -67,6 +67,28 @@ final class StepTest extends TestCase
         self::assertSame('Result: Hello World', $result->returnValue);
         self::assertFalse($result->repeat);
     }
+
+    public function testToStringWithArrayCallback(): void
+    {
+        $callback = [StaticClass::class, 'exampleMethod'];
+        $step = new Step($callback);
+
+        $expected = "Callable: [" . StaticClass::class . ", exampleMethod]";
+        $actual = $step->__toString();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testToStringWithObjectCallback(): void
+    {
+        $callback = new StaticClass();
+        $step = new Step([$callback, 'exampleMethod']);
+
+        $expected = "Callable: [" . StaticClass::class . ", exampleMethod]";
+        $actual = $step->__toString();
+
+        $this->assertSame($expected, $actual);
+    }
 }
 
 // Define a static class with a method for testing
