@@ -192,7 +192,22 @@ final class AppConfigTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
      */
-    public function testSaveTempDataThrowsJsonExceptionOnInvalidData()
+    public function testSaveTempDataDirSepInTypeName()
+    {
+        $type = 'test\\test';
+        $data = ['key' => 'value'];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->config->saveTempData($type, $data);
+
+        $filePath = self::TEST_TEMP_DIR . $type . '.xml';
+        self::assertFileDoesNotExist($filePath);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
+     */
+    public function testSaveTempDataThrowsTypeErrorOnInvalidData()
     {
         $type = 'invalid';
         $data = fopen('php://stdin', 'r');

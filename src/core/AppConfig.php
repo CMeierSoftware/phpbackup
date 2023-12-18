@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
+use InvalidArgumentException;
 use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
 use Laminas\Config\Reader\Xml as XmlReader;
@@ -79,10 +80,18 @@ class AppConfig
      */
     public function saveTempData(string $type, array $data): void
     {
+        if (str_contains($type, DIRECTORY_SEPARATOR) || str_contains($type, '\\')) {
+            throw new InvalidArgumentException('type can not contain backslashes or directory separator characters.');
+        }
+        
         $filePath = $this->getTempDir() . $type . '.xml';
+        FileLogger::getInstance()->Info("Will write tempData to '{$filePath}'.");
+
         $config = new Config($data, false);
         $writer = new XmlWriter();
         $writer->toFile($filePath, $config);
+
+        FileLogger::getInstance()->Info("Wrote tempData to '{$filePath}'.");
     }
 
     /**
