@@ -73,8 +73,6 @@ abstract class SystemLocker
 
     private static function getLockFilePath(string $system_path): string
     {
-        $lockFile = $system_path . DIRECTORY_SEPARATOR . self::DEFAULT_LOCK_FILE;
-
-        return $lockFile;
+        return $system_path . DIRECTORY_SEPARATOR . self::DEFAULT_LOCK_FILE;
     }
 }
