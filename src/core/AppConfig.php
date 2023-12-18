@@ -17,7 +17,7 @@ if (!defined('ABS_PATH')) {
 class AppConfig
 {
     private const TMP_DIR = 'temp_';
-    private static array $config;
+    private array $config;
     private readonly string $configFile;
     private readonly string $tempDir;
 
