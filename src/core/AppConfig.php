@@ -74,7 +74,7 @@ class AppConfig
      * Write data to a file in JSON format.
      *
      * @param string $type the name of the file without extension
-     * @param mixed $data the data to be written to the file
+     * @param array $data the data to be written to the file
      *
      * @return bool true on success, false on failure
      */
@@ -109,6 +109,8 @@ class AppConfig
             throw new FileNotFoundException("Can not find {$filePath}.");
         }
         $reader = new XmlReader();
+
+        FileLogger::getInstance()->Info("Read tempData from '{$filePath}'.");
 
         return $reader->fromFile($filePath);
     }

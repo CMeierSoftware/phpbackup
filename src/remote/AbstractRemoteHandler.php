@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Remote;
 
+use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\RemoteStorageNotConnectedException;
@@ -61,6 +62,7 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("Can not create directory for '{$remoteFilePath}' in remote storage.");
         }
 
+        FileLogger::getInstance()->Info("Upload local file '{$localFilePath}' to remote storage '{$remoteFilePath}'");
         return $this->_fileUpload($localFilePath, $remoteFilePath);
     }
 
@@ -86,6 +88,9 @@ abstract class AbstractRemoteHandler
 
         FileHelper::makeDir(dirname($localFilePath));
 
+        FileLogger::getInstance()->Info("Download remote file '{$remoteFilePath}' to local storage '{$localFilePath}'");
+
+
         return $this->_fileDownload($localFilePath, $remoteFilePath);
     }
 
@@ -105,6 +110,8 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
         }
 
+        FileLogger::getInstance()->Info("Delete remote file '{$remoteFilePath}'");
+
         return $this->_fileDelete($remoteFilePath);
     }
 
@@ -114,7 +121,13 @@ abstract class AbstractRemoteHandler
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
 
-        return $this->_fileExists($remoteFilePath);
+        $result = $this->_fileExists($remoteFilePath);
+        if ($result) {
+            FileLogger::getInstance()->Info("Remote file '{$remoteFilePath}' does exist.");
+        } else {
+            FileLogger::getInstance()->Info("Remote file '{$remoteFilePath}' doesn't exist.");
+        }
+        return $result;
     }
 
     /**
@@ -125,6 +138,8 @@ abstract class AbstractRemoteHandler
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
+        // Todo: split path and file name , check if path exists
+        FileLogger::getInstance()->Info("Create remote directory '{$remoteFilePath}'.");
 
         return $this->_createDirectory($remoteFilePath);
     }

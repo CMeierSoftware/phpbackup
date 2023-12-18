@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -22,6 +23,8 @@ abstract class SystemLocker
      */
     public static function lock(string $system_path): void
     {
+        FileLogger::getInstance()->Info("lock the system.");
+
         if (self::isLocked($system_path)) {
             throw new SystemAlreadyLockedException('System-Locker: System is locked since ' . self::readLockFile($system_path) . ' UTC.');
         }
@@ -48,6 +51,8 @@ abstract class SystemLocker
      */
     public static function unlock(string $system_path): void
     {
+        FileLogger::getInstance()->Info("unlock the system.");
+
         if (LOCK_TS === self::readLockFile($system_path)) {
             unlink(self::getLockFilePath($system_path));
         }
@@ -59,15 +64,17 @@ abstract class SystemLocker
      */
     public static function readLockFile(string $system_path): string
     {
-        if (self::isLocked($system_path)) {
-            return file_get_contents(self::getLockFilePath($system_path));
+        if (!self::isLocked($system_path)) {
+            throw new FileNotFoundException('System not locked.');
         }
-
-        return '';
+        
+        return file_get_contents(self::getLockFilePath($system_path));
     }
 
     private static function getLockFilePath(string $system_path): string
     {
-        return $system_path . DIRECTORY_SEPARATOR . self::DEFAULT_LOCK_FILE;
+        $lockFile = $system_path . DIRECTORY_SEPARATOR . self::DEFAULT_LOCK_FILE;
+
+        return $lockFile;
     }
 }
