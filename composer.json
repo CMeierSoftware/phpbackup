@@ -4,6 +4,9 @@
     "type": "project",
     "license": "MIT",
     "autoload": {
+        "classmap": [
+            "src/"
+        ],
         "psr-4": {
             "CMS\\PhpBackup\\": "src/"
         }
