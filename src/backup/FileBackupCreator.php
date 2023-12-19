@@ -10,10 +10,14 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
+use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
 use PhpZip\ZipFile;
 
+/**
+ * Class FileBackupCreator
+ */
 class FileBackupCreator
 {
     private ZipFile $archive;
@@ -22,9 +26,9 @@ class FileBackupCreator
     private array $ignoreList = [];
 
     /**
-     * constructor of class.
+     * Constructor of class.
      *
-     * @param array $ignoreList a list of file or directory names to ignore
+     * @param array|null $ignoreList A list of file or directory names to ignore
      */
     public function __construct(array $ignoreList = null)
     {
@@ -35,7 +39,9 @@ class FileBackupCreator
     }
 
     /**
-     * Function runs the archive and backups everything recursive in the given path.
+     * Function runs the archive and backs up everything recursively in the given path.
+     *
+     * @param string $src Path to the source directory
      *
      * @return string Path of the created zip file
      */
@@ -53,6 +59,7 @@ class FileBackupCreator
         try {
             $this->archive->addFilesFromIterator($ignoreIterator);
             $this->archive->saveAsFile($this->archiveName);
+            FileLogger::getInstance()->info("Backup created for '{$src}' at '{$this->archiveName}'.");
         } finally {
             $this->archive->close();
         }
@@ -60,6 +67,14 @@ class FileBackupCreator
         return $this->archiveName;
     }
 
+    /**
+     * Function backs up only specified files from the source directory.
+     *
+     * @param string $src Path to the source directory
+     * @param array $files List of files to be backed up
+     *
+     * @return string Path of the created zip file
+     */
     public function backupOnly(string $src, array $files): string
     {
         $srcDir = $this->prepareBackup($src);
@@ -73,6 +88,7 @@ class FileBackupCreator
                 }
             }
             $this->archive->saveAsFile($this->archiveName);
+            FileLogger::getInstance()->info("Backup created for '{$src}' with specific files at '{$this->archiveName}'.");
         } finally {
             $this->archive->close();
         }
@@ -80,6 +96,14 @@ class FileBackupCreator
         return $this->archiveName;
     }
 
+    /**
+     * Prepares the backup by validating the source directory and setting up necessary parameters.
+     *
+     * @param string $src Path to the source directory
+     *
+     * @return string The validated source directory
+     * @throws FileNotFoundException If the source directory is not found
+     */
     private function prepareBackup(string $src): string
     {
         $srcDir = realpath($src);

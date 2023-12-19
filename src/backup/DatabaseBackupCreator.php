@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Backup;
 
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
+use CMS\PhpBackup\Core\FileLogger;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
+/**
+ * Class DatabaseBackupCreator
+ */
 class DatabaseBackupCreator
 {
     private readonly string $host;
@@ -21,10 +25,10 @@ class DatabaseBackupCreator
     /**
      * Constructs a new Backup object with the specified database connection details.
      *
-     * @param string $host the database host
-     * @param string $username the database username
-     * @param string $password the database password
-     * @param string $database the database name
+     * @param string $host The database host
+     * @param string $username The database username
+     * @param string $password The database password
+     * @param string $database The database name
      */
     public function __construct(string $host, string $username, string $password, string $database)
     {
@@ -38,35 +42,41 @@ class DatabaseBackupCreator
     /**
      * Creates a backup of the specified MySQL database using mysqldump.
      *
-     * @return false returns the backup filename if backup was successful, false otherwise
+     * @param string $compression_mode The compression mode (default is 'zlib')
+     *
+     * @return string The backup filename if the backup was successful
+     * @throws ShellCommandUnavailableException If mysqldump is not available
+     * @throws \mysqli_sql_exception If the database connection fails
+     * @throws \UnexpectedValueException If an invalid compression mode is provided
+     * @throws \Exception If the backup fails
      */
     public function backupMySql(string $compression_mode = 'zlib'): string
     {
-        if (!$this->isMysqldumpAvailable()) {
-            throw new ShellCommandUnavailableException('mysqldump is not available. please provide a correct path.');
-        }
+            if (!$this->isMysqldumpAvailable()) {
+                throw new ShellCommandUnavailableException('mysqldump is not available. please provide a correct path.');
+            }
 
-        $conn = mysqli_connect($this->host, $this->username, $this->password, $this->database);
-        if (!$conn) {
-            throw new \mysqli_sql_exception('Database connection failed: ' . mysqli_connect_error());
-        }
+            $conn = mysqli_connect($this->host, $this->username, $this->password, $this->database);
+            if (!$conn) {
+                throw new \mysqli_sql_exception('Database connection failed: ' . mysqli_connect_error());
+            }
 
-        // Set the name of the backup file with timestamp
-        $backupFile = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
+            // Set the name of the backup file with timestamp
+            $backupFile = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
 
-        $compression = '';
+            $compression = '';
 
-        if (extension_loaded('zlib') && 'zlib' === $compression_mode) {
-            // Use gzip compression
-            $backupFile .= '.gz';
-            $compression = ' | gzip ';
-        } elseif (extension_loaded('bz2') && 'bz2' === $compression_mode) {
-            // Use bzip2 compression
-            $backupFile .= '.bz2';
-            $compression = ' | bzip2 ';
-        } elseif ('None' !== $compression_mode) {
-            throw new \UnexpectedValueException('Invalid compression mode or compression mode not available.');
-        }
+            if (extension_loaded('zlib') && 'zlib' === $compression_mode) {
+                // Use gzip compression
+                $backupFile .= '.gz';
+                $compression = ' | gzip ';
+            } elseif (extension_loaded('bz2') && 'bz2' === $compression_mode) {
+                // Use bzip2 compression
+                $backupFile .= '.bz2';
+                $compression = ' | bzip2 ';
+            } elseif ('None' !== $compression_mode) {
+                throw new \UnexpectedValueException('Invalid compression mode or compression mode not available.');
+            }
 
         try {
             // Construct the mysqldump command
@@ -75,6 +85,7 @@ class DatabaseBackupCreator
             $output = shell_exec($command);
 
             if (empty($output)) {
+                FileLogger::getInstance()->info("MySQL backup created at '{$backupFile}'.");
                 return $backupFile;
             }
 
@@ -84,7 +95,11 @@ class DatabaseBackupCreator
         }
     }
 
-    // Function to check if mysqldump is available
+    /**
+     * Function to check if mysqldump is available.
+     *
+     * @return bool True if mysqldump is available, false otherwise
+     */
     private function isMysqldumpAvailable(): bool
     {
         $output = shell_exec("{$this->mysqldumpExe} --version 2>&1");
