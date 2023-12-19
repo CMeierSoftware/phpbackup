@@ -67,7 +67,7 @@ class StepManager
         $prevStepInfo = $this->getLastStepInfo();
 
         // Check if there is no previous step information or if steps have changed
-        if (null === $prevStepInfo || $prevStepInfo['step_hash'] !== md5(json_encode($this->steps))) {
+        if (null === $prevStepInfo || $prevStepInfo['step_hash'] !== md5(serialize($this->steps))) {
             $this->currentStepIdx = 0;
 
             return $this->steps[0];
@@ -76,7 +76,7 @@ class StepManager
         $this->currentStepIdx = ((int) ($prevStepInfo['last_step_index']) + 1) % count($this->steps);
 
         // Check if the delay for the current step has passed
-        $delay = time() - ($prevStepInfo['timestamp'] + $this->steps[$this->currentStepIdx]->delay);
+        $delay = microtime(true) - ($prevStepInfo['timestamp'] + $this->steps[$this->currentStepIdx]->delay);
         if ($delay >= 0) {
             return $this->steps[$this->currentStepIdx];
         }
@@ -99,10 +99,10 @@ class StepManager
         $content = [
             'last_step_index' => $this->currentStepIdx,
             'timestamp' => time(),
-            'step_hash' => md5(json_encode($this->steps)),
+            'step_hash' => md5(serialize($this->steps)),
         ];
 
-        file_put_contents($this->stepFile, json_encode($content));
+        file_put_contents($this->stepFile, serialize($content));
     }
 
     /**
@@ -116,6 +116,6 @@ class StepManager
             return null;
         }
 
-        return json_decode(file_get_contents($this->stepFile), true);
+        return unserialize(file_get_contents($this->stepFile));
     }
 }
