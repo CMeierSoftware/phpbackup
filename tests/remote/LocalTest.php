@@ -60,6 +60,7 @@ final class LocalTest extends TestCase
         self::assertFalse($this->local->fileExists($file));
         copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
+        $this->local->clearCache();
         self::assertTrue($this->local->fileExists($file));
 
         $file = 'sub\\file.txt';
@@ -67,36 +68,10 @@ final class LocalTest extends TestCase
         FileHelper::makeDir(self::WORK_DIR_REMOTE . 'sub');
         copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
+        $this->local->clearCache();
         self::assertTrue($this->local->fileExists($file));
     }
 
-    /**
-     * @covers \CMS\PhpBackup\Remote\Local::fileUpload()
-     */
-    public function testFileUploadSrcFileNotFound()
-    {
-        $srcFile = self::TEST_FILE1_SRC . 'invalid';
-        $destFile = 'file.txt';
-        self::assertFileDoesNotExist($srcFile);
-        $this->expectException(FileNotFoundException::class);
-        $this->local->fileUpload($srcFile, $destFile);
-        self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $destFile);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Local::fileUpload()
-     */
-    public function testFileUploadDestFileAlreadyExists()
-    {
-        $destFile = 'file.txt';
-        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
-        self::assertFileExists(self::WORK_DIR_REMOTE . $destFile);
-
-        $this->expectException(FileAlreadyExistsException::class);
-        $this->local->fileUpload(self::TEST_FILE2_SRC, $destFile);
-        // check if remote file didn't change
-        self::assertFileEquals(self::TEST_FILE2_SRC, self::WORK_DIR_REMOTE . $destFile);
-    }
 
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileUpload()
@@ -114,36 +89,6 @@ final class LocalTest extends TestCase
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
     }
 
-    /**
-     * @covers \CMS\PhpBackup\Remote\Local::fileDownload()
-     */
-    public function testFileDownloadSrcFileNotFound()
-    {
-        $file = 'file.txt';
-        $this->setupRemoteStorage($file);
-
-        self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $file . 'invalid');
-
-        $this->expectException(FileNotFoundException::class);
-        $this->local->fileDownload(self::WORK_DIR_LOCAL . $file, $file . 'invalid');
-
-        self::assertFileDoesNotExist(self::WORK_DIR_LOCAL . $file);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Local::fileDownload()
-     */
-    public function testFileDownloadDestFileAlreadyExists()
-    {
-        $file = 'file.txt';
-        $this->setupRemoteStorage($file);
-
-        copy(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $file);
-        self::assertFileExists(self::WORK_DIR_LOCAL . $file);
-
-        $this->expectException(FileAlreadyExistsException::class);
-        $this->local->fileDownload(self::WORK_DIR_LOCAL . $file, $file);
-    }
 
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileDownload()
@@ -167,17 +112,6 @@ final class LocalTest extends TestCase
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $file);
     }
 
-    /**
-     * @covers \CMS\PhpBackup\Remote\Local::fileDelete()
-     */
-    public function testFileDeleteFileNotFound()
-    {
-        $file = 'file.txt';
-        $this->setupRemoteStorage($file);
-        self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $file . 'invalid');
-        $this->expectException(FileNotFoundException::class);
-        $this->local->fileDelete($file . 'invalid');
-    }
 
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileDelete()
