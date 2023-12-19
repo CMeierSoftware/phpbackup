@@ -24,8 +24,8 @@ final class AppConfig
     /**
      * AppConfig constructor.
      *
-     * @param string $configFile The path of the configuration file.
-     * @param string $tempDir The path of the temporary directory.
+     * @param string $configFile the path of the configuration file
+     * @param string $tempDir the path of the temporary directory
      */
     private function __construct(string $configFile, string $tempDir)
     {
@@ -41,9 +41,11 @@ final class AppConfig
     /**
      * Loads the application configuration for a specific app.
      *
-     * @param string $app The app name.
-     * @return self An instance of the AppConfig class.
-     * @throws FileNotFoundException If the configuration file does not exist.
+     * @param string $app the app name
+     *
+     * @return self an instance of the AppConfig class
+     *
+     * @throws FileNotFoundException if the configuration file does not exist
      */
     public static function loadAppConfig(string $app): self
     {
@@ -58,31 +60,22 @@ final class AppConfig
     }
 
     /**
-     * Creates the temporary directory if it does not exist.
-     */
-    private function createTempDir(): void
-    {
-        if (!file_exists($this->tempDir)) {
-            FileHelper::makeDir($this->tempDir);
-        }
-    }
-
-    /**
      * Returns the path of the temporary directory.
      *
-     * @return string The path of the temporary directory.
+     * @return string the path of the temporary directory
      */
     public function getTempDir(): string
     {
         $this->createTempDir();
+
         return $this->tempDir . DIRECTORY_SEPARATOR;
     }
 
     /**
      * Saves temporary data of a specific type.
      *
-     * @param string $type The type of data.
-     * @param array $data The data to be saved.
+     * @param string $type the type of data
+     * @param array $data the data to be saved
      */
     public function saveTempData(string $type, array $data): void
     {
@@ -100,9 +93,11 @@ final class AppConfig
     /**
      * Reads and returns temporary data of a specific type.
      *
-     * @param string $type The type of data.
-     * @return array The temporary data.
-     * @throws FileNotFoundException If the data file does not exist.
+     * @param string $type the type of data
+     *
+     * @return array the temporary data
+     *
+     * @throws FileNotFoundException if the data file does not exist
      */
     public function readTempData(string $type): array
     {
@@ -121,7 +116,7 @@ final class AppConfig
     /**
      * Returns the backup database settings from the configuration file.
      *
-     * @return array|null The backup database settings.
+     * @return null|array the backup database settings
      */
     public function getBackupDatabase(): ?array
     {
@@ -131,7 +126,7 @@ final class AppConfig
     /**
      * Returns the backup directory settings from the configuration file.
      *
-     * @return array|null The backup directory settings.
+     * @return null|array the backup directory settings
      */
     public function getBackupDirectory(): ?array
     {
@@ -141,7 +136,7 @@ final class AppConfig
     /**
      * Returns the backup settings from the configuration file.
      *
-     * @return array|null The backup settings.
+     * @return null|array the backup settings
      */
     public function getBackupSettings(): ?array
     {
@@ -151,10 +146,20 @@ final class AppConfig
     /**
      * Returns the remote settings from the configuration file.
      *
-     * @return array|null The remote settings.
+     * @return null|array the remote settings
      */
     public function getRemoteSettings(): ?array
     {
         return isset($this->config['remote']) ? $this->config['remote'] : null;
+    }
+
+    /**
+     * Creates the temporary directory if it does not exist.
+     */
+    private function createTempDir(): void
+    {
+        if (!file_exists($this->tempDir)) {
+            FileHelper::makeDir($this->tempDir);
+        }
     }
 }

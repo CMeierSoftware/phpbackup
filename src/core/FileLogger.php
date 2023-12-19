@@ -10,7 +10,8 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-enum LogLevel: int {
+enum LogLevel: int
+{
     case OFF = 0;
     case ERROR = 1;
     case WARNING = 2;
@@ -21,21 +22,17 @@ final class FileLogger
 {
     public const DEFAULT_LOG_FILE = './logs.log';
 
-    protected static ?FileLogger $instance = null;
+    private static ?FileLogger $instance = null;
     private string $logFile = self::DEFAULT_LOG_FILE;
     private LogLevel $logLevel = LogLevel::OFF;
     private bool $echoLogs = false;
 
-    protected function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Clones the logger instance (disallowed).
      */
-    protected function __clone()
-    {
-    }
+    private function __clone() {}
 
     /**
      * Gets the singleton instance of the logger.
@@ -59,7 +56,6 @@ final class FileLogger
         $this->info("set log file to {$log_file}");
         $this->logFile = $log_file;
         FileHelper::makeDir(dirname($log_file));
-
     }
 
     /**

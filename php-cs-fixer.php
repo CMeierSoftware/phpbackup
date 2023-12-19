@@ -12,6 +12,7 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
+        '@PhpCsFixer' => true,
         '@PhpCsFixer:risky' => true,
         'align_multiline_comment' => ['comment_type' => 'all_multiline'],
         'phpdoc_align' => ['align' => 'left'],

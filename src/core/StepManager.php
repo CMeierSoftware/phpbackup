@@ -76,7 +76,7 @@ final class StepManager
             return $this->steps[0];
         }
 
-        $this->currentStepIdx = ((int) ($prevStepInfo['last_step_index']) + 1) % count($this->steps);
+        $this->currentStepIdx = ((int) $prevStepInfo['last_step_index'] + 1) % count($this->steps);
 
         // Check if the delay for the current step has passed
         $delay = microtime(true) - ($prevStepInfo['timestamp'] + $this->steps[$this->currentStepIdx]->delay);

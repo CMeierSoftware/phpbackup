@@ -62,7 +62,6 @@ final class Ftp extends AbstractRemoteHandler
         $this->connection = null;
     }
 
-
     protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
         return ftp_put($this->connection, $remoteFilePath, $localFilePath);
@@ -81,6 +80,7 @@ final class Ftp extends AbstractRemoteHandler
     protected function _fileExists(string $remoteFilePath): bool
     {
         $content = ftp_nlist($this->connection, $remoteFilePath);
+
         return in_array($fileName, $content, true);
     }
 

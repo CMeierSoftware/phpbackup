@@ -74,7 +74,7 @@ final class FileBundleCreator
         }
 
         // last element
-        if (!empty($currentBundle)){
+        if (!empty($currentBundle)) {
             $fileBundles[] = $currentBundle;
         }
 

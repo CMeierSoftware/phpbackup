@@ -28,6 +28,29 @@ final class Step
         $this->arguments = $arguments;
     }
 
+    public function __toString(): string
+    {
+        if (is_array($this->callback)) {
+            [$class, $method] = $this->callback;
+            $cls = is_object($class) ? $class::class : $class;
+
+            return "Callable: [{$cls}, {$method}]";
+        }
+        if (is_object($this->callback)) {
+            return 'Callable: ' . get_class($this->callback);
+        }
+        if (is_string($this->callback)) {
+            return "Callable: {$this->callback}";
+        }
+
+        throw new \UnexpectedValueException('Unsupported callable type');
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->delay, (string) $this, $this->arguments];
+    }
+
     /**
      * Execute the callback and return the result.
      *
@@ -50,24 +73,5 @@ final class Step
         }
 
         return $result;
-    }
-
-    public function __toString(): string
-    {
-        if (is_array($this->callback)) {
-            [$class, $method] = $this->callback;
-            $cls = is_object($class) ? $class::class : $class;
-            return "Callable: [$cls, $method]";
-        } elseif (is_object($this->callback)) {
-            return "Callable: " . get_class($this->callback);
-        } elseif (is_string($this->callback)) {
-            return "Callable: {$this->callback}";
-        }
-        throw new \UnexpectedValueException("Unsupported callable type");
-    }
-    
-    public function __serialize(): array
-    {
-        return [$this->delay, (string)$this, $this->arguments];
     }
 }

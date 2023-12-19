@@ -33,7 +33,6 @@ final class FileLoggerTest extends TestCase
         $this->logger = FileLogger::getInstance();
         $this->logger->setLogFile(self::LOG_FILE_PATH);
         $this->logger->setLogLevel(LogLevel::INFO);
-
     }
 
     protected function tearDown(): void

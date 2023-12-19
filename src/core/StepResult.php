@@ -19,7 +19,7 @@ final class StepResult
     /**
      * StepResult constructor.
      *
-     * @param mixed $returnValue The value returned by the step.
+     * @param mixed $returnValue the value returned by the step
      * @param bool $repeat Indicates whether the step should be repeated. Default is false.
      */
     public function __construct(mixed $returnValue, bool $repeat = false)
@@ -31,10 +31,10 @@ final class StepResult
     /**
      * Returns a string representation of the object.
      *
-     * @return string The string representation of the object.
+     * @return string the string representation of the object
      */
     public function __toString(): string
     {
-        return "ReturnValue: " . $this->returnValue . ", Repeat: " . ($this->repeat ? 'true' : 'false');
+        return 'ReturnValue: ' . $this->returnValue . ', Repeat: ' . ($this->repeat ? 'true' : 'false');
     }
 }

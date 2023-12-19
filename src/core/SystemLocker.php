@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
+
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 
 if (!defined('ABS_PATH')) {
@@ -20,14 +21,14 @@ final class SystemLocker
     /**
      * Tries to lock the system by creating a lock file.
      *
-     * @param string $system_path The path to the system.
+     * @param string $system_path the path to the system
      *
-     * @throws SystemAlreadyLockedException If the system is already locked.
-     * @throws \Exception If the system cannot be locked.
+     * @throws SystemAlreadyLockedException if the system is already locked
+     * @throws \Exception if the system cannot be locked
      */
     public static function lock(string $system_path): void
     {
-        FileLogger::getInstance()->info("lock the system.");
+        FileLogger::getInstance()->info('lock the system.');
 
         if (self::isLocked($system_path)) {
             throw new SystemAlreadyLockedException('System-Locker: System is locked since ' . self::readLockFile($system_path) . ' UTC.');
@@ -43,9 +44,9 @@ final class SystemLocker
     /**
      * Checks if the system is locked.
      *
-     * @param string $system_path The path to the system.
+     * @param string $system_path the path to the system
      *
-     * @return bool True if the system is locked, false otherwise.
+     * @return bool true if the system is locked, false otherwise
      */
     public static function isLocked(string $system_path): bool
     {
@@ -56,11 +57,11 @@ final class SystemLocker
      * Tries to unlock the system.
      * It only unlocks it if this instance locked it.
      *
-     * @param string $system_path The path to the system.
+     * @param string $system_path the path to the system
      */
     public static function unlock(string $system_path): void
     {
-        FileLogger::getInstance()->info("unlock the system.");
+        FileLogger::getInstance()->info('unlock the system.');
 
         if (LOCK_TS === self::readLockFile($system_path)) {
             unlink(self::getLockFilePath($system_path));
@@ -70,27 +71,27 @@ final class SystemLocker
     /**
      * Reads the content of the lock file.
      *
-     * @param string $system_path The path to the system.
+     * @param string $system_path the path to the system
      *
-     * @return string The content of the lock file.
+     * @return string the content of the lock file
      *
-     * @throws FileNotFoundException If the system is not locked.
+     * @throws FileNotFoundException if the system is not locked
      */
     public static function readLockFile(string $system_path): string
     {
         if (!self::isLocked($system_path)) {
             throw new FileNotFoundException('System not locked.');
         }
-        
+
         return file_get_contents(self::getLockFilePath($system_path));
     }
 
     /**
      * Returns the path to the lock file.
      *
-     * @param string $system_path The path to the system.
+     * @param string $system_path the path to the system
      *
-     * @return string The path to the lock file.
+     * @return string the path to the lock file
      */
     private static function getLockFilePath(string $system_path): string
     {

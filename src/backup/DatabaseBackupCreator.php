@@ -12,7 +12,7 @@ if (!defined('ABS_PATH')) {
 }
 
 /**
- * Class DatabaseBackupCreator
+ * Class DatabaseBackupCreator.
  */
 class DatabaseBackupCreator
 {
@@ -45,6 +45,7 @@ class DatabaseBackupCreator
      * @param string $compression_mode The compression mode (default is 'zlib')
      *
      * @return string The backup filename if the backup was successful
+     *
      * @throws ShellCommandUnavailableException If mysqldump is not available
      * @throws \mysqli_sql_exception If the database connection fails
      * @throws \UnexpectedValueException If an invalid compression mode is provided
@@ -52,31 +53,31 @@ class DatabaseBackupCreator
      */
     public function backupMySql(string $compression_mode = 'zlib'): string
     {
-            if (!$this->isMysqldumpAvailable()) {
-                throw new ShellCommandUnavailableException('mysqldump is not available. please provide a correct path.');
-            }
+        if (!$this->isMysqldumpAvailable()) {
+            throw new ShellCommandUnavailableException('mysqldump is not available. please provide a correct path.');
+        }
 
-            $conn = mysqli_connect($this->host, $this->username, $this->password, $this->database);
-            if (!$conn) {
-                throw new \mysqli_sql_exception('Database connection failed: ' . mysqli_connect_error());
-            }
+        $conn = mysqli_connect($this->host, $this->username, $this->password, $this->database);
+        if (!$conn) {
+            throw new \mysqli_sql_exception('Database connection failed: ' . mysqli_connect_error());
+        }
 
-            // Set the name of the backup file with timestamp
-            $backupFile = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
+        // Set the name of the backup file with timestamp
+        $backupFile = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
 
-            $compression = '';
+        $compression = '';
 
-            if (extension_loaded('zlib') && 'zlib' === $compression_mode) {
-                // Use gzip compression
-                $backupFile .= '.gz';
-                $compression = ' | gzip ';
-            } elseif (extension_loaded('bz2') && 'bz2' === $compression_mode) {
-                // Use bzip2 compression
-                $backupFile .= '.bz2';
-                $compression = ' | bzip2 ';
-            } elseif ('None' !== $compression_mode) {
-                throw new \UnexpectedValueException('Invalid compression mode or compression mode not available.');
-            }
+        if (extension_loaded('zlib') && 'zlib' === $compression_mode) {
+            // Use gzip compression
+            $backupFile .= '.gz';
+            $compression = ' | gzip ';
+        } elseif (extension_loaded('bz2') && 'bz2' === $compression_mode) {
+            // Use bzip2 compression
+            $backupFile .= '.bz2';
+            $compression = ' | bzip2 ';
+        } elseif ('None' !== $compression_mode) {
+            throw new \UnexpectedValueException('Invalid compression mode or compression mode not available.');
+        }
 
         try {
             // Construct the mysqldump command
@@ -86,6 +87,7 @@ class DatabaseBackupCreator
 
             if (empty($output)) {
                 FileLogger::getInstance()->info("MySQL backup created at '{$backupFile}'.");
+
                 return $backupFile;
             }
 

@@ -16,7 +16,7 @@ use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
 use PhpZip\ZipFile;
 
 /**
- * Class FileBackupCreator
+ * Class FileBackupCreator.
  */
 class FileBackupCreator
 {
@@ -28,7 +28,7 @@ class FileBackupCreator
     /**
      * Constructor of class.
      *
-     * @param array|null $ignoreList A list of file or directory names to ignore
+     * @param null|array $ignoreList A list of file or directory names to ignore
      */
     public function __construct(array $ignoreList = null)
     {
@@ -102,6 +102,7 @@ class FileBackupCreator
      * @param string $src Path to the source directory
      *
      * @return string The validated source directory
+     *
      * @throws FileNotFoundException If the source directory is not found
      */
     private function prepareBackup(string $src): string

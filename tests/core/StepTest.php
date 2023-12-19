@@ -73,7 +73,7 @@ final class StepTest extends TestCase
         $callback = [StaticClass::class, 'exampleMethod'];
         $step = new Step($callback);
 
-        $expected = "Callable: [" . StaticClass::class . ", exampleMethod]";
+        $expected = 'Callable: [' . StaticClass::class . ', exampleMethod]';
         $actual = $step->__toString();
 
         self::assertSame($expected, $actual);
@@ -84,7 +84,7 @@ final class StepTest extends TestCase
         $callback = new StaticClass();
         $step = new Step([$callback, 'exampleMethod']);
 
-        $expected = "Callable: [" . StaticClass::class . ", exampleMethod]";
+        $expected = 'Callable: [' . StaticClass::class . ', exampleMethod]';
         $actual = $step->__toString();
 
         self::assertSame($expected, $actual);

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace CMS\PhpBackup\App;
+
 use CMS\PhpBackup\Helper\FileHelper;
 
 if (!defined('ABS_PATH')) {
@@ -37,7 +38,7 @@ class BackupRunner extends AbstractRunner
 
         try {
             $misc = $this->config->readTempData(self::MISC_FILE);
-            if(null === $misc || empty($misc)) {
+            if (null === $misc || empty($misc)) {
                 $this->misc = $miscDefault;
             } else {
                 $this->misc = $misc;
@@ -61,7 +62,7 @@ class BackupRunner extends AbstractRunner
     public function setupStep(): StepResult
     {
         $srcDir = $this->config->getBackupDirectory()['src'];
-        $limit = (int) ($this->config->getBackupSettings()['maxArchiveSize']);
+        $limit = (int) $this->config->getBackupSettings()['maxArchiveSize'];
         $this->misc['bundles'] = FileBundleCreator::createFileBundles($srcDir, $limit);
 
         $this->misc['backup_folder'] = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
@@ -150,6 +151,7 @@ class BackupRunner extends AbstractRunner
         FileHelper::deleteDirectory($this->misc['backup_folder']);
         $this->misc['bundles'] = [];
         $this->misc['archives'] = [];
+
         return new StepResult('', false);
     }
 

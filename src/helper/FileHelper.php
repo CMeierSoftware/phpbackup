@@ -19,10 +19,10 @@ abstract class FileHelper
      */
     public static function moveFile(string $src, string $dest): void
     {
-        FileLogger::getInstance()->info("Move '{$src}' to {'$dest}.");
+        FileLogger::getInstance()->info("Move '{$src}' to '{$dest}'.");
 
         if (!rename($src, $dest)) {
-            throw new \Exception("Cannot move {$src} to {$dest}.");
+            throw new \Exception("Cannot move '{$src}' to '{$dest}'.");
         }
     }
 
@@ -57,7 +57,6 @@ abstract class FileHelper
         }
 
         FileLogger::getInstance()->info("Delete directory {$dirname} recursively.");
-
 
         $files = iterator_to_array(new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
