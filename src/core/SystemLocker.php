@@ -13,13 +13,17 @@ use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 
 define('LOCK_TS', date('Y.m.d-H:i:s', time()));
 
-abstract class SystemLocker
+final abstract class SystemLocker
 {
     public const DEFAULT_LOCK_FILE = '.lock_system';
 
     /**
-     * Function tries to lock the system.
-     * Throws an Exception if can not lock the system.
+     * Tries to lock the system by creating a lock file.
+     *
+     * @param string $system_path The path to the system.
+     *
+     * @throws SystemAlreadyLockedException If the system is already locked.
+     * @throws \Exception If the system cannot be locked.
      */
     public static function lock(string $system_path): void
     {
@@ -37,17 +41,22 @@ abstract class SystemLocker
     }
 
     /**
-     * Function checks if the system is locked.
-     * @return bool is system locked
+     * Checks if the system is locked.
+     *
+     * @param string $system_path The path to the system.
+     *
+     * @return bool True if the system is locked, false otherwise.
      */
     public static function isLocked(string $system_path): bool
     {
         return file_exists(self::getLockFilePath($system_path));
     }
 
-    /*
-     * Function tries to unlock the system.
-     * It only unlocks it, if this instance locked it.
+    /**
+     * Tries to unlock the system.
+     * It only unlocks it if this instance locked it.
+     *
+     * @param string $system_path The path to the system.
      */
     public static function unlock(string $system_path): void
     {
@@ -59,8 +68,13 @@ abstract class SystemLocker
     }
 
     /**
-     * Function reads content of the lock file
-     * @return string The entire file in a string, FALSE on failure
+     * Reads the content of the lock file.
+     *
+     * @param string $system_path The path to the system.
+     *
+     * @return string The content of the lock file.
+     *
+     * @throws FileNotFoundException If the system is not locked.
      */
     public static function readLockFile(string $system_path): string
     {
@@ -71,6 +85,13 @@ abstract class SystemLocker
         return file_get_contents(self::getLockFilePath($system_path));
     }
 
+    /**
+     * Returns the path to the lock file.
+     *
+     * @param string $system_path The path to the system.
+     *
+     * @return string The path to the lock file.
+     */
     private static function getLockFilePath(string $system_path): string
     {
         return $system_path . DIRECTORY_SEPARATOR . self::DEFAULT_LOCK_FILE;

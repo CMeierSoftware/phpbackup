@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\SystemLocker;
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
@@ -107,6 +108,7 @@ final class SystemLockerTest extends TestCase
      */
     public function testReadLockFileWhenUnlocked()
     {
+        self::expectException(FileNotFoundException::class);
         $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
 
         self::assertEmpty($lockTimestamp);
