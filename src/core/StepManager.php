@@ -8,7 +8,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-class StepManager
+final class StepManager
 {
     private readonly string $stepFile;
     private readonly array $steps;
