@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace CMS\PhpBackup\App;
+use CMS\PhpBackup\Helper\FileHelper;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -20,9 +21,7 @@ use CMS\PhpBackup\Remote\Local;
 
 class BackupRunner extends AbstractRunner
 {
-    private const BUNDLES_FILE = self::class . '_bundles';
-    private const ARCHIVES_FILE = self::class . '_files';
-    private const MISC_FILE = self::class . '_misc';
+    private const MISC_FILE = 'BackupRunner_misc';
 
     private array $misc;
 
@@ -30,59 +29,70 @@ class BackupRunner extends AbstractRunner
     {
         parent::__construct($config);
 
+        $miscDefault = [
+            'backup_folder' => '',
+            'bundles' => [],
+            'archives' => [],
+        ];
+
         try {
-            $this->misc = $this->config->readTempData(self::MISC_FILE);
+            $misc = $this->config->readTempData(self::MISC_FILE);
+            if(null === $misc || empty($misc)) {
+                $this->misc = $miscDefault;
+            } else {
+                $this->misc = $misc;
+                $this->misc['bundles'] = json_decode($this->misc['bundles'], true);
+                $this->misc['archives'] = json_decode($this->misc['archives'], true);
+            }
         } catch (FileNotFoundException $th) {
-            $this->misc = [];
+            $this->misc = $miscDefault;
         }
     }
 
     public function __destruct()
     {
+        $this->misc['bundles'] = json_encode($this->misc['bundles']);
+        $this->misc['archives'] = json_encode($this->misc['archives']);
+
         $this->config->saveTempData(self::MISC_FILE, $this->misc);
+        parent::__destruct();
     }
 
-    public function setup(): StepResult
+    public function setupStep(): StepResult
     {
         $srcDir = $this->config->getBackupDirectory()['src'];
-        $limit = $this->config->getBackupSettings()['maxArchiveSize'];
-        $bundles = FileBundleCreator::createFileBundles($srcDir, $limit);
-        $cntBundles = count($bundles);
-        $this->config->saveTempData(self::BUNDLES_FILE, $bundles);
-        $this->logger->Info("Split {$srcDir} into {$cntBundles} parts (size limit: {$limit}).");
+        $limit = (int) ($this->config->getBackupSettings()['maxArchiveSize']);
+        $this->misc['bundles'] = FileBundleCreator::createFileBundles($srcDir, $limit);
 
-        $this->misc['backup_folder'] = TEMP_DIR . DIRECTORY_SEPARATOR . 'backup_' . date('_Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
-        mkdir($this->misc['backup_folder'], 0o644, true);
-        $this->logger->Info('Create backup folder: ' . $this->misc['backup_folder']);
+        $this->misc['backup_folder'] = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
+        FileHelper::makeDir($this->misc['backup_folder']);
 
-        return new StepResult('', false);
+        return new StepResult('Setup done.', false);
     }
 
-    public function makeDirectoryBackup(): StepResult
+    public function makeDirectoryBackupStep(): StepResult
     {
-        $bundles = $this->config->readTempData(self::BUNDLES_FILE);
-
-        try {
-            $archives = $this->config->readTempData(self::ARCHIVES_FILE);
-        } catch (FileNotFoundException $th) {
-            $archives = [];
-        }
-        $idx = count($archives);
+        $idx = null !== $this->misc['archives'] ? count($this->misc['archives']) : 0;
         $f = new FileBackupCreator();
 
-        $result = $f->backupOnly($this->config->getBackupDirectory()['src'], $bundles[$idx]);
+        $result = $f->backupOnly($this->config->getBackupDirectory()['src'], $this->misc['bundles'][$idx]);
         $this->logger->Info("Archive files to '{$result}'");
 
         FileCrypt::encryptFile($result, $this->config->getBackupSettings()['encryptionKey']);
 
         $result = $this->copyToTempDir($result, "archive_part_{$idx}.zip");
 
-        $archives[$result] = $bundles[$idx];
+        $this->misc['archives'][$result] = $this->misc['bundles'][$idx];
 
-        return new StepResult($result, count($bundles) === count($archives));
+        $cntBundles = count($this->misc['bundles']);
+        $cntArchives = count($this->misc['archives']);
+
+        $this->logger->Info("Archived {$cntArchives} of {$cntBundles} bundles.");
+
+        return new StepResult($result, $cntArchives < $cntBundles);
     }
 
-    public function makeSqlBackup(): StepResult
+    public function makeSqlBackupStep(): StepResult
     {
         $result = '';
         if ($cfg = $this->config->getBackupDatabase()) {
@@ -101,9 +111,7 @@ class BackupRunner extends AbstractRunner
 
             $result = $this->copyToTempDir($result, basename($result));
 
-            $files = $this->config->readTempData(self::ARCHIVES_FILE);
-            $files[$result] = 'Database dump';
-            $this->config->saveTempData(self::ARCHIVES_FILE, $files);
+            $this->misc['archives'][$result] = 'Database dump';
         } else {
             $this->logger->Info('No database defined in config.');
         }
@@ -116,38 +124,47 @@ class BackupRunner extends AbstractRunner
         $localConfig = $this->config->getRemoteSettings()['local'];
 
         $local = new Local($localConfig['rootDir']);
+        $local->connect();
         $backupDirName = basename($this->misc['backup_folder']);
-        $archives = $this->config->readTempData(self::ARCHIVES_FILE);
         $uploadedFiles = [];
 
-        $local->createDirectory($backupDirName);
-        foreach ($archives as $archivePath => $content) {
-            $local->fileUpload($archivePath, $backupDirName);
+        if (!$local->fileExists($backupDirName)) {
+            $local->createDirectory($backupDirName);
+        }
+        foreach ($this->misc['archives'] as $archivePath => $content) {
+            $local->fileUpload($archivePath, $backupDirName . '/' . basename($archivePath));
             $uploadedFiles[basename($archivePath)] = $content;
         }
 
-        // todo: save uploadedFiles in remote storage
+        // Specify the file path
+        $fileMapping = $this->misc['backup_folder'] . 'file_mapping.json';
+        file_put_contents($fileMapping, json_encode($uploadedFiles, JSON_PRETTY_PRINT));
+
+        $local->fileUpload($fileMapping, $backupDirName . '/' . basename($fileMapping));
 
         return new StepResult('', false);
     }
 
     public function cleanUp(): StepResult
     {
+        FileHelper::deleteDirectory($this->misc['backup_folder']);
+        $this->misc['bundles'] = [];
+        $this->misc['archives'] = [];
         return new StepResult('', false);
     }
 
     protected function setupSteps(): void
     {
         $this->steps = [
-            new Step([$this, 'setup']),
-            new Step([$this, 'makeDirectoryBackup']),
-            new Step([$this, 'makeSqlBackup']),
+            new Step([$this, 'setupStep']),
+            new Step([$this, 'makeDirectoryBackupStep']),
+            new Step([$this, 'makeSqlBackupStep']),
             new Step([$this, 'sendLocal']),
             new Step([$this, 'cleanUp']),
         ];
     }
 
-    private function copyToTempDir(string $file, string $newName)
+    private function copyToTempDir(string $file, string $newName): string
     {
         $newFile = $this->misc['backup_folder'] . $newName;
         rename($file, $newFile);
