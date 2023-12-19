@@ -62,7 +62,7 @@ abstract class AbstractRunner
      */
     public function lockBackupDir(): void
     {
-        SystemLocker::lock($this->config->getBackupDirectory()['src']);
+        SystemLocker::lock($this->config->getTempDir());
     }
 
     /**
@@ -70,7 +70,7 @@ abstract class AbstractRunner
      */
     public function unlockBackupDir(): void
     {
-        SystemLocker::unlock($this->config->getBackupDirectory()['src']);
+        SystemLocker::unlock($this->config->getTempDir());
     }
 
     abstract protected function setupSteps();
