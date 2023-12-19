@@ -8,7 +8,10 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-abstract class LogLevel
+/**
+ * Represents different log levels for logging messages.
+ */
+final class LogLevel
 {
     public const OFF = 0;
     public const ERROR = 1;
@@ -18,9 +21,9 @@ abstract class LogLevel
     /**
      * Converts a log level integer value to its string representation.
      *
-     * @param int $level the log level integer value to convert
-     *
-     * @return string the string representation of the log level
+     * @param int $level The log level integer value to convert.
+     * @return string The string representation of the log level.
+     * @throws \Exception If an invalid log level is provided.
      */
     public static function toString(int $level): string
     {

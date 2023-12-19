@@ -14,7 +14,7 @@ use Laminas\Config\Writer\Xml as XmlWriter;
 if (!defined('ABS_PATH')) {
     return;
 }
-class AppConfig
+final class AppConfig
 {
     private const TMP_DIR = 'temp_';
     private array $config;

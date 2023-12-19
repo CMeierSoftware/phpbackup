@@ -11,9 +11,6 @@ if (!defined('ABS_PATH')) {
 /**
  * Represents the result of executing a step in a process.
  */
-/**
- * Represents the result of executing a step in a process.
- */
 final class StepResult
 {
     public $returnValue;

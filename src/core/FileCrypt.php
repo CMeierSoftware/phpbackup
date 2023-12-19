@@ -11,7 +11,7 @@ if (!defined('ABS_PATH')) {
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use Defuse\Crypto\File;
 
-abstract class FileCrypt
+final class FileCrypt
 {
     public static function encryptFile(string $inputFile, string $key)
     {
