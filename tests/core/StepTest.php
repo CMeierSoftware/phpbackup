@@ -76,7 +76,7 @@ final class StepTest extends TestCase
         $expected = "Callable: [" . StaticClass::class . ", exampleMethod]";
         $actual = $step->__toString();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     public function testToStringWithObjectCallback(): void
@@ -87,7 +87,7 @@ final class StepTest extends TestCase
         $expected = "Callable: [" . StaticClass::class . ", exampleMethod]";
         $actual = $step->__toString();
 
-        $this->assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 }
 

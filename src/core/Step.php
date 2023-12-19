@@ -8,19 +8,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-final class StepResult
-{
-    public $returnValue;
-    public bool $repeat;
-
-    public function __construct(mixed $returnValue, bool $repeat = false)
-    {
-        $this->returnValue = $returnValue;
-        $this->repeat = $repeat;
-    }
-}
-
-class Step
+final class Step
 {
     public readonly int $delay;
     private $callback;
