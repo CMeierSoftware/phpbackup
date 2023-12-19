@@ -81,7 +81,7 @@ final class Ftp extends AbstractRemoteHandler
     protected function _fileExists(string $remoteFilePath): bool
     {
         $content = ftp_nlist($this->connection, $remoteFilePath);
-        return in_array($fileName, $content);
+        return in_array($fileName, $content, true);
     }
 
     protected function _createDirectory(string $remoteFilePath): bool
