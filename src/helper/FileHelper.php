@@ -33,7 +33,7 @@ abstract class FileHelper
      *
      * @throws \Exception if the directory cannot be created
      */
-    public static function makeDir(string $path, int $mode = 0o644): void
+    public static function makeDir(string $path, int $mode = 0o755): void
     {
         if ('.' === $path) {
             return;
