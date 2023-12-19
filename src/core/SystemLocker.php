@@ -27,7 +27,7 @@ final class SystemLocker
      */
     public static function lock(string $system_path): void
     {
-        FileLogger::getInstance()->Info("lock the system.");
+        FileLogger::getInstance()->info("lock the system.");
 
         if (self::isLocked($system_path)) {
             throw new SystemAlreadyLockedException('System-Locker: System is locked since ' . self::readLockFile($system_path) . ' UTC.');
@@ -60,7 +60,7 @@ final class SystemLocker
      */
     public static function unlock(string $system_path): void
     {
-        FileLogger::getInstance()->Info("unlock the system.");
+        FileLogger::getInstance()->info("unlock the system.");
 
         if (LOCK_TS === self::readLockFile($system_path)) {
             unlink(self::getLockFilePath($system_path));

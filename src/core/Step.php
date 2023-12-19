@@ -41,7 +41,7 @@ final class Step
             throw new \RuntimeException('Callback is not set.');
         }
 
-        FileLogger::getInstance()->Info("Execute {$this}");
+        FileLogger::getInstance()->info("Execute {$this}");
 
         $result = call_user_func_array($this->callback, $this->arguments);
 

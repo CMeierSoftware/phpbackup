@@ -88,13 +88,13 @@ final class AppConfig
     {
         $sanitizedType = str_replace([DIRECTORY_SEPARATOR, '\\', '/'], '_', $type);
         $filePath = $this->getTempDir() . $sanitizedType . '.xml';
-        FileLogger::getInstance()->Info("Will write tempData to '{$filePath}'.");
+        FileLogger::getInstance()->info("Will write tempData to '{$filePath}'.");
 
         $config = new Config($data, false);
         $writer = new XmlWriter();
         $writer->toFile($filePath, $config);
 
-        FileLogger::getInstance()->Info("Wrote tempData to '{$filePath}'.");
+        FileLogger::getInstance()->info("Wrote tempData to '{$filePath}'.");
     }
 
     /**
@@ -113,7 +113,7 @@ final class AppConfig
         }
         $reader = new XmlReader();
 
-        FileLogger::getInstance()->Info("Read tempData from '{$filePath}'.");
+        FileLogger::getInstance()->info("Read tempData from '{$filePath}'.");
 
         return $reader->fromFile($filePath);
     }

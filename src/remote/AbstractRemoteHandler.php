@@ -62,7 +62,7 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("Can not create directory for '{$remoteFilePath}' in remote storage.");
         }
 
-        FileLogger::getInstance()->Info("Upload local file '{$localFilePath}' to remote storage '{$remoteFilePath}'");
+        FileLogger::getInstance()->info("Upload local file '{$localFilePath}' to remote storage '{$remoteFilePath}'");
         return $this->_fileUpload($localFilePath, $remoteFilePath);
     }
 
@@ -88,7 +88,7 @@ abstract class AbstractRemoteHandler
 
         FileHelper::makeDir(dirname($localFilePath));
 
-        FileLogger::getInstance()->Info("Download remote file '{$remoteFilePath}' to local storage '{$localFilePath}'");
+        FileLogger::getInstance()->info("Download remote file '{$remoteFilePath}' to local storage '{$localFilePath}'");
 
 
         return $this->_fileDownload($localFilePath, $remoteFilePath);
@@ -110,7 +110,7 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
         }
 
-        FileLogger::getInstance()->Info("Delete remote file '{$remoteFilePath}'");
+        FileLogger::getInstance()->info("Delete remote file '{$remoteFilePath}'");
 
         return $this->_fileDelete($remoteFilePath);
     }
@@ -123,9 +123,9 @@ abstract class AbstractRemoteHandler
 
         $result = $this->_fileExists($remoteFilePath);
         if ($result) {
-            FileLogger::getInstance()->Info("Remote file '{$remoteFilePath}' does exist.");
+            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' does exist.");
         } else {
-            FileLogger::getInstance()->Info("Remote file '{$remoteFilePath}' doesn't exist.");
+            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' doesn't exist.");
         }
         return $result;
     }
@@ -139,7 +139,7 @@ abstract class AbstractRemoteHandler
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
         // Todo: split path and file name , check if path exists
-        FileLogger::getInstance()->Info("Create remote directory '{$remoteFilePath}'.");
+        FileLogger::getInstance()->info("Create remote directory '{$remoteFilePath}'.");
 
         return $this->_createDirectory($remoteFilePath);
     }

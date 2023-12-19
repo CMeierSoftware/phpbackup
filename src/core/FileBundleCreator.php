@@ -17,15 +17,13 @@ final class FileBundleCreator
     public static function createFileBundles(string $directory, int $sizeLimitInMB): array
     {
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
-        $directory = rtrim($directory, '/');
-        $directory = rtrim($directory, '\\');
-        $directory = rtrim($directory, DIRECTORY_SEPARATOR);
+        $directory = rtrim($directory, '/\\' . DIRECTORY_SEPARATOR);
 
-        FileLogger::getInstance()->Info("Calculate bundles for '{$directory}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
+        FileLogger::getInstance()->info("Calculate bundles for '{$directory}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
 
         $bundles = self::packDirectory($directory, $sizeLimit);
         $cnt = count($bundles);
-        FileLogger::getInstance()->Info("Calculated {$cnt} bundles for '{$directory}'.");
+        FileLogger::getInstance()->info("Calculated {$cnt} bundles for '{$directory}'.");
 
         return $bundles;
     }

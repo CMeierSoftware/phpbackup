@@ -90,10 +90,10 @@ final class StepManager
     private function saveCurrentStep(bool $repeatCurrentStep): void
     {
         if ($repeatCurrentStep) {
-            FileLogger::getInstance()->Info('On next call, execute this step again.');
+            FileLogger::getInstance()->info('On next call, execute this step again.');
             $this->currentStepIdx = ($this->currentStepIdx < 0 ? count($this->steps) : $this->currentStepIdx) - 1;
         } else {
-            FileLogger::getInstance()->Info('On next call, execute next step.');
+            FileLogger::getInstance()->info('On next call, execute next step.');
         }
 
         $content = [

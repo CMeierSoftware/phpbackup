@@ -17,9 +17,9 @@ abstract class FileHelper
      *
      * @throws \Exception if the file cannot be moved
      */
-    public static function moveFile(string $src, string $dest)
+    public static function moveFile(string $src, string $dest): void
     {
-        FileLogger::getInstance()->Info("Move '{$src}' to {'$dest}.");
+        FileLogger::getInstance()->info("Move '{$src}' to {'$dest}.");
 
         if (!rename($src, $dest)) {
             throw new \Exception("Cannot move {$src} to {$dest}.");
@@ -38,7 +38,7 @@ abstract class FileHelper
         if ('.' === $path) {
             return;
         }
-        FileLogger::getInstance()->Info("Create directory {$path}.");
+        FileLogger::getInstance()->info("Create directory {$path}.");
         if (!is_dir($path) && !mkdir($path, $mode, true)) {
             throw new \Exception("Cannot create {$path}.");
         }
@@ -50,13 +50,13 @@ abstract class FileHelper
      *
      * @param string $dirname path to the directory which should be deleted
      */
-    public static function deleteDirectory(string $dirname)
+    public static function deleteDirectory(string $dirname): void
     {
         if (!self::doesDirExists($dirname)) {
             return;
         }
 
-        FileLogger::getInstance()->Info("Delete directory {$dirname} recursively.");
+        FileLogger::getInstance()->info("Delete directory {$dirname} recursively.");
 
 
         $files = iterator_to_array(new \RecursiveIteratorIterator(
@@ -95,7 +95,7 @@ abstract class FileHelper
      *
      * @throws \Exception if there is a problem changing the file permissions
      */
-    public static function changePermission(string $file, int $chmod)
+    public static function changePermission(string $file, int $chmod): void
     {
         if (!chmod($file, $chmod)) {
             throw new \Exception("Failed to set permissions on file {$file}");
