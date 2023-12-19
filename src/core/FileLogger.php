@@ -10,14 +10,21 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
+enum LogLevel: int {
+    case OFF = 0;
+    case ERROR = 1;
+    case WARNING = 2;
+    case INFO = 3;
+}
+
 final class FileLogger
 {
     public const DEFAULT_LOG_FILE = './logs.log';
 
     protected static ?FileLogger $instance = null;
-    private string $log_file = self::DEFAULT_LOG_FILE;
-    private int $log_level = LogLevel::WARNING;
-    private bool $echo_logs = false;
+    private string $logFile = self::DEFAULT_LOG_FILE;
+    private LogLevel $logLevel = LogLevel::OFF;
+    private bool $echoLogs = false;
 
     protected function __construct()
     {
@@ -49,9 +56,9 @@ final class FileLogger
      */
     public function setLogFile(string $log_file): void
     {
-            $this->log_file = $log_file;
-            FileHelper::makeDir(dirname($log_file));
-            $this->info("set log file to {$log_file}");
+        $this->info("set log file to {$log_file}");
+        $this->logFile = $log_file;
+        FileHelper::makeDir(dirname($log_file));
 
     }
 
@@ -59,10 +66,10 @@ final class FileLogger
      * Set the Log level
      * Type must be from 'LogLevel'.
      */
-    public function setLogLevel(int $log_level): void
+    public function setLogLevel(LogLevel $newLogLevel): void
     {
-        $this->info('set log level to ' . LogLevel::toString($log_level));
-        $this->log_level = $log_level;
+        $this->info('set log level to ' . $newLogLevel->name);
+        $this->logLevel = $newLogLevel;
     }
 
     /**
@@ -71,7 +78,7 @@ final class FileLogger
      */
     public function activateEchoLogs(): void
     {
-        $this->echo_logs = true;
+        $this->echoLogs = true;
     }
 
     /**
@@ -79,7 +86,7 @@ final class FileLogger
      */
     public function deactivateEchoLogs(): void
     {
-        $this->echo_logs = false;
+        $this->echoLogs = false;
     }
 
     /**
@@ -93,7 +100,7 @@ final class FileLogger
     /**
      * Writes a message of the level 'Warning'.
      */
-    public function warning(string $message)
+    public function warning(string $message): void
     {
         $this->writeEntry(LogLevel::WARNING, $message);
     }
@@ -111,12 +118,12 @@ final class FileLogger
     /**
      * Writes a log entry to the file if the log level is equal to or greater than the specified level.
      *
-     * @param int $level The log level of the message
+     * @param LogLevel $level The log level of the message
      * @param string $message The message to be logged
      */
-    private function writeEntry(int $level, string $message): void
+    private function writeEntry(LogLevel $level, string $message): void
     {
-        if ($this->log_level >= $level) {
+        if ($this->logLevel->value >= $level->value) {
             $entry = $this->concatEntry($level, $message);
             $this->writeToFile($entry);
         }
@@ -125,12 +132,12 @@ final class FileLogger
     /**
      * Formats a log entry with the specified log level, timestamp, and message.
      *
-     * @param int $level The log level of the message
+     * @param -LogLevel $level The log level of the message
      * @param string $message The message to be logged
      *
      * @return string The formatted log entry
      */
-    private function concatEntry(int $level, string $message): string
+    private function concatEntry(LogLevel $level, string $message): string
     {
         $timestamp = date('d.m.Y H:i:s');
         $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 4);
@@ -141,7 +148,7 @@ final class FileLogger
             $class = basename($trace[3]['file']);
         }
 
-        return LogLevel::toString($level) . "\t" . $timestamp . "\t" . $class . ': ' . $message . "\n";
+        return $level->name . "\t" . $timestamp . "\t" . $class . ': ' . $message . "\n";
     }
 
     /**
@@ -151,9 +158,9 @@ final class FileLogger
      */
     private function writeToFile(string $entry): void
     {
-        file_put_contents($this->log_file, $entry, FILE_APPEND | LOCK_EX);
+        file_put_contents($this->logFile, $entry, FILE_APPEND | LOCK_EX);
 
-        if ($this->echo_logs) {
+        if ($this->echoLogs) {
             echo $entry . '<br>';
         }
     }
