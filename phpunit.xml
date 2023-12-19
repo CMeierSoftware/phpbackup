@@ -13,6 +13,9 @@
          failOnNotice="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnTestsThatTriggerNotices="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToErrors="true"
+         convertErrorsToExceptions="true"
         >
     <testsuites>
         <testsuite name="Core">
@@ -29,7 +32,7 @@
         </testsuite>
     </testsuites>
 
-    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+    <source restrictDeprecations="false" restrictNotices="false" restrictWarnings="false">
         <include>
             <directory>src</directory>
         </include>
