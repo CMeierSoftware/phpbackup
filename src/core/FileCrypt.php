@@ -11,76 +11,81 @@ if (!defined('ABS_PATH')) {
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use Defuse\Crypto\File;
 
+/**
+ * Class FileCrypt
+ * @package CMS\PhpBackup\Core
+ */
 final class FileCrypt
 {
-    public static function encryptFile(string $inputFile, string $key)
+    /**
+     * Encrypts or decrypts a file using a given key.
+     *
+     * @param string $inputFile The path to the input file.
+     * @param string $key The encryption or decryption key.
+     * @param bool $isEncrypt If true, performs encryption; otherwise, performs decryption.
+     * @throws \InvalidArgumentException If the key is empty.
+     * @throws FileNotFoundException If the input file is not found.
+     * @throws \Exception If any other error occurs during encryption or decryption.
+     */
+    private static function processFile(string $inputFile, string $key, bool $isEncrypt): void
     {
-        // Check if the key is empty
         if (empty($key)) {
-            throw new \InvalidArgumentException('Encryption key cannot be empty.');
+            throw new \InvalidArgumentException(($isEncrypt ? 'Encryption' : 'Decryption') . ' key cannot be empty.');
         }
 
-        // Check if the file exists
         if (!file_exists($inputFile)) {
             throw new FileNotFoundException("File not found: $inputFile");
         }
 
         $tempFile = $inputFile . uniqid();
+        $action = $isEncrypt ? 'Encrypt' : 'Decrypt';
 
-        FileLogger::getInstance()->Info("Encrypt '{$inputFile}' into temp file '{$tempFile}'.");
+        FileLogger::getInstance()->info("$action '{$inputFile}' into temp file '{$tempFile}'.");
 
         try {
-            File::encryptFileWithPassword($inputFile, $tempFile, $key);
+            $method = strtolower($action) . 'FileWithPassword';
+            File::$method($inputFile, $tempFile, $key);
         } catch (\Exception $th) {
             unlink($tempFile);
-
             throw $th;
         }
 
-        // Delete the original file
         if (!unlink($inputFile)) {
-            throw new \Exception('Failed to delete the original file after encryption.');
+            throw new \Exception("Failed to delete the original file after $action.");
         }
 
         if (!rename($tempFile, $inputFile)) {
-            throw new \Exception('Failed to rename the temporary file after encryption.');
+            throw new \Exception("Failed to rename the temporary file after $action.");
         }
-        FileLogger::getInstance()->Info("Renamed tempFile back to inputFile.");
 
+        FileLogger::getInstance()->info("Renamed tempFile back to inputFile.");
     }
 
-    public static function decryptFile(string $inputFile, string $key)
+    /**
+     * Encrypts a file using a given key.
+     *
+     * @param string $inputFile The path to the input file.
+     * @param string $key The encryption key.
+     * @throws \InvalidArgumentException If the encryption key is empty.
+     * @throws FileNotFoundException If the input file is not found.
+     * @throws \Exception If any other error occurs during encryption.
+     */
+    public static function encryptFile(string $inputFile, string $key): void
     {
-        // Check if the key is empty
-        if (empty($key)) {
-            throw new \InvalidArgumentException('Decryption key cannot be empty.');
-        }
+        self::processFile($inputFile, $key, true);
+    }
 
-        // Check if the file exists
-        if (!file_exists($inputFile)) {
-            throw new FileNotFoundException("File not found: $inputFile");
-        }
-
-        $tempFile = $inputFile . uniqid();
-
-        FileLogger::getInstance()->Info("Decrypt '{$inputFile}' into temp file '{$tempFile}'.");
-
-        try {
-            File::decryptFileWithPassword($inputFile, $tempFile, $key);
-        } catch (\Exception $th) {
-            unlink($tempFile);
-
-            throw $th;
-        }
-
-        // Delete the original file
-        if (!unlink($inputFile)) {
-            throw new \Exception('Failed to delete the original file after encryption.');
-        }
-
-        if (!rename($tempFile, $inputFile)) {
-            throw new \Exception('Failed to rename the temporary file after encryption.');
-        }
-        FileLogger::getInstance()->Info("Renamed tempFile back to inputFile.");
+    /**
+     * Decrypts a file using a given key.
+     *
+     * @param string $inputFile The path to the input file.
+     * @param string $key The decryption key.
+     * @throws \InvalidArgumentException If the decryption key is empty.
+     * @throws FileNotFoundException If the input file is not found.
+     * @throws \Exception If any other error occurs during decryption.
+     */
+    public static function decryptFile(string $inputFile, string $key): void
+    {
+        self::processFile($inputFile, $key, false);
     }
 }
