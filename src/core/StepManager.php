@@ -64,10 +64,13 @@ final class StepManager
      */
     private function getNextStep(): ?Step
     {
-        $prevStepInfo = $this->getLastStepInfo();
+        $prevStepInfo = false;
+        if (file_exists($this->stepFile) && 0 !== filesize($this->stepFile)) {
+            $prevStepInfo = unserialize(file_get_contents($this->stepFile));
+        }
 
         // Check if there is no previous step information or if steps have changed
-        if (null === $prevStepInfo || $prevStepInfo['step_hash'] !== md5(serialize($this->steps))) {
+        if (!$prevStepInfo || $prevStepInfo['step_hash'] !== md5(serialize($this->steps))) {
             $this->currentStepIdx = 0;
 
             return $this->steps[0];
@@ -103,19 +106,5 @@ final class StepManager
         ];
 
         file_put_contents($this->stepFile, serialize($content));
-    }
-
-    /**
-     * Gets information about the last executed step from the step file.
-     *
-     * @return null|array the information about the last executed step, or null if no information is available
-     */
-    private function getLastStepInfo(): ?array
-    {
-        if (!file_exists($this->stepFile) || 0 === filesize($this->stepFile)) {
-            return null;
-        }
-
-        return unserialize(file_get_contents($this->stepFile));
     }
 }
