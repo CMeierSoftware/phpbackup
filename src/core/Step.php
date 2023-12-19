@@ -66,4 +66,8 @@ final class Step
         throw new \UnexpectedValueException("Unsupported callable type");
     }
     
+    public function __serialize(): array
+    {
+        return [$this->delay, (string)$this, $this->arguments];
+    }
 }
