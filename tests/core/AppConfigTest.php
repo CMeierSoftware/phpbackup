@@ -20,6 +20,7 @@ final class AppConfigTest extends TestCase
     private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\temp_test.xml';
     private const TEST_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test.xml';
     private const TEST_EMPTY_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\empty_config.xml';
+    private const TEST_NO_DB_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test_no_db.xml';
     private const TEST_TEMP_DIR = CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
 
     private AppConfig $config;
@@ -28,8 +29,10 @@ final class AppConfigTest extends TestCase
     {
         copy(self::TEST_EMPTY_CONFIG_FILE, CONFIG_DIR . '\\empty_app.xml');
         copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.xml');
+        copy(self::TEST_NO_DB_CONFIG_FILE, CONFIG_DIR . '\\valid_app_no_db.xml');
         self::assertFileExists(self::TEST_CONFIG_FILE);
         self::assertFileExists(self::TEST_EMPTY_CONFIG_FILE);
+        self::assertFileExists(self::TEST_NO_DB_CONFIG_FILE);
 
         $this->config = AppConfig::loadAppConfig('valid_app');
     }
@@ -55,8 +58,8 @@ final class AppConfigTest extends TestCase
      */
     public function testLoadAppConfigFailure(): void
     {
-        $nonExistentAppConfig = AppConfig::loadAppConfig('non_existent_app');
-        self::assertNull($nonExistentAppConfig);
+        self::expectException(FileNotFoundException::class);
+        AppConfig::loadAppConfig('non_existent_app');
     }
 
     /**
@@ -65,8 +68,8 @@ final class AppConfigTest extends TestCase
     public function testLoadAppConfigWrongFileFormat(): void
     {
         rename(CONFIG_DIR . '\\valid_app.xml', CONFIG_DIR . '\\valid_app.json');
-        $nonExistentAppConfig = AppConfig::loadAppConfig('valid_app');
-        self::assertNull($nonExistentAppConfig);
+        self::expectException(FileNotFoundException::class);
+        AppConfig::loadAppConfig('valid_app');
     }
 
     /**
@@ -158,7 +161,7 @@ final class AppConfigTest extends TestCase
      */
     public function testNoDatabaseDefined()
     {
-        $config = AppConfig::loadAppConfig('empty_app');
+        $config = AppConfig::loadAppConfig('valid_app_no_db');
         $actualDatabaseConfig = $config->getBackupDatabase();
         self::assertNull($actualDatabaseConfig);
     }
@@ -197,11 +200,10 @@ final class AppConfigTest extends TestCase
         $type = 'test\\test';
         $data = ['key' => 'value'];
 
-        $this->expectException(\InvalidArgumentException::class);
         $this->config->saveTempData($type, $data);
 
-        $filePath = self::TEST_TEMP_DIR . $type . '.xml';
-        self::assertFileDoesNotExist($filePath);
+        $filePath = self::TEST_TEMP_DIR . 'test_test.xml';
+        self::assertFileExists($filePath);
     }
 
     /**

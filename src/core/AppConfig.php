@@ -30,7 +30,11 @@ final class AppConfig
     private function __construct(string $configFile, string $tempDir)
     {
         $this->configFile = $configFile;
-        $this->config = LaminasConfigFactory::fromFile($configFile);
+        $cfg = LaminasConfigFactory::fromFile($configFile);
+        if (empty($cfg) || !is_array($cfg)) {
+            throw new \Laminas\Config\Exception\UnprocessableConfigException('');
+        }
+        $this->config = $cfg;
         $this->tempDir = $tempDir;
     }
 

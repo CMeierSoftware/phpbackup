@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <backup>
+        <directory>
+            <src>.</src>
+        </directory>
+        <settings>
+            <maxArchiveSize>5</maxArchiveSize>
+            <encryptionKey>some_random_Key</encryptionKey>
+        </settings>
+    </backup>
+    <remote>
+        <local>
+            <rootDir></rootDir>
+        </local>
+        <backblaze>
+            <accountId>some_id</accountId>
+            <applicationKey>some_key</applicationKey>
+            <bucketName>some_name</bucketName>
+        </backblaze>
+    </remote>
+</config>
