@@ -13,7 +13,7 @@ use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 
 define('LOCK_TS', date('Y.m.d-H:i:s', time()));
 
-final abstract class SystemLocker
+final class SystemLocker
 {
     public const DEFAULT_LOCK_FILE = '.lock_system';
 
