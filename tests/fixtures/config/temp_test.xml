@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <laminas-config>
   <key>value</key>
+  <bundles_0>item1</bundles_0>
+  <bundles_0>item2</bundles_0>
+  <bundles_1>item3</bundles_1>
+  <bundles_1>item4</bundles_1>
 </laminas-config>
