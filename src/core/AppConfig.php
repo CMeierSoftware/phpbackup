@@ -83,6 +83,16 @@ final class AppConfig
         $filePath = $this->getTempDir() . $sanitizedType . '.xml';
         FileLogger::getInstance()->info("Will write tempData to '{$filePath}'.");
 
+        if (isset($data['bundles']) && is_array($data['bundles'])) {
+            // Iterate through each bundle and create new keys like 'bundles_0', 'bundles_1', etc.
+            foreach ($data['bundles'] as $index => $bundle) {
+                $data["bundles_{$index}"] = $bundle;
+            }
+
+            // Remove the original 'bundles' key
+            unset($data['bundles']);
+        }
+
         $config = new Config($data, false);
         $writer = new XmlWriter();
         $writer->toFile($filePath, $config);
@@ -110,7 +120,17 @@ final class AppConfig
 
         FileLogger::getInstance()->info("Read tempData from '{$filePath}'.");
 
-        return $reader->fromFile($filePath);
+        $data = $reader->fromFile($filePath);
+
+        foreach (array_keys($data) as $key) {
+            if (str_starts_with($key, 'bundles_')) {
+                $idx = (int) explode('_', $key)[1];
+                $data['bundles'][$idx] = $data[$key];
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
     }
 
     /**

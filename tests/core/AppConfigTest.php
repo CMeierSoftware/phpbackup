@@ -183,7 +183,13 @@ final class AppConfigTest extends TestCase
     public function testSaveTempDataSuccessfullySavesDataToFile()
     {
         $type = 'test';
-        $data = ['key' => 'value'];
+        $data = [
+            'key' => 'value',
+            'bundles' => [
+                ['item1', 'item2'],
+                ['item3', 'item4'],
+            ],
+        ];
 
         $this->config->saveTempData($type, $data);
 
@@ -230,7 +236,13 @@ final class AppConfigTest extends TestCase
     public function testReadTempData()
     {
         $type = 'test';
-        $data = ['key' => 'value'];
+        $data = [
+            'key' => 'value',
+            'bundles' => [
+                ['item1', 'item2'],
+                ['item3', 'item4'],
+            ],
+        ];
 
         // Save data to file for testing
         $this->config->saveTempData($type, $data);
