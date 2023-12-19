@@ -27,7 +27,10 @@ abstract class AbstractRunner
     public function __construct(AppConfig $config)
     {
         $this->config = $config;
-        $this->logger = FileLogger::GetInstance($this->config->getTempDir() . 'debug.log', LogLevel::INFO, true);
+        $this->logger = FileLogger::GetInstance();
+        $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
+        $this->logger->setLogLevel(LogLevel::INFO);
+        $this->logger->activateEchoLogs();
         $this->setupSteps();
         $this->stepManager = new StepManager($this->steps, $this->config->getTempDir());
     }
