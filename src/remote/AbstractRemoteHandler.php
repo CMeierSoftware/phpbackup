@@ -82,11 +82,11 @@ abstract class AbstractRemoteHandler
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
-        if (!$this->fileExists($remoteFilePath)) {
-            throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
-        }
         if (file_exists($localFilePath)) {
             throw new FileAlreadyExistsException("The file '{$localFilePath}' already exists on local storage.");
+        }
+        if (!$this->fileExists($remoteFilePath)) {
+            throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
         }
 
         FileHelper::makeDir(dirname($localFilePath));
@@ -127,7 +127,7 @@ abstract class AbstractRemoteHandler
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
-        var_dump($this->fileExistsCache);
+
         if (!isset($this->fileExistsCache[$remoteFilePath])) {
             $result = $this->_fileExists($remoteFilePath);
             $this->fileExistsCache[$remoteFilePath] = $result;
@@ -162,6 +162,7 @@ abstract class AbstractRemoteHandler
         if (!empty($pathInfo['extension'])) {
             $remoteFilePath = $directoryPath;
         }
+
         if (!$this->fileExists($remoteFilePath)) {
             FileLogger::getInstance()->info("Create remote directory '{$remoteFilePath}'.");
 
