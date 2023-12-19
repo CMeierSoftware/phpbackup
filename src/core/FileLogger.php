@@ -10,53 +10,35 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-class FileLogger
+final class FileLogger
 {
-    public const DEFAULT_LOG_FILE = './logs.txt';
+    public const DEFAULT_LOG_FILE = './logs.log';
 
     protected static ?FileLogger $instance = null;
     private string $log_file = self::DEFAULT_LOG_FILE;
     private int $log_level = LogLevel::WARNING;
     private bool $echo_logs = false;
 
-    /**
-     * Constructs the logger instance.
-     *
-     * @param string $log_file the path to the log file
-     * @param int $log_level the log level to use
-     * @param bool $echo_logs whether to echo log messages in HTML format
-     */
-    protected function __construct(string $log_file, int $log_level, bool $echo_logs)
+    protected function __construct()
     {
-        // $this->log_file = $log_file;
-        $this->SetLogFile($log_file);
-        $this->SetLogLevel($log_level);
-
-        if ($echo_logs) {
-            $this->ActivateEchoLogs();
-        } else {
-            $this->DeactivateEchoLogs();
-        }
     }
 
     /**
      * Clones the logger instance (disallowed).
      */
-    protected function __clone() {}
+    protected function __clone()
+    {
+    }
 
     /**
      * Gets the singleton instance of the logger.
      *
-     * @param string $log_file The path to the log file (optional, default: `logs.txt`).
-     * @param int $log_level the log level to use (optional, default: `LogLevel::WARNING`)
-     * @param bool $echo_logs whether to echo log messages in HTML format (optional, default: `false`)
-     *
      * @return FileLogger the singleton instance of the logger
      */
-    public static function getInstance(string $log_file = self::DEFAULT_LOG_FILE, int $log_level = LogLevel::WARNING, bool $echo_logs = false): self
+    public static function getInstance(): self
     {
         if (null === self::$instance) {
-            self::$instance = new self($log_file, $log_level, $echo_logs);
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -65,18 +47,29 @@ class FileLogger
     /**
      * Function sets a new path to a log file. This new file will be created if it still not exists.
      */
-    public function SetLogFile(string $log_file)
+    public function setLogFile(string $log_file): void
     {
-        $this->log_file = $log_file;
-        FileHelper::makeDir(dirname($log_file));
-        $this->Info("set log file to {$log_file}");
+            $this->log_file = $log_file;
+            FileHelper::makeDir(dirname($log_file));
+            $this->info("set log file to {$log_file}");
+
+    }
+
+    /**
+     * Set the Log level
+     * Type must be from 'LogLevel'.
+     */
+    public function setLogLevel(int $log_level): void
+    {
+        $this->info('set log level to ' . LogLevel::toString($log_level));
+        $this->log_level = $log_level;
     }
 
     /**
      * activates 'echo logs'.
      * IF you activate 'echo logs', the logger will echo the logs in the file AND will print it as HTML.
      */
-    public function ActivateEchoLogs()
+    public function activateEchoLogs(): void
     {
         $this->echo_logs = true;
     }
@@ -84,35 +77,25 @@ class FileLogger
     /**
      * Deactivates 'echo logs'.
      */
-    public function DeactivateEchoLogs()
+    public function deactivateEchoLogs(): void
     {
         $this->echo_logs = false;
     }
 
     /**
-     * Set the Log level
-     * Type must be from 'LogLevel'.
-     */
-    public function SetLogLevel(int $log_level): void
-    {
-        $this->Info('set log level to ' . LogLevel::toString($log_level));
-        $this->log_level = $log_level;
-    }
-
-    /**
      * Writes a message of the level 'Error'.
      */
-    public function Error(string $message): void
+    public function error(string $message): void
     {
-        $this->WriteEntry(LogLevel::ERROR, $message);
+        $this->writeEntry(LogLevel::ERROR, $message);
     }
 
     /**
      * Writes a message of the level 'Warning'.
      */
-    public function Warning(string $message)
+    public function warning(string $message)
     {
-        $this->WriteEntry(LogLevel::WARNING, $message);
+        $this->writeEntry(LogLevel::WARNING, $message);
     }
 
     /**
@@ -120,7 +103,7 @@ class FileLogger
      *
      * @param string $message The message to be logged
      */
-    public function Info(string $message): void
+    public function info(string $message): void
     {
         $this->writeEntry(LogLevel::INFO, $message);
     }
@@ -147,11 +130,18 @@ class FileLogger
      *
      * @return string The formatted log entry
      */
-    private function ConcatEntry(int $level, string $message): string
+    private function concatEntry(int $level, string $message): string
     {
         $timestamp = date('d.m.Y H:i:s');
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 4);
+        $class = '';
+        if (isset($trace[3]['object'])) {
+            $class = get_class($trace[3]['object']);
+        } else {
+            $class = basename($trace[3]['file']);
+        }
 
-        return LogLevel::ToString($level) . "\t" . $timestamp . "\t" . $message . "\n";
+        return LogLevel::toString($level) . "\t" . $timestamp . "\t" . $class . ': ' . $message . "\n";
     }
 
     /**
@@ -159,9 +149,9 @@ class FileLogger
      *
      * @param string $entry The log entry to be written to the file
      */
-    private function WriteToFile(string $entry)
+    private function writeToFile(string $entry): void
     {
-        file_put_contents($this->log_file, $entry, FILE_APPEND);
+        file_put_contents($this->log_file, $entry, FILE_APPEND | LOCK_EX);
 
         if ($this->echo_logs) {
             echo $entry . '<br>';

@@ -32,7 +32,7 @@ final class FileLoggerTest extends TestCase
 
         $this->logger = FileLogger::getInstance();
         $this->logger->setLogFile(self::LOG_FILE_PATH);
-        $this->logger->SetLogLevel(LogLevel::INFO);
+        $this->logger->setLogLevel(LogLevel::INFO);
     }
 
     protected function tearDown(): void
@@ -70,22 +70,22 @@ final class FileLoggerTest extends TestCase
         self::assertStringStartsWith(LogLevel::toString(LogLevel::INFO), $log_file_content);
         self::assertStringEndsWith("set log level to INFO\n", $log_file_content);
 
-        $this->logger->Error($message);
-        $this->logger->Warning($message);
-        $this->logger->Info($message);
+        $this->logger->error($message);
+        $this->logger->warning($message);
+        $this->logger->info($message);
 
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
         self::assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
         self::assertStringContainsString(LogLevel::toString(LogLevel::WARNING), $log_file_content);
 
-        $this->logger->SetLogLevel(LogLevel::WARNING);
+        $this->logger->setLogLevel(LogLevel::WARNING);
         // unlink after changing the level, because SetLogLevel will also create a Info
         unlink(self::LOG_FILE_PATH);
 
-        $this->logger->Error($message);
-        $this->logger->Warning($message);
-        $this->logger->Info($message);
+        $this->logger->error($message);
+        $this->logger->warning($message);
+        $this->logger->info($message);
         // Assert that the log entry is written to the file
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringContainsString(LogLevel::toString(LogLevel::ERROR), $log_file_content);
@@ -102,11 +102,12 @@ final class FileLoggerTest extends TestCase
     public function testActiveEchoLogEntry()
     {
         $errorMessage = 'This is an error message';
-        $this->logger->ActivateEchoLogs();
+        $this->logger->activateEchoLogs();
         // Capture output to check if it's echoed when echo_logs is activated
         ob_start();
-        $this->logger->Error($errorMessage);
+        $this->logger->error($errorMessage);
         $output = ob_get_clean();
+        $this->logger->deactivateEchoLogs();
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
@@ -124,7 +125,7 @@ final class FileLoggerTest extends TestCase
     {
         $errorMessage = 'This is an error message';
 
-        $this->logger->DeactivateEchoLogs();
+        $this->logger->deactivateEchoLogs();
 
         // Capture output to check if it's echoed when echo_logs is activated
         ob_start();
@@ -164,7 +165,7 @@ final class FileLoggerTest extends TestCase
     public function testWarningLogEntry()
     {
         $errorMessage = 'This is a warning message';
-        $this->logger->Warning($errorMessage);
+        $this->logger->warning($errorMessage);
 
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
@@ -182,7 +183,7 @@ final class FileLoggerTest extends TestCase
     public function testInfoLogEntry()
     {
         $errorMessage = 'This is an error message';
-        $this->logger->Info($errorMessage);
+        $this->logger->info($errorMessage);
 
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
