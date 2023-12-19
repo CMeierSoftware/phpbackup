@@ -15,7 +15,8 @@ use CMS\PhpBackup\Helper\FileHelper;
  */
 abstract class AbstractRemoteHandler
 {
-    protected mixed $connection;
+    public array $fileExistsCache = [];
+    protected mixed $connection = null;
 
     /**
      * Destructor to ensure disconnection upon object destruction.
@@ -63,7 +64,9 @@ abstract class AbstractRemoteHandler
         }
 
         FileLogger::getInstance()->info("Upload local file '{$localFilePath}' to remote storage '{$remoteFilePath}'");
-        return $this->_fileUpload($localFilePath, $remoteFilePath);
+        $this->fileExistsCache[$remoteFilePath] = $this->_fileUpload($localFilePath, $remoteFilePath);
+
+        return $this->fileExistsCache[$remoteFilePath];
     }
 
     /**
@@ -90,7 +93,6 @@ abstract class AbstractRemoteHandler
 
         FileLogger::getInstance()->info("Download remote file '{$remoteFilePath}' to local storage '{$localFilePath}'");
 
-
         return $this->_fileDownload($localFilePath, $remoteFilePath);
     }
 
@@ -112,7 +114,12 @@ abstract class AbstractRemoteHandler
 
         FileLogger::getInstance()->info("Delete remote file '{$remoteFilePath}'");
 
-        return $this->_fileDelete($remoteFilePath);
+        $result = $this->_fileDelete($remoteFilePath);
+        if ($result) {
+            $this->fileExistsCache[$remoteFilePath] = false;
+        }
+
+        return $result;
     }
 
     public function fileExists(string $remoteFilePath): bool
@@ -120,14 +127,22 @@ abstract class AbstractRemoteHandler
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
-
-        $result = $this->_fileExists($remoteFilePath);
-        if ($result) {
-            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' does exist.");
+        var_dump($this->fileExistsCache);
+        if (!isset($this->fileExistsCache[$remoteFilePath])) {
+            $result = $this->_fileExists($remoteFilePath);
+            $this->fileExistsCache[$remoteFilePath] = $result;
+            if ($this->fileExistsCache[$remoteFilePath]) {
+                FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' does exist (request).");
+            } else {
+                FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' doesn't exist (request).");
+            }
+        } elseif ($this->fileExistsCache[$remoteFilePath]) {
+            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' does exist (cache).");
         } else {
-            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' doesn't exist.");
+            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' doesn't exist (cache).");
         }
-        return $result;
+
+        return $this->fileExistsCache[$remoteFilePath];
     }
 
     /**
@@ -138,10 +153,22 @@ abstract class AbstractRemoteHandler
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
-        // Todo: split path and file name , check if path exists
-        FileLogger::getInstance()->info("Create remote directory '{$remoteFilePath}'.");
 
-        return $this->_createDirectory($remoteFilePath);
+        // Split the path and file name
+        $pathInfo = pathinfo($remoteFilePath);
+        $directoryPath = $pathInfo['dirname'];
+
+        // Check if it's a file path, if true, remove the file name
+        if (!empty($pathInfo['extension'])) {
+            $remoteFilePath = $directoryPath;
+        }
+        if (!$this->fileExists($remoteFilePath)) {
+            FileLogger::getInstance()->info("Create remote directory '{$remoteFilePath}'.");
+
+            $this->fileExistsCache[$remoteFilePath] = $this->_createDirectory($remoteFilePath);
+        }
+
+        return $this->fileExistsCache[$remoteFilePath];
     }
 
     /**
@@ -152,6 +179,14 @@ abstract class AbstractRemoteHandler
     public function isConnected(): bool
     {
         return !(null === $this->connection || false === $this->connection);
+    }
+
+    /**
+     * Clears the cache.
+     */
+    public function clearCache(): void
+    {
+        $this->fileExistsCache = [];
     }
 
     /**
