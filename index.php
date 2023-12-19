@@ -1,7 +1,8 @@
 <?php
+
 declare(strict_types=1);
-use CMS\PhpBackup\App\BackupRunner;
-use CMS\PhpBackup\Core\AppConfig;
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 
 if (!isset($_GET['key']) || 'pZk5ukBLtZ6wdQgZ' !== $_GET['key']) {
@@ -19,6 +20,16 @@ if (!isset($_GET['app']) || empty($_GET['app'])) {
 }
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'defines.php';
+
+if (!defined('ABS_PATH')) {
+	$msg = 'ABS_PATH not defined';
+    header('HTTP/1.1 500 ' . $msg, true, 500);
+
+    exit($msg);
+}
+
+use CMS\PhpBackup\App\BackupRunner;
+use CMS\PhpBackup\Core\AppConfig;
 
 $cfg = AppConfig::loadAppConfig($_GET['app']);
 
