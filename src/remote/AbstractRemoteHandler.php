@@ -59,7 +59,7 @@ abstract class AbstractRemoteHandler
         if ($this->fileExists($remoteFilePath)) {
             throw new FileAlreadyExistsException("The file '{$remoteFilePath}' already exists on remote storage.");
         }
-        if (!$this->createDirectory($remoteFilePath)) {
+        if (!$this->dirCreate($remoteFilePath)) {
             throw new FileNotFoundException("Can not create directory for '{$remoteFilePath}' in remote storage.");
         }
 
@@ -122,6 +122,13 @@ abstract class AbstractRemoteHandler
         return $result;
     }
 
+    /**
+     * Checks if a file or directory exists on the remote server.
+     *
+     * @param string $remoteFilePath - The remote file path to check.
+     *
+     * @return bool - True if exists, false otherwise
+     */
     public function fileExists(string $remoteFilePath): bool
     {
         if (!$this->isConnected()) {
@@ -148,7 +155,7 @@ abstract class AbstractRemoteHandler
     /**
      * Creates a directory path recursive if not already exists.
      */
-    public function createDirectory(string $remoteFilePath): bool
+    public function dirCreate(string $remoteFilePath): bool
     {
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
@@ -166,7 +173,7 @@ abstract class AbstractRemoteHandler
         if (!$this->fileExists($remoteFilePath)) {
             FileLogger::getInstance()->info("Create remote directory '{$remoteFilePath}'.");
 
-            $this->fileExistsCache[$remoteFilePath] = $this->_createDirectory($remoteFilePath);
+            $this->fileExistsCache[$remoteFilePath] = $this->_dirCreate($remoteFilePath);
         }
 
         return $this->fileExistsCache[$remoteFilePath];
@@ -211,7 +218,7 @@ abstract class AbstractRemoteHandler
     abstract protected function _fileExists(string $remoteFilePath): bool;
 
     /**
-     * @see AbstractRemoteHandler::createDirectory()
+     * @see AbstractRemoteHandler::dirCreate()
      */
-    abstract protected function _createDirectory(string $remoteFilePath): bool;
+    abstract protected function _dirCreate(string $remoteFilePath): bool;
 }

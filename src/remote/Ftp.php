@@ -84,7 +84,7 @@ final class Ftp extends AbstractRemoteHandler
         return in_array($fileName, $content, true);
     }
 
-    protected function _createDirectory(string $remoteFilePath): bool
+    protected function _dirCreate(string $remoteFilePath): bool
     {
         return ftp_mkdir($this->connection, $remoteFilePath);
     }

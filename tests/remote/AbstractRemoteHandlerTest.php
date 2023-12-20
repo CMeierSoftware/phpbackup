@@ -90,7 +90,7 @@ final class AbstractRemoteHandlerTest extends TestCase
 
         // two times _fileExists: 1. check if file exists, 2. check if dir exists
         $this->mockedHandler->expects(self::any())->method('_fileExists')->willReturn(false);
-        $this->mockedHandler->expects(self::any())->method('_createDirectory')->willReturn(true);
+        $this->mockedHandler->expects(self::any())->method('_dirCreate')->willReturn(true);
         $this->mockedHandler->expects(self::exactly(1))->method('_fileUpload')->willReturn(true);
 
         self::assertTrue($this->mockedHandler->fileUpload($srcFile, $destFile));
@@ -133,7 +133,7 @@ final class AbstractRemoteHandlerTest extends TestCase
 
         // two times _fileExists: 1. check if file exists, 2. check if dir exists
         $this->mockedHandler->expects(self::exactly(2))->method('_fileExists')->willReturn(false);
-        $this->mockedHandler->expects(self::exactly(1))->method('_createDirectory')->willReturn(false);
+        $this->mockedHandler->expects(self::exactly(1))->method('_dirCreate')->willReturn(false);
 
         $this->expectException(FileNotFoundException::class);
         self::expectExceptionMessage("Can not create directory for '{$destFile}' in remote storage.");
@@ -244,10 +244,10 @@ final class AbstractRemoteHandlerTest extends TestCase
     {
         $dirs = ['test', 'bar\foo.txt', 'six/seven', 'one/two.txt'];
         $this->mockedHandler->expects(self::exactly(count($dirs)))->method('_fileExists')->willReturn(false);
-        $this->mockedHandler->expects(self::exactly(count($dirs)))->method('_createDirectory')->willReturn(true);
+        $this->mockedHandler->expects(self::exactly(count($dirs)))->method('_dirCreate')->willReturn(true);
 
         foreach ($dirs as $dir) {
-            self::assertTrue($this->mockedHandler->createDirectory(self::WORK_DIR_LOCAL . $dir, $dir));
+            self::assertTrue($this->mockedHandler->dirCreate(self::WORK_DIR_LOCAL . $dir, $dir));
         }
 
         self::assertMockedCache([
@@ -290,7 +290,7 @@ final class AbstractRemoteHandlerTest extends TestCase
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractRemoteHandler::class);
-        $mockBuilder->onlyMethods(['_fileUpload', '_fileDownload', '_fileExists', '_fileDelete', '_createDirectory', 'connect', 'disconnect']);
+        $mockBuilder->onlyMethods(['_fileUpload', '_fileDownload', '_fileExists', '_fileDelete', '_dirCreate', 'connect', 'disconnect']);
 
         $handler = $mockBuilder->getMock();
 

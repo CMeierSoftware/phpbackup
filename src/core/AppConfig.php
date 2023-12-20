@@ -198,7 +198,6 @@ final class AppConfig
                 );
             }
             $this->processDataForSave($node);
-            
         }
     }
 
@@ -210,7 +209,7 @@ final class AppConfig
             if (!is_array($node) || empty($node)) {
                 continue;
             }
-            
+
             $this->processDataForRead($data[$key]);
 
             $childKeys = array_keys($node);

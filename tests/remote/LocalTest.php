@@ -133,11 +133,11 @@ final class LocalTest extends TestCase
     {
         $dirs = ['a\\b\\c', 'foo\\b\\c\\', 'foo\\b\\c\\'];
         foreach ($dirs as $dir) {
-            $this->local->createDirectory($dir);
+            $this->local->dirCreate($dir);
             self::assertFileExists(self::WORK_DIR_REMOTE . $dir);
         }
 
-        $this->local->createDirectory('bar\b\\c\\test.txt');
+        $this->local->dirCreate('bar\b\\c\\test.txt');
         self::assertFileExists(self::WORK_DIR_REMOTE . 'bar\b\\c\\');
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . 'bar\b\\c\\test.txt');
     }

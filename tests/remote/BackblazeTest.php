@@ -34,7 +34,7 @@ final class BackblazeTest extends TestCase
     {
         $this->remote = new Backblaze('', '', '');
         $this->remote->connect();
-        $this->remote->createDirectory($this->workDir);
+        $this->remote->dirCreate($this->workDir);
         $this->assertRemoteFileExists($this->workDir);
 
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
@@ -110,11 +110,11 @@ final class BackblazeTest extends TestCase
         $dirs = ['a/', '/b', 'foo/b/c/'];
         foreach ($dirs as $dir) {
             $this->assertRemoteFileDoesNotExist($this->workDir . $dir);
-            self::assertTrue($this->remote->createDirectory($this->workDir . $dir));
+            self::assertTrue($this->remote->dirCreate($this->workDir . $dir));
             $this->assertRemoteFileExists($this->workDir . $dir);
         }
 
-        $this->remote->createDirectory($this->workDir . 'bar/b/c/test.txt');
+        $this->remote->dirCreate($this->workDir . 'bar/b/c/test.txt');
         $this->assertRemoteFileExists($this->workDir . 'bar/b/c/');
         $this->assertRemoteFileDoesNotExist($this->workDir . 'bar/b/c/test.txt');
     }

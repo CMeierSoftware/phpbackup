@@ -38,7 +38,7 @@ class BackupRunner extends AbstractRunner
 
         try {
             $misc = $this->config->readTempData(self::MISC_FILE);
-            $this->misc =  null === $misc || empty($misc) ? $miscDefault : $misc + $miscDefault;
+            $this->misc = null === $misc || empty($misc) ? $miscDefault : $misc + $miscDefault;
         } catch (FileNotFoundException $th) {
             $this->misc = $miscDefault;
         }
@@ -121,7 +121,7 @@ class BackupRunner extends AbstractRunner
         $uploadedFiles = [];
 
         if (!$local->fileExists($backupDirName)) {
-            $local->createDirectory($backupDirName);
+            $local->dirCreate($backupDirName);
         }
         foreach ($this->misc['archives'] as $archiveFileName => $content) {
             $archivePath = $this->misc['backup_folder'] . $archiveFileName;

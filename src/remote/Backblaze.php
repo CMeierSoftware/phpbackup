@@ -43,7 +43,7 @@ class Backblaze extends AbstractRemoteHandler
         return true;
     }
 
-    public function _createDirectory(string $remoteDirectoryPath): bool
+    public function _dirCreate(string $remoteDirectoryPath): bool
     {
         $emptyFilePath = rtrim(ltrim($remoteDirectoryPath, '/'), '/') . '/.bzEmpty';
         $localEmptyFilePath = TEMP_DIR . 'temp.txt';

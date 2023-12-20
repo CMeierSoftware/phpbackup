@@ -48,7 +48,7 @@ class Local extends AbstractRemoteHandler
         return unlink($this->buildAbsPath($remoteFilePath));
     }
 
-    protected function _createDirectory(string $remoteFilePath): bool
+    protected function _dirCreate(string $remoteFilePath): bool
     {
         $absolutePath = $this->buildAbsPath($remoteFilePath);
 

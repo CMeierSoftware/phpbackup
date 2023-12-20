@@ -4,7 +4,6 @@ declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-
 if (!isset($_GET['key']) || 'pZk5ukBLtZ6wdQgZ' !== $_GET['key']) {
     $msg = 'Forbidden';
     header('HTTP/1.1 403 ' . $msg, true, 403);
@@ -22,7 +21,7 @@ if (!isset($_GET['app']) || empty($_GET['app'])) {
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'defines.php';
 
 if (!defined('ABS_PATH')) {
-	$msg = 'ABS_PATH not defined';
+    $msg = 'ABS_PATH not defined';
     header('HTTP/1.1 500 ' . $msg, true, 500);
 
     exit($msg);
