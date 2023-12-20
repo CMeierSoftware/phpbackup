@@ -83,16 +83,6 @@ final class AppConfig
         $filePath = $this->getTempDir() . $sanitizedType . '.xml';
         FileLogger::getInstance()->info("Will write tempData to '{$filePath}'.");
 
-        if (isset($data['bundles']) && is_array($data['bundles'])) {
-            // Iterate through each bundle and create new keys like 'bundles_0', 'bundles_1', etc.
-            foreach ($data['bundles'] as $index => $bundle) {
-                $data["bundles_{$index}"] = $bundle;
-            }
-
-            // Remove the original 'bundles' key
-            unset($data['bundles']);
-        }
-
         $config = new Config($data, false);
         $writer = new XmlWriter();
         $writer->toFile($filePath, $config);
@@ -122,14 +112,7 @@ final class AppConfig
 
         $data = $reader->fromFile($filePath);
 
-        foreach (array_keys($data) as $key) {
-            if (str_starts_with($key, 'bundles_')) {
-                $idx = (int) explode('_', $key)[1];
-                $data['bundles'][$idx] = $data[$key];
-                unset($data[$key]);
-            }
-        }
-
+        
         return $data;
     }
 
@@ -150,7 +133,18 @@ final class AppConfig
      */
     public function getBackupDirectory(): ?array
     {
-        return isset($this->config['backup']['directory']) ? $this->config['backup']['directory'] : null;
+        if (isset($this->config['backup']['directory'])) {
+            if (str_contains($this->config['backup']['directory']['src'], '..')) {
+                $this->config['backup']['directory']['src'] = realpath(CONFIG_DIR . $this->config['backup']['directory']['src']);
+                if (!$this->config['backup']['directory']['src'] || !file_exists($this->config['backup']['directory']['src'])) {
+                    throw new FileNotFoundException('Directory source for backup does not exists. It must be relative from config dir.');
+                }
+            }
+
+            return $this->config['backup']['directory'];
+        }
+
+        return null;
     }
 
     /**
