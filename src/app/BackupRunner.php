@@ -38,13 +38,7 @@ class BackupRunner extends AbstractRunner
 
         try {
             $misc = $this->config->readTempData(self::MISC_FILE);
-            if (null === $misc || empty($misc)) {
-                $this->misc = $miscDefault;
-            } else {
-                $this->misc = $misc;
-                $this->misc['bundles'] = json_decode($this->misc['bundles'], true);
-                $this->misc['archives'] = json_decode($this->misc['archives'], true);
-            }
+            $this->misc =  null === $misc || empty($misc) ? $miscDefault : $misc + $miscDefault;
         } catch (FileNotFoundException $th) {
             $this->misc = $miscDefault;
         }
@@ -52,9 +46,6 @@ class BackupRunner extends AbstractRunner
 
     public function __destruct()
     {
-        $this->misc['bundles'] = json_encode($this->misc['bundles']);
-        $this->misc['archives'] = json_encode($this->misc['archives']);
-
         $this->config->saveTempData(self::MISC_FILE, $this->misc);
         parent::__destruct();
     }
@@ -83,7 +74,7 @@ class BackupRunner extends AbstractRunner
 
         $result = $this->copyToTempDir($result, "archive_part_{$idx}.zip");
 
-        $this->misc['archives'][$result] = $this->misc['bundles'][$idx];
+        $this->misc['archives'][basename($result)] = $this->misc['bundles'][$idx];
 
         $cntBundles = count($this->misc['bundles']);
         $cntArchives = count($this->misc['archives']);
@@ -112,7 +103,7 @@ class BackupRunner extends AbstractRunner
 
             $result = $this->copyToTempDir($result, basename($result));
 
-            $this->misc['archives'][$result] = 'Database dump';
+            $this->misc['archives'][basename($result)] = 'Database dump';
         } else {
             $this->logger->Info('No database defined in config.');
         }
@@ -132,9 +123,10 @@ class BackupRunner extends AbstractRunner
         if (!$local->fileExists($backupDirName)) {
             $local->createDirectory($backupDirName);
         }
-        foreach ($this->misc['archives'] as $archivePath => $content) {
-            $local->fileUpload($archivePath, $backupDirName . '/' . basename($archivePath));
-            $uploadedFiles[basename($archivePath)] = $content;
+        foreach ($this->misc['archives'] as $archiveFileName => $content) {
+            $archivePath = $this->misc['backup_folder'] . $archiveFileName;
+            $local->fileUpload($archivePath, $backupDirName . '/' . basename($archiveFileName));
+            $uploadedFiles[$archiveFileName] = $content;
         }
 
         // Specify the file path
@@ -143,6 +135,16 @@ class BackupRunner extends AbstractRunner
 
         $local->fileUpload($fileMapping, $backupDirName . '/' . basename($fileMapping));
 
+        return new StepResult('', false);
+    }
+
+    public function deleteOldFiles(): StepResult
+    {
+        return new StepResult('', false);
+    }
+
+    public function sendBackblaze(): StepResult
+    {
         return new StepResult('', false);
     }
 
