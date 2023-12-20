@@ -152,6 +152,23 @@ final class LocalTest extends TestCase
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . 'bar\b\\c\\test.txt');
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Remote\Local::dirDelete()
+     */
+    public function testDirectoryDeleteSuccess()
+    {
+        $dirs = ['sub\\', 'sub'];
+        foreach ($dirs as $dir) {
+            $file = 'file.txt';
+            $this->setupRemoteStorage($file);
+            
+            self::assertFileExists(self::WORK_DIR_REMOTE . $dir);
+            self::assertTrue($this->remote->dirDelete($dir));
+            self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $dir);
+            self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $dir . DIRECTORY_SEPARATOR . $file);
+        }
+    }
+
     private function setupRemoteStorage(string $file): void
     {
         copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);

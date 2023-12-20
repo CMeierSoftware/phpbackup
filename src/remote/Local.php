@@ -70,6 +70,12 @@ class Local extends AbstractRemoteHandler
         return file_exists($this->buildAbsPath($remoteFilePath));
     }
 
+    protected function _dirDelete(string $remoteFilePath): bool
+    {
+        FileHelper::deleteDirectory($this->buildAbsPath($remoteFilePath));
+        return true;
+    }
+
     private function buildAbsPath(string $remoteFilePath): string
     {
         return $this->remoteRootPath . DIRECTORY_SEPARATOR . ltrim($remoteFilePath, DIRECTORY_SEPARATOR);
