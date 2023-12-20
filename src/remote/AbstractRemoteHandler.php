@@ -42,12 +42,16 @@ abstract class AbstractRemoteHandler
 
     /**
      * Uploads a file to the remote server.
-     * If the target directory does not exists, it will be created recursively.
+     * If the target directory does not exist, it will be created recursively.
      *
-     * @param string $localPath - The local file path
-     * @param string $remotePath - The remote destination path
+     * @param string $localPath The local file path
+     * @param string $remotePath The remote destination path
      *
-     * @return bool - True if the upload is successful, false otherwise
+     * @return bool True if the upload is successful, false otherwise
+     *
+     * @throws FileNotFoundException If the local file is not found
+     * @throws FileAlreadyExistsException If the remote file already exists
+     * @throws FileNotFoundException If the directory for the remote file cannot be created
      */
     public function fileUpload(string $localPath, string $remotePath): bool
     {
@@ -72,10 +76,13 @@ abstract class AbstractRemoteHandler
     /**
      * Downloads a file from the remote server.
      *
-     * @param string $localPath - The local destination path
-     * @param string $remotePath - The remote file path
+     * @param string $localPath The local destination path
+     * @param string $remotePath The remote file path
      *
-     * @return bool - True if the download is successful, false otherwise
+     * @return bool True if the download is successful, false otherwise
+     *
+     * @throws FileAlreadyExistsException If the local file already exists
+     * @throws FileNotFoundException If the remote file is not found
      */
     public function fileDownload(string $localPath, string $remotePath): bool
     {
@@ -98,9 +105,11 @@ abstract class AbstractRemoteHandler
     /**
      * Deletes a file from the remote server.
      *
-     * @param string $remotePath - The remote file path to delete
+     * @param string $remotePath The remote file path to delete
      *
-     * @return bool - True if the deletion is successful, false otherwise
+     * @return bool True if the deletion is successful, false otherwise
+     *
+     * @throws FileNotFoundException If the remote file is not found
      */
     public function fileDelete(string $remotePath): bool
     {
@@ -123,9 +132,11 @@ abstract class AbstractRemoteHandler
     /**
      * Checks if a file or directory exists on the remote server.
      *
-     * @param string $remotePath - The remote file path to check
+     * @param string $remotePath The remote file path to check
      *
-     * @return bool - True if exists, false otherwise
+     * @return bool True if exists, false otherwise
+     *
+     * @throws RemoteStorageNotConnectedException If the remote storage is not connected
      */
     public function fileExists(string $remotePath): bool
     {
@@ -150,10 +161,43 @@ abstract class AbstractRemoteHandler
         return $this->fileExistsCache[$remotePath];
     }
 
-   
+    /**
+     * Lists a directory.
+     *
+     * @param string $remotePath The remote directory path
+     *
+     * @return array An array of file and directory names in the remote directory
+     *
+     * @throws RemoteStorageNotConnectedException If the remote storage is not connected
+     */
+    public function dirList(string $remotePath): array
+    {
+        $this->sanitizeDirCheck($remotePath);
+
+        if ($this->fileExists($remotePath)) {
+            FileLogger::getInstance()->info("Create remote directory '{$remotePath}'.");
+
+            $result = $this->_dirList($remotePath);
+            $result = array_values(array_diff($result, ['..', '.']));
+            $result = array_map(
+                static fn ($path) => rtrim($remotePath, '\\/') . DIRECTORY_SEPARATOR . $path,
+                $result
+            );
+            $result = array_values($result);
+            $this->fileExistsCache += array_fill_keys($result, true);
+        }
+
+        return $result;
+    }
 
     /**
-     * Creates a directory path recursive if not already exists.
+     * Creates a directory path recursively if not already exists.
+     *
+     * @param string $remotePath The remote directory path to create
+     *
+     * @return bool True if the directory creation is successful, false otherwise
+     *
+     * @throws RemoteStorageNotConnectedException If the remote storage is not connected
      */
     public function dirCreate(string $remotePath): bool
     {
@@ -175,6 +219,10 @@ abstract class AbstractRemoteHandler
 
     /**
      * Deletes a directory recursively with all its content.
+     *
+     * @param string $remotePath The remote directory path to delete
+     *
+     * @return bool True if the deletion is successful, false otherwise
      */
     public function dirDelete(string $remotePath): bool
     {
@@ -248,6 +296,20 @@ abstract class AbstractRemoteHandler
      */
     abstract protected function _dirDelete(string $remotePath): bool;
 
+    /**
+     * @see AbstractRemoteHandler::dirList()
+     */
+    abstract protected function _dirList(string $remotePath): array;
+
+    /**
+     * Sanitizes the remote path for file-related checks.
+     *
+     * @param string $remotePath The remote path to sanitize
+     * @param bool $checkFilePath Whether to check if the path belongs to a file (default is true)
+     *
+     * @throws RemoteStorageNotConnectedException If the remote storage is not connected
+     * @throws InvalidArgumentException If the provided path belongs to a file, not a directory
+     */
     private function sanitizeFileCheck(string $remotePath, bool $checkFilePath = true): void
     {
         if (!$this->isConnected()) {
@@ -258,6 +320,15 @@ abstract class AbstractRemoteHandler
         }
     }
 
+    /**
+     * Sanitizes the remote path for directory-related checks.
+     *
+     * @param string $remotePath The remote path to sanitize
+     * @param bool $allowFilePaths Whether to allow file paths (default is false)
+     *
+     * @throws RemoteStorageNotConnectedException If the remote storage is not connected
+     * @throws InvalidArgumentException If the provided path belongs to a file, not a directory
+     */
     private function sanitizeDirCheck(string $remotePath, bool $allowFilePaths = false): void
     {
         if (!$this->isConnected()) {
@@ -268,6 +339,13 @@ abstract class AbstractRemoteHandler
         }
     }
 
+    /**
+     * Checks if the provided remote path belongs to a file.
+     *
+     * @param string $remotePath The remote path to check
+     *
+     * @return bool True if the path belongs to a file, false if it belongs to a directory
+     */
     private function isFilePath(string $remotePath): bool
     {
         // Split the path and file name

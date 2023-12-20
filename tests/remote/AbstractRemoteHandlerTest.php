@@ -238,6 +238,36 @@ final class AbstractRemoteHandlerTest extends TestCase
     }
 
     /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirList()
+     */
+    public function testDirectoryListSuccess()
+    {
+        $files = ['test', 'bar', '.', '..', 'foo.txt', 'six.xml', 'two.txt'];
+        $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(true);
+        $this->mockedHandler->expects(self::exactly(1))->method('_dirList')->willReturn($files);
+
+        $expectation = [
+            self::WORK_DIR_LOCAL . 'test',
+            self::WORK_DIR_LOCAL . 'bar',
+            self::WORK_DIR_LOCAL . 'foo.txt',
+            self::WORK_DIR_LOCAL . 'six.xml',
+            self::WORK_DIR_LOCAL . 'two.txt'];
+
+        $expectationCache = [
+            self::WORK_DIR_LOCAL => true,
+            self::WORK_DIR_LOCAL . 'test' => true,
+            self::WORK_DIR_LOCAL . 'bar' => true,
+            self::WORK_DIR_LOCAL . 'foo.txt' => true,
+            self::WORK_DIR_LOCAL . 'six.xml' => true,
+            self::WORK_DIR_LOCAL . 'two.txt' => true,
+        ];
+
+        $result = $this->mockedHandler->dirList(self::WORK_DIR_LOCAL);
+        self::assertMockedCache($expectationCache);
+        self::assertSame($expectation, $result);
+    }
+
+    /**
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirCreate()
      */
     public function testDirectoryCreateSuccess()
