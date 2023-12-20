@@ -11,11 +11,10 @@
          colors="true"
          failOnWarning="true" 
          failOnNotice="true"
+         failOnDeprecation="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnTestsThatTriggerNotices="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToErrors="true"
-         convertErrorsToExceptions="true"
         >
     <testsuites>
         <testsuite name="Core">
