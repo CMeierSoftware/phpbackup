@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Backblaze;
 use PHPUnit\Framework\TestCase;

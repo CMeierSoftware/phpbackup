@@ -44,6 +44,7 @@ final class FileCryptTest extends TestCase
         $this->expectException(FileNotFoundException::class);
         FileCrypt::encryptFile(self::TEST_FILE_PLAIN . 'invalid', self::TEST_KEY);
     }
+
     /**
      * @covers \CMS\PhpBackup\Core\FileCrypt::decryptFile
      */

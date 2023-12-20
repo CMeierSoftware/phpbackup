@@ -56,7 +56,7 @@ final class LocalTest extends TestCase
     {
         $file = 'file.txt';
         $this->setupRemoteStorage($file);
-        
+
         self::assertTrue($this->remote->fileExists($file));
         self::assertFalse($this->remote->fileExists($file . 'invalid'));
         self::assertTrue($this->remote->fileExists('sub/' . $file));
@@ -71,7 +71,7 @@ final class LocalTest extends TestCase
         $this->setupRemoteStorage($file);
 
         $dir = '';
-        self::assertTrue($this->remote->fileExists($dir));        
+        self::assertTrue($this->remote->fileExists($dir));
         $dir = '.';
         self::assertTrue($this->remote->fileExists($dir));
         $dir = 'sub';
@@ -161,7 +161,7 @@ final class LocalTest extends TestCase
         foreach ($dirs as $dir) {
             $file = 'file.txt';
             $this->setupRemoteStorage($file);
-            
+
             self::assertFileExists(self::WORK_DIR_REMOTE . $dir);
             self::assertTrue($this->remote->dirDelete($dir));
             self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $dir);
