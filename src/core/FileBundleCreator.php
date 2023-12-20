@@ -9,25 +9,28 @@ namespace CMS\PhpBackup\Core;
  */
 final class FileBundleCreator
 {
+    private static $rootDir = '';
+
     /**
      * Create bundles of files from a directory based on a size limit.
      *
-     * @param string $directory the path to the directory
+     * @param string $rootDir the path to the directory
      * @param int $sizeLimitInMB the size limit for each bundle in megabytes
      *
      * @return array an array of arrays, where each inner array represents a bundle of files within the size limit
      */
-    public static function createFileBundles(string $directory, int $sizeLimitInMB): array
+    public static function createFileBundles(string $rootDir, int $sizeLimitInMB): array
     {
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
-        $directory = rtrim($directory, '/\\' . DIRECTORY_SEPARATOR);
+        $rootDir = rtrim($rootDir, '/\\' . DIRECTORY_SEPARATOR);
+        self::$rootDir = $rootDir;
 
-        FileLogger::getInstance()->info("Calculating bundles for '{$directory}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
+        FileLogger::getInstance()->info("Calculating bundles for '{$rootDir}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
 
         $bundles = [];
-        self::packDirectory($directory, $sizeLimit, $bundles);
+        self::packDirectory($rootDir, $sizeLimit, $bundles);
         $bundleCount = count($bundles);
-        FileLogger::getInstance()->info("Calculated {$bundleCount} bundles for '{$directory}'.");
+        FileLogger::getInstance()->info("Calculated {$bundleCount} bundles for '{$rootDir}'.");
 
         return $bundles;
     }
@@ -66,7 +69,7 @@ final class FileBundleCreator
             $currentBundle = end($fileBundles);
             array_pop($fileBundles);
             foreach ($currentBundle as $f) {
-                $currentSize += filesize($f);
+                $currentSize += filesize(self::$rootDir . $f);
             }
         }
 
@@ -116,8 +119,8 @@ final class FileBundleCreator
             if ($notPackedFiles[$file] <= $remainingSize) {
                 // File fits in the current bundle -> add
                 $bundle[] = $file;
-                unset($notPackedFiles[$file]);
                 $remainingSize -= $notPackedFiles[$file];
+                unset($notPackedFiles[$file]);
             }
         }
 
@@ -145,12 +148,17 @@ final class FileBundleCreator
             if (is_dir($filePath)) {
                 $folders[] = $filePath;
             } else {
-                $files[$filePath] = filesize($filePath);
+                $files[self::trimFilePath($filePath)] = filesize($filePath);
             }
         }
 
         asort($files);
 
         return [array_reverse($files), $folders];
+    }
+
+    private static function trimFilePath(string $filePath): string
+    {
+        return str_replace(self::$rootDir, '', $filePath);
     }
 }
