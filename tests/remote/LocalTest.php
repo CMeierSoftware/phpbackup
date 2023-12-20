@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
-use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use PHPUnit\Framework\TestCase;
@@ -72,7 +70,6 @@ final class LocalTest extends TestCase
         self::assertTrue($this->local->fileExists($file));
     }
 
-
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileUpload()
      */
@@ -88,7 +85,6 @@ final class LocalTest extends TestCase
         self::assertFileExists(self::WORK_DIR_REMOTE . $destFile);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
     }
-
 
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileDownload()
@@ -111,7 +107,6 @@ final class LocalTest extends TestCase
         self::assertFileEquals(self::WORK_DIR_REMOTE . $file, self::WORK_DIR_LOCAL . $file);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $file);
     }
-
 
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileDelete()
