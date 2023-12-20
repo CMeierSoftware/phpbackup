@@ -63,8 +63,8 @@ final class AbstractRemoteHandlerTest extends TestCase
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileUpload()
      *
      * @uses \CMS\PhpBackup\Remote\AbstractRemoteHandler::isConnected()
-     * 
-      * @dataProvider publicFunctionsProvider
+     *
+     * @dataProvider provideExceptionOnMissingConnectionCases
      */
     public function testExceptionOnMissingConnection(string $function)
     {
@@ -72,12 +72,13 @@ final class AbstractRemoteHandlerTest extends TestCase
         self::assertFalse($handler->isConnected());
 
         self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->$function('', '');
+        $handler->{$function}('', '');
     }
 
-    public static function publicFunctionsProvider(): array
+    public static function provideExceptionOnMissingConnectionCases(): iterable
     {
-        return [['fileUpload'], ['fileDownload'], ['fileDelete'], ['fileExists'], ['dirCreate'], ['dirDelete'], ];
+        return [['fileUpload'], ['fileDownload'], ['fileDelete'], ['fileExists'],
+            ['dirCreate'], ['dirList'], ['dirDelete'], ];
     }
 
     /**
@@ -288,11 +289,10 @@ final class AbstractRemoteHandlerTest extends TestCase
             self::WORK_DIR_LOCAL . 'test/seven' => true,
             self::WORK_DIR_LOCAL . 'test/seven/two.txt' => true,
         ];
-        
+
         $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(true);
         $this->mockedHandler->expects(self::exactly(1))->method('_dirDelete')->willReturn(true);
 
-        
         $reflectionClass = new \ReflectionClass($this->mockedHandler);
         $property = $reflectionClass->getProperty('fileExistsCache');
         $property->setAccessible(true); // Make the protected property accessible
@@ -318,11 +318,10 @@ final class AbstractRemoteHandlerTest extends TestCase
             self::WORK_DIR_LOCAL . 'test/seven' => true,
             self::WORK_DIR_LOCAL . 'test/seven/two.txt' => true,
         ];
-        
+
         $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(false);
         $this->mockedHandler->expects(self::never())->method('_dirDelete');
 
-        
         $reflectionClass = new \ReflectionClass($this->mockedHandler);
         $property = $reflectionClass->getProperty('fileExistsCache');
         $property->setAccessible(true); // Make the protected property accessible
@@ -372,8 +371,8 @@ final class AbstractRemoteHandlerTest extends TestCase
         $mockBuilder = $this->getMockBuilder(AbstractRemoteHandler::class);
         $mockBuilder->onlyMethods([
             '_fileUpload', '_fileDownload', '_fileExists', '_fileDelete',
-            '_dirCreate', '_dirDelete',
-            'connect', 'disconnect'
+            '_dirCreate', '_dirList', '_dirDelete',
+            'connect', 'disconnect',
         ]);
 
         $handler = $mockBuilder->getMock();

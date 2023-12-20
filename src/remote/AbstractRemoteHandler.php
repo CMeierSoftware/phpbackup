@@ -42,81 +42,79 @@ abstract class AbstractRemoteHandler
 
     /**
      * Uploads a file to the remote server.
+     * If the target directory does not exists, it will be created recursively.
      *
-     * @param string $localFilePath - The local file path
-     * @param string $remoteFilePath - The remote destination path
+     * @param string $localPath - The local file path
+     * @param string $remotePath - The remote destination path
      *
      * @return bool - True if the upload is successful, false otherwise
      */
-    public function fileUpload(string $localFilePath, string $remoteFilePath): bool
+    public function fileUpload(string $localPath, string $remotePath): bool
     {
-        if (!$this->isConnected()) {
-            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        $this->sanitizeFileCheck($remotePath);
+
+        if (!is_file($localPath)) {
+            throw new FileNotFoundException("The file '{$localPath}' was not found in local storage.");
         }
-        if (!file_exists($localFilePath)) {
-            throw new FileNotFoundException("The file '{$localFilePath}' was not found in local storage.");
+        if ($this->fileExists($remotePath)) {
+            throw new FileAlreadyExistsException("The file '{$remotePath}' already exists on remote storage.");
         }
-        if ($this->fileExists($remoteFilePath)) {
-            throw new FileAlreadyExistsException("The file '{$remoteFilePath}' already exists on remote storage.");
-        }
-        if (!$this->dirCreate($remoteFilePath)) {
-            throw new FileNotFoundException("Can not create directory for '{$remoteFilePath}' in remote storage.");
+        if (!$this->dirCreate($remotePath)) {
+            throw new FileNotFoundException("Can not create directory for '{$remotePath}' in remote storage.");
         }
 
-        FileLogger::getInstance()->info("Upload local file '{$localFilePath}' to remote storage '{$remoteFilePath}'");
-        $this->fileExistsCache[$remoteFilePath] = $this->_fileUpload($localFilePath, $remoteFilePath);
+        FileLogger::getInstance()->info("Upload local file '{$localPath}' to remote storage '{$remotePath}'");
+        $this->fileExistsCache[$remotePath] = $this->_fileUpload($localPath, $remotePath);
 
-        return $this->fileExistsCache[$remoteFilePath];
+        return $this->fileExistsCache[$remotePath];
     }
 
     /**
      * Downloads a file from the remote server.
      *
-     * @param string $localFilePath - The local destination path
-     * @param string $remoteFilePath - The remote file path
+     * @param string $localPath - The local destination path
+     * @param string $remotePath - The remote file path
      *
      * @return bool - True if the download is successful, false otherwise
      */
-    public function fileDownload(string $localFilePath, string $remoteFilePath): bool
+    public function fileDownload(string $localPath, string $remotePath): bool
     {
-        if (!$this->isConnected()) {
-            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        $this->sanitizeFileCheck($remotePath);
+
+        if (file_exists($localPath)) {
+            throw new FileAlreadyExistsException("The file '{$localPath}' already exists on local storage.");
         }
-        if (file_exists($localFilePath)) {
-            throw new FileAlreadyExistsException("The file '{$localFilePath}' already exists on local storage.");
-        }
-        if (!$this->fileExists($remoteFilePath)) {
-            throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
+        if (!$this->fileExists($remotePath)) {
+            throw new FileNotFoundException("The file '{$remotePath}' was not found in remote storage.");
         }
 
-        FileHelper::makeDir(dirname($localFilePath));
+        FileHelper::makeDir(dirname($localPath));
 
-        FileLogger::getInstance()->info("Download remote file '{$remoteFilePath}' to local storage '{$localFilePath}'");
+        FileLogger::getInstance()->info("Download remote file '{$remotePath}' to local storage '{$localPath}'");
 
-        return $this->_fileDownload($localFilePath, $remoteFilePath);
+        return $this->_fileDownload($localPath, $remotePath);
     }
 
     /**
      * Deletes a file from the remote server.
      *
-     * @param string $remoteFilePath - The remote file path to delete
+     * @param string $remotePath - The remote file path to delete
      *
      * @return bool - True if the deletion is successful, false otherwise
      */
-    public function fileDelete(string $remoteFilePath): bool
+    public function fileDelete(string $remotePath): bool
     {
-        if (!$this->isConnected()) {
-            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
-        }
-        if (!$this->fileExists($remoteFilePath)) {
-            throw new FileNotFoundException("The file '{$remoteFilePath}' was not found in remote storage.");
+        $this->sanitizeFileCheck($remotePath);
+
+        if (!$this->fileExists($remotePath)) {
+            throw new FileNotFoundException("The file '{$remotePath}' was not found in remote storage.");
         }
 
-        FileLogger::getInstance()->info("Delete remote file '{$remoteFilePath}'");
+        FileLogger::getInstance()->info("Delete remote file '{$remotePath}'");
 
-        $result = $this->_fileDelete($remoteFilePath);
+        $result = $this->_fileDelete($remotePath);
         if ($result) {
-            $this->fileExistsCache[$remoteFilePath] = false;
+            $this->fileExistsCache[$remotePath] = false;
         }
 
         return $result;
@@ -125,81 +123,75 @@ abstract class AbstractRemoteHandler
     /**
      * Checks if a file or directory exists on the remote server.
      *
-     * @param string $remoteFilePath - The remote file path to check.
+     * @param string $remotePath - The remote file path to check
      *
      * @return bool - True if exists, false otherwise
      */
-    public function fileExists(string $remoteFilePath): bool
+    public function fileExists(string $remotePath): bool
     {
         if (!$this->isConnected()) {
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
 
-        if (!isset($this->fileExistsCache[$remoteFilePath])) {
-            $result = $this->_fileExists($remoteFilePath);
-            $this->fileExistsCache[$remoteFilePath] = $result;
-            if ($this->fileExistsCache[$remoteFilePath]) {
-                FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' does exist (request).");
+        if (!isset($this->fileExistsCache[$remotePath])) {
+            $result = $this->_fileExists($remotePath);
+            $this->fileExistsCache[$remotePath] = $result;
+            if ($this->fileExistsCache[$remotePath]) {
+                FileLogger::getInstance()->info("Remote file '{$remotePath}' does exist (request).");
             } else {
-                FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' doesn't exist (request).");
+                FileLogger::getInstance()->info("Remote file '{$remotePath}' doesn't exist (request).");
             }
-        } elseif ($this->fileExistsCache[$remoteFilePath]) {
-            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' does exist (cache).");
+        } elseif ($this->fileExistsCache[$remotePath]) {
+            FileLogger::getInstance()->info("Remote file '{$remotePath}' does exist (cache).");
         } else {
-            FileLogger::getInstance()->info("Remote file '{$remoteFilePath}' doesn't exist (cache).");
+            FileLogger::getInstance()->info("Remote file '{$remotePath}' doesn't exist (cache).");
         }
 
-        return $this->fileExistsCache[$remoteFilePath];
+        return $this->fileExistsCache[$remotePath];
     }
+
+   
 
     /**
      * Creates a directory path recursive if not already exists.
      */
-    public function dirCreate(string $remoteFilePath): bool
+    public function dirCreate(string $remotePath): bool
     {
-        if (!$this->isConnected()) {
-            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        // if its a file, get the directory
+        if ($this->isFilePath($remotePath)) {
+            $remotePath = dirname($remotePath);
         }
 
-        // Split the path and file name
-        $pathInfo = pathinfo($remoteFilePath);
-        $directoryPath = $pathInfo['dirname'];
+        $this->sanitizeDirCheck($remotePath);
 
-        // Check if it's a file path, if true, remove the file name
-        if (!empty($pathInfo['extension'])) {
-            $remoteFilePath = $directoryPath;
+        if (!$this->fileExists($remotePath)) {
+            FileLogger::getInstance()->info("Create remote directory '{$remotePath}'.");
+
+            $this->fileExistsCache[$remotePath] = $this->_dirCreate($remotePath);
         }
 
-        if (!$this->fileExists($remoteFilePath)) {
-            FileLogger::getInstance()->info("Create remote directory '{$remoteFilePath}'.");
-
-            $this->fileExistsCache[$remoteFilePath] = $this->_dirCreate($remoteFilePath);
-        }
-
-        return $this->fileExistsCache[$remoteFilePath];
+        return $this->fileExistsCache[$remotePath];
     }
 
     /**
      * Deletes a directory recursively with all its content.
      */
-    public function dirDelete(string $remoteFilePath): bool
+    public function dirDelete(string $remotePath): bool
     {
-        if (!$this->isConnected()) {
-            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
-        }
+        $this->sanitizeDirCheck($remotePath);
+
         $success = false;
 
-        if ($this->fileExists($remoteFilePath)) {
-            FileLogger::getInstance()->info("Delete remote directory recursively '{$remoteFilePath}'.");
+        if ($this->fileExists($remotePath)) {
+            FileLogger::getInstance()->info("Delete remote directory recursively '{$remotePath}'.");
 
-            $success = $this->_dirDelete($remoteFilePath);
-            $this->fileExistsCache[$remoteFilePath] = !$success;
+            $success = $this->_dirDelete($remotePath);
+            $this->fileExistsCache[$remotePath] = !$success;
         }
 
-        if (!$this->fileExistsCache[$remoteFilePath]) {
-            foreach (array_keys($this->fileExistsCache) as $file)
-            {
-                if (str_starts_with($file, $remoteFilePath)) {
+        if (!$this->fileExistsCache[$remotePath]) {
+            foreach (array_keys($this->fileExistsCache) as $file) {
+                if (str_starts_with($file, $remotePath)) {
                     $this->fileExistsCache[$file] = false;
                 }
             }
@@ -229,30 +221,59 @@ abstract class AbstractRemoteHandler
     /**
      * @see AbstractRemoteHandler::fileUpload()
      */
-    abstract protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool;
+    abstract protected function _fileUpload(string $localPath, string $remotePath): bool;
 
     /**
      * @see AbstractRemoteHandler::fileDownload()
      */
-    abstract protected function _fileDownload(string $localFilePath, string $remoteFilePath): bool;
+    abstract protected function _fileDownload(string $localPath, string $remotePath): bool;
 
     /**
      * @see AbstractRemoteHandler::fileDelete()
      */
-    abstract protected function _fileDelete(string $remoteFilePath): bool;
+    abstract protected function _fileDelete(string $remotePath): bool;
 
     /**
      * @see AbstractRemoteHandler::fileExists()
      */
-    abstract protected function _fileExists(string $remoteFilePath): bool;
+    abstract protected function _fileExists(string $remotePath): bool;
 
     /**
      * @see AbstractRemoteHandler::dirCreate()
      */
-    abstract protected function _dirCreate(string $remoteFilePath): bool;
+    abstract protected function _dirCreate(string $remotePath): bool;
 
     /**
      * @see AbstractRemoteHandler::dirDelete()
      */
-    abstract protected function _dirDelete(string $remoteFilePath): bool;
+    abstract protected function _dirDelete(string $remotePath): bool;
+
+    private function sanitizeFileCheck(string $remotePath, bool $checkFilePath = true): void
+    {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        }
+        if ($checkFilePath && !$this->isFilePath($remotePath)) {
+            throw new \InvalidArgumentException('The provided path belongs to a file, not a directory.');
+        }
+    }
+
+    private function sanitizeDirCheck(string $remotePath, bool $allowFilePaths = false): void
+    {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        }
+        if (!$allowFilePaths && $this->isFilePath($remotePath)) {
+            throw new \InvalidArgumentException('The provided path belongs to a file, not a directory.');
+        }
+    }
+
+    private function isFilePath(string $remotePath): bool
+    {
+        // Split the path and file name
+        $pathInfo = pathinfo($remotePath);
+
+        // Check if it's a file path, if true, remove the file name
+        return !empty($pathInfo['extension']);
+    }
 }
