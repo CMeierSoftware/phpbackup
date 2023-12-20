@@ -174,18 +174,19 @@ abstract class AbstractRemoteHandler
     {
         $this->sanitizeDirCheck($remotePath);
 
-        if ($this->fileExists($remotePath)) {
-            FileLogger::getInstance()->info("Create remote directory '{$remotePath}'.");
-
-            $result = $this->_dirList($remotePath);
-            $result = array_values(array_diff($result, ['..', '.']));
-            $result = array_map(
-                static fn ($path) => rtrim($remotePath, '\\/') . DIRECTORY_SEPARATOR . $path,
-                $result
-            );
-            $result = array_values($result);
-            $this->fileExistsCache += array_fill_keys($result, true);
+        if (!$this->fileExists($remotePath)) {
+            throw new FileNotFoundException("The directory '{$remotePath}' was not found in remote storage.");
         }
+
+        FileLogger::getInstance()->info("Create remote directory '{$remotePath}'.");
+
+        $result = $this->_dirList($remotePath);
+        $result = array_values(array_diff($result, ['..', '.']));
+        $resultCache = array_map(
+            static fn ($path) => rtrim($remotePath, '\\/') . DIRECTORY_SEPARATOR . $path,
+            $result
+        );
+        $this->fileExistsCache += array_fill_keys($resultCache, true);
 
         return $result;
     }

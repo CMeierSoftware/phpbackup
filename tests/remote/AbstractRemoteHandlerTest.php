@@ -247,11 +247,11 @@ final class AbstractRemoteHandlerTest extends TestCase
         $this->mockedHandler->expects(self::exactly(1))->method('_dirList')->willReturn($files);
 
         $expectation = [
-            self::WORK_DIR_LOCAL . 'test',
-            self::WORK_DIR_LOCAL . 'bar',
-            self::WORK_DIR_LOCAL . 'foo.txt',
-            self::WORK_DIR_LOCAL . 'six.xml',
-            self::WORK_DIR_LOCAL . 'two.txt'];
+            'test',
+            'bar',
+            'foo.txt',
+            'six.xml',
+            'two.txt'];
 
         $expectationCache = [
             self::WORK_DIR_LOCAL => true,
