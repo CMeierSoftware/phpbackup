@@ -19,7 +19,7 @@ final class LocalTest extends TestCase
     private const WORK_DIR_REMOTE = ABS_PATH . 'tests\\work\\Remote\\';
     private const TEST_FILE1_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
     private const TEST_FILE2_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file2.xls';
-    private Local $local;
+    private Local $remote;
 
     protected function setUp(): void
     {
@@ -28,8 +28,8 @@ final class LocalTest extends TestCase
         FileHelper::makeDir(self::WORK_DIR_REMOTE);
         self::assertFileExists(self::WORK_DIR_REMOTE);
 
-        $this->local = new Local(self::WORK_DIR_REMOTE);
-        $this->local->connect();
+        $this->remote = new Local(self::WORK_DIR_REMOTE);
+        $this->remote->connect();
     }
 
     protected function tearDown(): void
@@ -55,19 +55,29 @@ final class LocalTest extends TestCase
     public function testFileExists()
     {
         $file = 'file.txt';
-        self::assertFalse($this->local->fileExists($file));
-        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);
-        self::assertFileExists(self::WORK_DIR_REMOTE . $file);
-        $this->local->clearCache();
-        self::assertTrue($this->local->fileExists($file));
+        $this->setupRemoteStorage($file);
+        
+        self::assertTrue($this->remote->fileExists($file));
+        self::assertFalse($this->remote->fileExists($file . 'invalid'));
+        self::assertTrue($this->remote->fileExists('sub/' . $file));
+    }
 
-        $file = 'sub\\file.txt';
-        self::assertFalse($this->local->fileExists($file));
-        FileHelper::makeDir(self::WORK_DIR_REMOTE . 'sub');
-        copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $file);
-        self::assertFileExists(self::WORK_DIR_REMOTE . $file);
-        $this->local->clearCache();
-        self::assertTrue($this->local->fileExists($file));
+    /**
+     * @covers \CMS\PhpBackup\Remote\Backblaze::fileExists()
+     */
+    public function testDirExists()
+    {
+        $file = 'file.txt';
+        $this->setupRemoteStorage($file);
+
+        $dir = '';
+        self::assertTrue($this->remote->fileExists($dir));        
+        $dir = '.';
+        self::assertTrue($this->remote->fileExists($dir));
+        $dir = 'sub';
+        self::assertTrue($this->remote->fileExists($dir));
+        $dir = 'invalid';
+        self::assertFalse($this->remote->fileExists($dir));
     }
 
     /**
@@ -76,12 +86,12 @@ final class LocalTest extends TestCase
     public function testFileUploadSuccess()
     {
         $destFile = 'file.txt';
-        self::assertTrue($this->local->fileUpload(self::TEST_FILE1_SRC, $destFile));
+        self::assertTrue($this->remote->fileUpload(self::TEST_FILE1_SRC, $destFile));
         self::assertFileExists(self::WORK_DIR_REMOTE . $destFile);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
 
         $destFile = 'sub\\file.txt';
-        self::assertTrue($this->local->fileUpload(self::TEST_FILE1_SRC, $destFile));
+        self::assertTrue($this->remote->fileUpload(self::TEST_FILE1_SRC, $destFile));
         self::assertFileExists(self::WORK_DIR_REMOTE . $destFile);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
     }
@@ -89,19 +99,19 @@ final class LocalTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileDownload()
      */
-    public function testFileDownload()
+    public function testFileDownloadSuccess()
     {
         $file = 'file.txt';
         $this->setupRemoteStorage($file);
 
-        self::assertTrue($this->local->fileDownload(self::WORK_DIR_LOCAL . $file, $file));
+        self::assertTrue($this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, $file));
         self::assertFileExists(self::WORK_DIR_LOCAL . $file);
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
         self::assertFileEquals(self::WORK_DIR_REMOTE . $file, self::WORK_DIR_LOCAL . $file);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $file);
 
         $file = 'sub\\file.txt';
-        self::assertTrue($this->local->fileDownload(self::WORK_DIR_LOCAL . $file, $file));
+        self::assertTrue($this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, $file));
         self::assertFileExists(self::WORK_DIR_LOCAL . $file);
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
         self::assertFileEquals(self::WORK_DIR_REMOTE . $file, self::WORK_DIR_LOCAL . $file);
@@ -111,33 +121,33 @@ final class LocalTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\Local::fileDelete()
      */
-    public function testFileDelete()
+    public function testFileDeleteSuccess()
     {
         $file = 'file.txt';
         $this->setupRemoteStorage($file);
 
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
-        self::assertTrue($this->local->fileDelete($file));
+        self::assertTrue($this->remote->fileDelete($file));
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $file);
 
         $file = 'sub\\file.txt';
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
-        self::assertTrue($this->local->fileDelete($file));
+        self::assertTrue($this->remote->fileDelete($file));
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $file);
     }
 
     /**
      * @covers \CMS\PhpBackup\Remote\Local::createDirectory()
      */
-    public function testCreateDirectory()
+    public function testDirectoryCreateSuccess()
     {
         $dirs = ['a\\b\\c', 'foo\\b\\c\\', 'foo\\b\\c\\'];
         foreach ($dirs as $dir) {
-            $this->local->dirCreate($dir);
+            $this->remote->dirCreate($dir);
             self::assertFileExists(self::WORK_DIR_REMOTE . $dir);
         }
 
-        $this->local->dirCreate('bar\b\\c\\test.txt');
+        $this->remote->dirCreate('bar\b\\c\\test.txt');
         self::assertFileExists(self::WORK_DIR_REMOTE . 'bar\b\\c\\');
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . 'bar\b\\c\\test.txt');
     }

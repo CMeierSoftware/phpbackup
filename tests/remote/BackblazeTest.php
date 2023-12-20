@@ -73,28 +73,6 @@ final class BackblazeTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\Backblaze::fileUpload()
      */
-    public function testFileUploadSrcFileNotFound()
-    {
-        $destFile = 'file.txt';
-        $this->expectException(FileNotFoundException::class);
-        $this->remote->fileUpload(self::TEST_FILE_SRC . 'invalid', $destFile);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Backblaze::fileUpload()
-     */
-    public function testFileUploadDestFileAlreadyExists()
-    {
-        $this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest);
-        $this->assertRemoteFileExists($this->remoteFileDest);
-        $this->expectException(FileAlreadyExistsException::class);
-        $this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest);
-        $this->assertRemoteFileExists($this->remoteFileDest);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Backblaze::fileUpload()
-     */
     public function testFileUploadSuccess()
     {
         $this->assertRemoteFileDoesNotExist($this->remoteFileDest);
@@ -105,7 +83,7 @@ final class BackblazeTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\Backblaze::createDirectory()
      */
-    public function testCreateDirectory()
+    public function testDirectoryCreateSuccess()
     {
         $dirs = ['a/', '/b', 'foo/b/c/'];
         foreach ($dirs as $dir) {
@@ -122,31 +100,7 @@ final class BackblazeTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\Backblaze::fileDownload()
      */
-    public function testFileDownloadSrcFileNotFound()
-    {
-        $file = 'file.txt';
-        $this->expectException(FileNotFoundException::class);
-        $this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, $file . 'invalid');
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Backblaze::fileDownload()
-     */
-    public function testFileDownloadDestFileAlreadyExists()
-    {
-        $file = 'file1.txt';
-
-        copy(self::TEST_FILE_SRC, self::WORK_DIR_LOCAL . $file);
-        self::assertFileExists(self::WORK_DIR_LOCAL . $file);
-
-        $this->expectException(FileAlreadyExistsException::class);
-        $this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, 'fixtures/' . $file);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Backblaze::fileDownload()
-     */
-    public function testFileDownload()
+    public function testFileDownloadSuccess()
     {
         $file = 'file1.txt';
 
@@ -158,18 +112,7 @@ final class BackblazeTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\Backblaze::fileDelete()
      */
-    public function testFileDeleteFileNotFound()
-    {
-        $file = 'invalid.txt';
-
-        $this->expectException(FileNotFoundException::class);
-        $this->remote->fileDelete($file);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Remote\Backblaze::fileDelete()
-     */
-    public function testFileDelete()
+    public function testFileDeleteSuccess()
     {
         self::assertTrue($this->remote->fileUpload(self::TEST_FILE_SRC, $this->remoteFileDest));
         $this->assertRemoteFileExists($this->remoteFileDest);

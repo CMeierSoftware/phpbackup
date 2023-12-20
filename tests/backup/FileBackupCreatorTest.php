@@ -27,8 +27,6 @@ final class FileBackupCreatorTest extends TestCase
     public function testBackupInvalidDir(): void
     {
         $this->expectException(FileNotFoundException::class);
-        $this->backupCreator->backupAll('invalid');
-        $this->expectException(FileNotFoundException::class);
         $this->backupCreator->backupAll(self::FIXTURES_DIR . '\invalid');
     }
 

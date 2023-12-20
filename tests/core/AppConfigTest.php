@@ -224,10 +224,6 @@ final class AppConfigTest extends TestCase
     public function testSaveTempDataThrowsTypeErrorOnInvalidData()
     {
         $type = 'invalid';
-        $data = fopen('php://stdin', 'r');
-
-        $this->expectException(\TypeError::class);
-        $this->config->saveTempData($type, $data);
 
         $data = 'string';
         $this->expectException(\TypeError::class);

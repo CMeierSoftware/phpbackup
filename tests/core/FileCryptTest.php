@@ -37,13 +37,18 @@ final class FileCryptTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileCrypt::decryptFile
      * @covers \CMS\PhpBackup\Core\FileCrypt::encryptFile
      */
-    public function testFileNotFound()
+    public function testEncryptionFileNotFound()
     {
         $this->expectException(FileNotFoundException::class);
         FileCrypt::encryptFile(self::TEST_FILE_PLAIN . 'invalid', self::TEST_KEY);
+    }
+    /**
+     * @covers \CMS\PhpBackup\Core\FileCrypt::decryptFile
+     */
+    public function testDecryptionFileNotFound()
+    {
         $this->expectException(FileNotFoundException::class);
         FileCrypt::decryptFile(self::TEST_FILE_PLAIN . 'invalid', self::TEST_KEY);
     }

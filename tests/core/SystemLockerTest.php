@@ -60,8 +60,6 @@ final class SystemLockerTest extends TestCase
 
         $this->expectException(SystemAlreadyLockedException::class);
         SystemLocker::lock(self::TEST_DIR);
-
-        SystemLocker::unlock(self::TEST_DIR);
     }
 
     /**
@@ -109,8 +107,6 @@ final class SystemLockerTest extends TestCase
     public function testReadLockFileWhenUnlocked()
     {
         self::expectException(FileNotFoundException::class);
-        $lockTimestamp = SystemLocker::readLockFile(self::TEST_DIR);
-
-        self::assertEmpty($lockTimestamp);
+        SystemLocker::readLockFile(self::TEST_DIR);
     }
 }
