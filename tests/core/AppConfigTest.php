@@ -186,8 +186,14 @@ final class AppConfigTest extends TestCase
         $data = [
             'key' => 'value',
             'bundles' => [
+                'a' => ['item1', 'item2'],
+                'b' => ['item3', 'item4'],
+                'c' => ['c1' => ['item5', 'item6'], 'c2' => ['item7', 'item8']],
+            ],
+            'archives' => [
                 ['item1', 'item2'],
                 ['item3', 'item4'],
+                [['item5', 'item6'], ['item7', 'item8']],
             ],
         ];
 
@@ -229,7 +235,7 @@ final class AppConfigTest extends TestCase
     }
 
     /**
-     * @uses \CMS\PhpBackup\Core\AppConfig::saveTempData()
+     * @uses \CMS\PhpBackup\Core\AppConfig::getTempDir()
      *
      * @covers \CMS\PhpBackup\Core\AppConfig::readTempData()
      */
@@ -239,13 +245,20 @@ final class AppConfigTest extends TestCase
         $data = [
             'key' => 'value',
             'bundles' => [
+                'a' => ['item1', 'item2'],
+                'b' => ['item3', 'item4'],
+                'c' => ['c1' => ['item5', 'item6'], 'c2' => ['item7', 'item8']],
+            ],
+            'archives' => [
                 ['item1', 'item2'],
                 ['item3', 'item4'],
+                [['item5', 'item6'], ['item7', 'item8']],
             ],
         ];
 
-        // Save data to file for testing
-        $this->config->saveTempData($type, $data);
+        $filePath = $this->config->getTempDir() . $type . '.xml';
+        copy(self::TEST_TEMP_TEST_RESULT, $filePath);
+        self::assertFileExists($filePath);
 
         $result = $this->config->readTempData($type);
 

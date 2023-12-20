@@ -77,8 +77,10 @@ final class AppConfig
      * @param string $type the type of data
      * @param array $data the data to be saved
      */
-    public function saveTempData(string $type, array $data): void
+    public function saveTempData(string $type, array &$data): void
     {
+        $this->processDataForSave($data);
+
         $sanitizedType = str_replace([DIRECTORY_SEPARATOR, '\\', '/'], '_', $type);
         $filePath = $this->getTempDir() . $sanitizedType . '.xml';
         FileLogger::getInstance()->info("Will write tempData to '{$filePath}'.");
@@ -112,7 +114,8 @@ final class AppConfig
 
         $data = $reader->fromFile($filePath);
 
-        
+        $this->processDataForRead($data);
+
         return $data;
     }
 
@@ -165,6 +168,59 @@ final class AppConfig
     public function getRemoteSettings(): ?array
     {
         return isset($this->config['remote']) ? $this->config['remote'] : null;
+    }
+
+    // Helper function to check if an array has numeric keys
+    private function hasNumericKeys(array &$array): bool
+    {
+        foreach (array_keys($array) as $key) {
+            if (is_numeric($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Recursive function for saving data
+    private function processDataForSave(array &$data): void
+    {
+        foreach (array_keys($data) as $key) {
+            $node = &$data[$key];
+            if (!is_array($node) || empty($node)) {
+                continue;
+            }
+            // only change keys when values are also arrays
+            if (is_array($node[array_key_first($node)]) && $this->hasNumericKeys($node)) {
+                $node = array_combine(
+                    array_map(static fn ($k) => $key . '_' . $k, array_keys($node)),
+                    $node
+                );
+            }
+            $this->processDataForSave($node);
+            
+        }
+    }
+
+    // Recursive function for reading data
+    private function processDataForRead(array &$data): void
+    {
+        foreach (array_keys($data) as $key) {
+            $node = &$data[$key];
+            if (!is_array($node) || empty($node)) {
+                continue;
+            }
+            
+            $this->processDataForRead($data[$key]);
+
+            $childKeys = array_keys($node);
+            if (is_string($childKeys[0]) && 0 === strpos($childKeys[0], $key . '_')) {
+                $node = array_combine(
+                    array_map(static fn ($k) => (int) str_replace($key . '_', '', $k), array_keys($node)),
+                    $node
+                );
+            }
+        }
     }
 
     /**

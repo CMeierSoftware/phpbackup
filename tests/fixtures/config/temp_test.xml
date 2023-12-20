@@ -1,8 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <laminas-config>
   <key>value</key>
-  <bundles_0>item1</bundles_0>
-  <bundles_0>item2</bundles_0>
-  <bundles_1>item3</bundles_1>
-  <bundles_1>item4</bundles_1>
+  <bundles>
+    <a>item1</a>
+    <a>item2</a>
+    <b>item3</b>
+    <b>item4</b>
+    <c>
+      <c1>item5</c1>
+      <c1>item6</c1>
+      <c2>item7</c2>
+      <c2>item8</c2>
+    </c>
+  </bundles>
+  <archives>
+    <archives_0>item1</archives_0>
+    <archives_0>item2</archives_0>
+    <archives_1>item3</archives_1>
+    <archives_1>item4</archives_1>
+    <archives_2>
+      <archives_2_0>item5</archives_2_0>
+      <archives_2_0>item6</archives_2_0>
+      <archives_2_1>item7</archives_2_1>
+      <archives_2_1>item8</archives_2_1>
+    </archives_2>
+  </archives>
 </laminas-config>
