@@ -55,29 +55,29 @@ final class AbstractRemoteHandlerTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::createDirectory()
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirCreate()
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirDelete()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileDelete()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileDownload()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileExists()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileUpload()
      *
      * @uses \CMS\PhpBackup\Remote\AbstractRemoteHandler::isConnected()
+     * 
+      * @dataProvider publicFunctionsProvider
      */
-    public function testExceptionOnMissingConnection()
+    public function testExceptionOnMissingConnection(string $function)
     {
         $handler = $this->getMockedHandler(false);
         self::assertFalse($handler->isConnected());
 
         self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->fileUpload('', '');
-        self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->fileDownload('', '');
-        self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->fileDelete('', '');
-        self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->fileExists('', '');
-        self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->createDirectory('', '');
+        $handler->$function('', '');
+    }
+
+    public static function publicFunctionsProvider(): array
+    {
+        return [['fileUpload'], ['fileDownload'], ['fileDelete'], ['fileExists'], ['dirCreate'], ['dirDelete'], ];
     }
 
     /**
@@ -108,7 +108,6 @@ final class AbstractRemoteHandlerTest extends TestCase
         $this->expectException(FileNotFoundException::class);
         self::expectExceptionMessage("The file '{$srcFile}' was not found in local storage.");
         $this->mockedHandler->fileUpload($srcFile, $destFile);
-        self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $destFile);
     }
 
     /**
@@ -238,9 +237,9 @@ final class AbstractRemoteHandlerTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::createDirectory()
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirCreate()
      */
-    public function testCreateDirectorySuccess()
+    public function testDirectoryCreateSuccess()
     {
         $dirs = ['test', 'bar\foo.txt', 'six/seven', 'one/two.txt'];
         $this->mockedHandler->expects(self::exactly(count($dirs)))->method('_fileExists')->willReturn(false);
@@ -255,6 +254,87 @@ final class AbstractRemoteHandlerTest extends TestCase
             self::WORK_DIR_LOCAL . 'bar' => true,
             self::WORK_DIR_LOCAL . 'six/seven' => true,
             self::WORK_DIR_LOCAL . 'one' => true,
+        ]);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirCreate()
+     */
+    public function testDirectoryCreateDirAlreadyExists()
+    {
+        $dirs = ['test', 'bar\foo.txt', 'six/seven', 'one/two.txt'];
+        $this->mockedHandler->expects(self::exactly(count($dirs)))->method('_fileExists')->willReturn(true);
+        $this->mockedHandler->expects(self::never())->method('_dirCreate')->willReturn(true);
+
+        foreach ($dirs as $dir) {
+            self::assertTrue($this->mockedHandler->dirCreate(self::WORK_DIR_LOCAL . $dir, $dir));
+        }
+
+        self::assertMockedCache([
+            self::WORK_DIR_LOCAL . 'test' => true,
+            self::WORK_DIR_LOCAL . 'bar' => true,
+            self::WORK_DIR_LOCAL . 'six/seven' => true,
+            self::WORK_DIR_LOCAL . 'one' => true,
+        ]);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirDelete()
+     */
+    public function testDirectoryDeleteSuccess()
+    {
+        $dirs = [
+            self::WORK_DIR_LOCAL . 'test\foo.txt' => true,
+            self::WORK_DIR_LOCAL . 'test/seven' => true,
+            self::WORK_DIR_LOCAL . 'test/seven/two.txt' => true,
+        ];
+        
+        $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(true);
+        $this->mockedHandler->expects(self::exactly(1))->method('_dirDelete')->willReturn(true);
+
+        
+        $reflectionClass = new \ReflectionClass($this->mockedHandler);
+        $property = $reflectionClass->getProperty('fileExistsCache');
+        $property->setAccessible(true); // Make the protected property accessible
+        $property->setValue($this->mockedHandler, $dirs);
+
+        self::assertTrue($this->mockedHandler->dirDelete(self::WORK_DIR_LOCAL . 'test'));
+
+        self::assertMockedCache([
+            self::WORK_DIR_LOCAL . 'test\foo.txt' => false,
+            self::WORK_DIR_LOCAL . 'test/seven' => false,
+            self::WORK_DIR_LOCAL . 'test/seven/two.txt' => false,
+            self::WORK_DIR_LOCAL . 'test' => false,
+        ]);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirDelete()
+     */
+    public function testDirectoryDeleteFileNotFound()
+    {
+        $dirs = [
+            self::WORK_DIR_LOCAL . 'test\foo.txt' => true,
+            self::WORK_DIR_LOCAL . 'test/seven' => true,
+            self::WORK_DIR_LOCAL . 'test/seven/two.txt' => true,
+        ];
+        
+        $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(false);
+        $this->mockedHandler->expects(self::never())->method('_dirDelete');
+
+        
+        $reflectionClass = new \ReflectionClass($this->mockedHandler);
+        $property = $reflectionClass->getProperty('fileExistsCache');
+        $property->setAccessible(true); // Make the protected property accessible
+        $property->setValue($this->mockedHandler, $dirs);
+
+        self::assertFalse($this->mockedHandler->dirDelete(self::WORK_DIR_LOCAL . 'test'));
+
+        self::assertMockedCache([
+            self::WORK_DIR_LOCAL . 'test\foo.txt' => false,
+            self::WORK_DIR_LOCAL . 'test/seven' => false,
+            self::WORK_DIR_LOCAL . 'test/seven/two.txt' => false,
+            self::WORK_DIR_LOCAL . 'test' => false,
         ]);
     }
 
@@ -286,11 +366,15 @@ final class AbstractRemoteHandlerTest extends TestCase
         self::assertSame($excepted, $property->getValue($this->mockedHandler));
     }
 
-    private function getMockedHandler(bool $connect = true): MockObject
+    private function getMockedHandler(bool $connect = true): AbstractRemoteHandler
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractRemoteHandler::class);
-        $mockBuilder->onlyMethods(['_fileUpload', '_fileDownload', '_fileExists', '_fileDelete', '_dirCreate', 'connect', 'disconnect']);
+        $mockBuilder->onlyMethods([
+            '_fileUpload', '_fileDownload', '_fileExists', '_fileDelete',
+            '_dirCreate', '_dirDelete',
+            'connect', 'disconnect'
+        ]);
 
         $handler = $mockBuilder->getMock();
 

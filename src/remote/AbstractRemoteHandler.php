@@ -180,6 +180,35 @@ abstract class AbstractRemoteHandler
     }
 
     /**
+     * Deletes a directory recursively with all its content.
+     */
+    public function dirDelete(string $remoteFilePath): bool
+    {
+        if (!$this->isConnected()) {
+            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
+        }
+        $success = false;
+
+        if ($this->fileExists($remoteFilePath)) {
+            FileLogger::getInstance()->info("Delete remote directory recursively '{$remoteFilePath}'.");
+
+            $success = $this->_dirDelete($remoteFilePath);
+            $this->fileExistsCache[$remoteFilePath] = !$success;
+        }
+
+        if (!$this->fileExistsCache[$remoteFilePath]) {
+            foreach (array_keys($this->fileExistsCache) as $file)
+            {
+                if (str_starts_with($file, $remoteFilePath)) {
+                    $this->fileExistsCache[$file] = false;
+                }
+            }
+        }
+
+        return $success;
+    }
+
+    /**
      * Checks if the remote handler is currently connected to the remote server.
      *
      * @return bool true if connected, false if disconnected or connection status is unknown
@@ -221,4 +250,9 @@ abstract class AbstractRemoteHandler
      * @see AbstractRemoteHandler::dirCreate()
      */
     abstract protected function _dirCreate(string $remoteFilePath): bool;
+
+    /**
+     * @see AbstractRemoteHandler::dirDelete()
+     */
+    abstract protected function _dirDelete(string $remoteFilePath): bool;
 }
