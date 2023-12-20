@@ -77,6 +77,11 @@ class Local extends AbstractRemoteHandler
         return true;
     }
 
+    protected function _dirList(string $remoteFilePath): array
+    {
+        return scandir($this->buildAbsPath($remoteFilePath));
+    }
+
     private function buildAbsPath(string $remoteFilePath): string
     {
         return $this->remoteRootPath . DIRECTORY_SEPARATOR . ltrim($remoteFilePath, DIRECTORY_SEPARATOR);

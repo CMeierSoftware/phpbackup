@@ -137,7 +137,19 @@ final class LocalTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\Local::createDirectory()
+     * @covers \CMS\PhpBackup\Remote\Local::dirList()
+     */
+    public function testDirectoryListSuccess()
+    {
+        $file = 'file.txt';
+        $this->setupRemoteStorage($file);
+        $result = $this->remote->dirList('.');
+
+        self::assertSame([$file, 'sub'], $result);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\Local::dirCreate()
      */
     public function testDirectoryCreateSuccess()
     {
