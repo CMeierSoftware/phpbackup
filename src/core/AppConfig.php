@@ -8,6 +8,7 @@ use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Config;
 use Laminas\Config\Factory as LaminasConfigFactory;
+use \Laminas\Config\Exception\UnprocessableConfigException;
 use Laminas\Config\Reader\Xml as XmlReader;
 use Laminas\Config\Writer\Xml as XmlWriter;
 
@@ -32,7 +33,7 @@ final class AppConfig
         $this->configFile = $configFile;
         $cfg = LaminasConfigFactory::fromFile($configFile);
         if (empty($cfg) || !is_array($cfg)) {
-            throw new \Laminas\Config\Exception\UnprocessableConfigException('');
+            throw new UnprocessableConfigException("The config {$configFile} is not formatted correctly. Its empty or not containing elements.");
         }
         $this->config = $cfg;
         $this->tempDir = $tempDir;
@@ -168,6 +169,18 @@ final class AppConfig
     public function getRemoteSettings(): ?array
     {
         return isset($this->config['remote']) ? $this->config['remote'] : null;
+    }
+
+    public function getDefinedRemoteClasses(): array
+    {
+        $remoteClasses = $this->getRemoteSettings();
+
+        if (null === $remoteClasses) {
+            return [];
+        }
+        $remoteClasses = array_keys($remoteClasses);
+        $remoteClasses = array_map(fn($cls) => 'CMS\PhpBackup\Remote\\' . ucfirst($cls), $remoteClasses);
+        return array_filter($remoteClasses, 'class_exists');
     }
 
     // Helper function to check if an array has numeric keys

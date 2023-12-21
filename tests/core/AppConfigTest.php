@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\AppConfig;
+use \Laminas\Config\Exception\UnprocessableConfigException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Exception\RuntimeException;
@@ -17,22 +18,25 @@ use PHPUnit\Framework\TestCase;
  */
 final class AppConfigTest extends TestCase
 {
-    private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\temp_test.xml';
-    private const TEST_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test.xml';
-    private const TEST_EMPTY_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\empty_config.xml';
-    private const TEST_NO_DB_CONFIG_FILE = ABS_PATH . 'tests\\fixtures\\config\\test_no_db.xml';
+    private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\test_temp_data.xml';
     private const TEST_TEMP_DIR = CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
+    private const APPS = [
+        'valid_app' => ABS_PATH . 'tests\\fixtures\\config\\config_full_valid.xml',
+        'empty_app' => ABS_PATH . 'tests\\fixtures\\config\\config_empty.xml',
+        'empty_elements' => ABS_PATH . 'tests\\fixtures\\config\\config_empty_elements.xml',
+        'valid_app_no_db' => ABS_PATH . 'tests\\fixtures\\config\\config_no_db.xml',
+        'valid_app_no_remote' => ABS_PATH . 'tests\\fixtures\\config\\config_no_remote.xml',
+    ];
 
     private AppConfig $config;
 
     protected function setUp(): void
-    {
-        copy(self::TEST_EMPTY_CONFIG_FILE, CONFIG_DIR . '\\empty_app.xml');
-        copy(self::TEST_CONFIG_FILE, CONFIG_DIR . '\\valid_app.xml');
-        copy(self::TEST_NO_DB_CONFIG_FILE, CONFIG_DIR . '\\valid_app_no_db.xml');
-        self::assertFileExists(self::TEST_CONFIG_FILE);
-        self::assertFileExists(self::TEST_EMPTY_CONFIG_FILE);
-        self::assertFileExists(self::TEST_NO_DB_CONFIG_FILE);
+    {    
+        foreach (self::APPS as $configName => $sourceFile) {
+            $destinationFile = CONFIG_DIR . DIRECTORY_SEPARATOR . $configName . '.xml';
+            copy($sourceFile, $destinationFile);
+            self::assertFileExists($destinationFile);
+        }
 
         $this->config = AppConfig::loadAppConfig('valid_app');
     }
@@ -51,6 +55,15 @@ final class AppConfigTest extends TestCase
     {
         $appConfig = AppConfig::loadAppConfig('valid_app');
         self::assertInstanceOf(AppConfig::class, $appConfig);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     */
+    public function testLoadAppConfigEmpty(): void
+    {
+        self::expectException(UnprocessableConfigException::class);
+        AppConfig::loadAppConfig('empty_app');
     }
 
     /**
@@ -131,6 +144,30 @@ final class AppConfigTest extends TestCase
             self::assertArrayHasKey($key, $actualConfig);
             self::assertSame($value, $actualConfig[$key]);
         }
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getDefinedRemoteClasses()
+     */
+    public function testDefinedRemoteClasses(): void
+    {
+        $classes = [
+            'CMS\PhpBackup\Remote\Local',
+            'CMS\PhpBackup\Remote\Backblaze',
+        ];
+        $result = $this->config->getDefinedRemoteClasses();
+        self::assertSame($classes, $result);
+    }
+
+    /**
+     * @uses \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     * 
+     * @covers \CMS\PhpBackup\Core\AppConfig::getDefinedRemoteClasses()
+     */
+    public function testDefinedRemoteClassesNoRemote(): void
+    {
+        $config = AppConfig::loadAppConfig('valid_app_no_remote');
+        self::assertEmpty($config->getDefinedRemoteClasses());
     }
 
     /**

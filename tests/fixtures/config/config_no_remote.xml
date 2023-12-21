@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <backup>
+        <database>
+            <adapter>pdo_mysql</adapter>
+            <host>db.example.com</host>
+            <username>dbuser</username>
+            <password>secret</password>
+            <dbname>dbproduction</dbname>
+        </database>
+        <directory>
+            <src>.</src>
+        </directory>
+        <settings>
+            <maxArchiveSize>5</maxArchiveSize>
+            <encryptionKey>some_random_Key</encryptionKey>
+            <keepBackupAmount>2</keepBackupAmount>
+            <keepBackupDays>0</keepBackupDays>
+        </settings>
+    </backup>
+</config>
