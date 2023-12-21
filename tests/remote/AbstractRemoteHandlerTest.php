@@ -368,6 +368,81 @@ final class AbstractRemoteHandlerTest extends TestCase
     }
 
     /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::deleteOld()
+     */
+    public function testDeleteOldAgeSuccess()
+    {
+        $days = 7;
+
+        list($expiredDirs, $validDirs) = self::mockDirList($days);
+
+        $this->mockedHandler->expects(self::exactly(1))
+            ->method('_dirList')
+            ->willReturn(array_merge($expiredDirs, $validDirs))
+        ;
+
+        // + 1 because dirList use it as well
+        $this->mockedHandler->expects(self::exactly(count($expiredDirs) + 1))
+            ->method('_fileExists')
+            ->willReturn(true)
+        ;
+
+        $this->mockedHandler->expects(self::exactly(count($expiredDirs)))
+            ->method('_dirDelete')
+            ->willReturnCallback(
+                static fn ($remotePath) => in_array(ltrim($remotePath, '/'), $expiredDirs, true) ? true : self::fail("Function wants to delete validDir {$remotePath} " . json_encode($expiredDirs))
+            )
+        ;
+
+        $deletedCount = $this->mockedHandler->deleteOld('', $days, 0);
+
+        // Assert that the return value is an integer
+        self::assertSame(count($expiredDirs), $deletedCount);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::deleteOld()
+     */
+    public function testDeleteOldCountSuccess()
+    {
+        $countToKeep = 7;
+
+        list($expiredDirs, $validDirs) = self::mockDirList($countToKeep);
+        $allDirs = array_merge($expiredDirs, $validDirs);
+
+        $this->mockedHandler->expects(self::exactly(1))
+            ->method('_dirList')
+            ->willReturn($allDirs)
+        ;
+
+        // + 1 because dirList use it as well
+        $this->mockedHandler->expects(self::exactly(count($allDirs) - $countToKeep + 1))
+            ->method('_fileExists')
+            ->willReturn(true)
+        ;
+
+        $this->mockedHandler->expects(self::exactly(count($allDirs) - $countToKeep))
+            ->method('_dirDelete')
+            ->willReturnCallback(
+                static fn ($remotePath) => in_array(ltrim($remotePath, '/'), $expiredDirs, true) ? true : self::fail("Function wants to delete validDir {$remotePath} " . json_encode($expiredDirs))
+            )
+        ;
+
+        $deletedCount = $this->mockedHandler->deleteOld('', 0, $countToKeep);
+
+        // Assert that the return value is an integer
+        self::assertSame(count($allDirs) - $countToKeep, $deletedCount);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::deleteOld()
+     */
+    public function testDeleteOldWithZeroParameters()
+    {
+        self::assertSame(0, $this->mockedHandler->deleteOld('', 0, 0));
+    }
+
+    /**
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::clearCache()
      */
     public function testClearCache()
@@ -417,5 +492,22 @@ final class AbstractRemoteHandlerTest extends TestCase
         $handler->expects(self::any())->method('connect')->willReturn(true);
 
         return $handler;
+    }
+
+    private static function mockDirList(int $numberOfDays): array
+    {
+        $expiredFiles = [];
+        $validFiles = [];
+
+        for ($i = 0; $i < 2 * $numberOfDays; ++$i) {
+            $timestamp = strtotime("-{$i} days") - 120;
+            if ($i < $numberOfDays) {
+                $validFiles[] = 'backup_' . date('Y-m-d_H-i-s', $timestamp);
+            } else {
+                $expiredFiles[] = 'backup_' . date('Y-m-d_H-i-s', $timestamp);
+            }
+        }
+
+        return [$expiredFiles, $validFiles];
     }
 }

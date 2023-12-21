@@ -267,6 +267,58 @@ abstract class AbstractRemoteHandler
         $this->fileExistsCache = [];
     }
 
+    public function deleteOld(string $remotePath, int $ageInDays, int $amount): int
+    {
+        $this->sanitizeDirCheck($remotePath);
+
+        if ($ageInDays <= 0 && $amount <= 0) {
+            return 0; // Nothing to do if both parameters are 0 or negative
+        }
+
+        $dirs = $this->dirList($remotePath);
+
+        $validDirs = [];
+
+        foreach ($dirs as $dir) {
+            if (preg_match('/^backup_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})$/', $dir, $matches)) {
+                $dateTime = \DateTime::createFromFormat('Y-m-d_H-i-s', $matches[1]);
+                $dirTimestamp = $dateTime->getTimestamp();
+                $validDirs[$dir] = $dirTimestamp;
+            }
+        }
+
+        // Sort valid directories based on creation time, oldest first
+        asort($validDirs);
+
+        // Delete oldest directories until the desired amount is reached
+        $deletedCount = 0;
+
+        if ($amount > 0) {
+            $countToDelete = max(0, count($validDirs) - $amount);
+
+            foreach (array_slice($validDirs, 0, $countToDelete) as $dir => $timestamp) {
+                $this->dirDelete("{$remotePath}/{$dir}");
+                unset($validDirs[$dir]);
+                ++$deletedCount;
+            }
+        }
+
+        // Delete directories older than the specified days
+        if ($ageInDays > 0) {
+            $cutoffTime = time() - ($ageInDays * 24 * 60 * 60);
+
+            foreach ($validDirs as $dir => $timestamp) {
+                if ($timestamp < $cutoffTime) {
+                    $this->dirDelete("{$remotePath}/{$dir}");
+                    unset($validDirs[$dir]);
+                    ++$deletedCount;
+                }
+            }
+        }
+
+        return $deletedCount;
+    }
+
     /**
      * @see AbstractRemoteHandler::fileUpload()
      */
