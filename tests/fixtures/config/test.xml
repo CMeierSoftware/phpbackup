@@ -14,6 +14,8 @@
         <settings>
             <maxArchiveSize>5</maxArchiveSize>
             <encryptionKey>some_random_Key</encryptionKey>
+            <keepBackupAmount>2</keepBackupAmount>
+            <keepBackupDays>0</keepBackupDays>
         </settings>
     </backup>
     <remote>
