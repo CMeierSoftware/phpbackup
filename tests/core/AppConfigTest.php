@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Core\AppConfig;
-use \Laminas\Config\Exception\UnprocessableConfigException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Exception\RuntimeException;
+use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,7 +31,7 @@ final class AppConfigTest extends TestCase
     private AppConfig $config;
 
     protected function setUp(): void
-    {    
+    {
         foreach (self::APPS as $configName => $sourceFile) {
             $destinationFile = CONFIG_DIR . DIRECTORY_SEPARATOR . $configName . '.xml';
             copy($sourceFile, $destinationFile);
@@ -161,7 +161,7 @@ final class AppConfigTest extends TestCase
 
     /**
      * @uses \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
-     * 
+     *
      * @covers \CMS\PhpBackup\Core\AppConfig::getDefinedRemoteClasses()
      */
     public function testDefinedRemoteClassesNoRemote(): void
