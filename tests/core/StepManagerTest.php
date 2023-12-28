@@ -24,7 +24,7 @@ final class StepManagerTest extends TestCase
     protected function setUp(): void
     {
         for ($i = 0; $i < 10; ++$i) {
-            $step = new StepManagerTestClass(['Hello World', $i]);
+            $step = new StepClass(['arg1' => 'Hello World', 'arg2' => $i]);
             $this->steps[] = $step;
         }
 
@@ -95,13 +95,15 @@ final class StepManagerTest extends TestCase
 }
 
 // Define a static class with a method for testing
-class StepManagerTestClass extends AbstractStep
+final class StepClass extends AbstractStep
 {
     private bool $repeated = false;
 
     protected function _execute(): StepResult
     {
-        $this->repeated = (9 === $arg2 && !$this->repeated);
+        $this->repeated = (9 === $this->arguments['arg2'] && !$this->repeated);
+        $arg1 = $this->arguments['arg1'];
+        $arg2 = $this->arguments['arg2'];
 
         return new StepResult("Result: {$arg1} {$arg2}", $this->repeated);
     }
