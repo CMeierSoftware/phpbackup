@@ -13,8 +13,8 @@ if (!defined('ABS_PATH')) {
 abstract class AbstractStep
 {
     public readonly int $delay;
-    private readonly array $arguments;
-    private FileLogger $logger;
+    protected readonly array $arguments;
+    protected FileLogger $logger;
 
     /**
      * Set the callback for the step with optional arguments.
@@ -29,27 +29,9 @@ abstract class AbstractStep
         $this->logger = FileLogger::getInstance();
     }
 
-    public function __toString(): string
-    {
-        if (is_array($this->callback)) {
-            [$class, $method] = $this->callback;
-            $cls = is_object($class) ? $class::class : $class;
-
-            return "Callable: [{$cls}, {$method}]";
-        }
-        if (is_object($this->callback)) {
-            return 'Callable: ' . get_class($this->callback);
-        }
-        if (is_string($this->callback)) {
-            return "Callable: {$this->callback}";
-        }
-
-        throw new \UnexpectedValueException('Unsupported callable type');
-    }
-
     public function __serialize(): array
     {
-        return [$this->delay, (string) $this, $this->arguments];
+        return [$this->delay, $this->arguments];
     }
 
     /**
@@ -59,7 +41,8 @@ abstract class AbstractStep
      */
     public function execute(): StepResult
     {
-        $this->logger->info("Execute {$this}");
+        $class = self::class;
+        $this->logger->info("Execute {$class}");
 
         return $this->_execute();
     }
