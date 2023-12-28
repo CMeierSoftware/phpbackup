@@ -30,18 +30,20 @@ final class AbstractStepTest extends TestCase
         self::assertSame($stepResult, $result);
     }
 
-    public function testToStringWithObjectCallback(): void
+    public function testSerialize(): void
     {
-        self::fail('_toString must be implemented');
+        $step = $this->getMockedHandler();
+
+        $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":2:{i:0;i:0;i:1;a:0:{}}';
+
+        self::assertSame($expected, serialize($step));
     }
 
     private function getMockedHandler(bool $connect = true): MockObject
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
-        $mockBuilder->onlyMethods([
-            '_execute',
-        ]);
+        $mockBuilder->onlyMethods(['_execute',]);
 
         return $mockBuilder->getMock();
     }
