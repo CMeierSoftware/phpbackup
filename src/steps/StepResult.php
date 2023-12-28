@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Core;
+namespace CMS\PhpBackup\Step;
 
 if (!defined('ABS_PATH')) {
     return;

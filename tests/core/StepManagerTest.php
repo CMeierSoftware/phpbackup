@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\Step;
 use CMS\PhpBackup\Core\StepManager;
-use CMS\PhpBackup\Core\StepResult;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Step\AbstractStep;
+use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,9 +23,8 @@ final class StepManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $sm = new StepManagerTestClass();
         for ($i = 0; $i < 10; ++$i) {
-            $step = new Step([$sm, 'exampleMethod'], ['Hello World', $i]);
+            $step = new StepManagerTestClass(['Hello World', $i]);
             $this->steps[] = $step;
         }
 
@@ -96,11 +95,11 @@ final class StepManagerTest extends TestCase
 }
 
 // Define a static class with a method for testing
-class StepManagerTestClass
+class StepManagerTestClass extends AbstractStep
 {
     private bool $repeated = false;
 
-    public function exampleMethod($arg1, $arg2)
+    protected function _execute(): StepResult
     {
         $this->repeated = (9 === $arg2 && !$this->repeated);
 

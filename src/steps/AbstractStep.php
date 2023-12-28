@@ -2,30 +2,31 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Core;
+namespace CMS\PhpBackup\Step;
+
+use CMS\PhpBackup\Core\FileLogger;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class Step
+abstract class AbstractStep
 {
     public readonly int $delay;
-    private $callback;
     private readonly array $arguments;
+    private FileLogger $logger;
 
     /**
      * Set the callback for the step with optional arguments.
      *
-     * @param callable $callback the callback function or [class, method] array
      * @param array $arguments optional arguments to be passed to the callback
      * @param int $delay delay between this and the previous step
      */
-    public function __construct(callable $callback, array $arguments = [], int $delay = 0)
+    public function __construct(array $arguments = [], int $delay = 0)
     {
         $this->delay = $delay;
-        $this->callback = $callback;
         $this->arguments = $arguments;
+        $this->logger = FileLogger::getInstance();
     }
 
     public function __toString(): string
@@ -55,23 +56,13 @@ final class Step
      * Execute the callback and return the result.
      *
      * @return StepResult the result of the callback execution
-     *
-     * @throws \RuntimeException if the callback is not set
      */
     public function execute(): StepResult
     {
-        if (!$this->callback) {
-            throw new \RuntimeException('Callback is not set.');
-        }
+        $this->logger->info("Execute {$this}");
 
-        FileLogger::getInstance()->info("Execute {$this}");
-
-        $result = call_user_func_array($this->callback, $this->arguments);
-
-        if (!$result instanceof StepResult) {
-            throw new \RuntimeException('the step result is not of type ' . StepResult::class);
-        }
-
-        return $result;
+        return $this->_execute();
     }
+
+    abstract protected function _execute(): StepResult;
 }

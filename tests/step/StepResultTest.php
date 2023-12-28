@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\StepResult;
+use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
- * @covers \CMS\PhpBackup\Core\StepResult
+ * @covers \CMS\PhpBackup\Step\StepResult
  */
 final class StepResultTest extends TestCase
 {
     /**
-     * @covers \CMS\PhpBackup\Core\StepResult::__construct()
+     * @covers \CMS\PhpBackup\Step\StepResult::__construct()
      */
     public function testCreateNewInstanceWithReturnValueAndRepeatFlag()
     {
@@ -28,7 +28,7 @@ final class StepResultTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\StepResult::__toString()
+     * @covers \CMS\PhpBackup\Step\StepResult::__toString()
      */
     public function testCallToStringOnInstance()
     {
@@ -41,7 +41,7 @@ final class StepResultTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\StepResult::__toString()
+     * @covers \CMS\PhpBackup\Step\StepResult::__toString()
      */
     public function testCreateNewInstanceWithReturnValueOnly()
     {

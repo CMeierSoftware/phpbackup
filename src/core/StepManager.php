@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
+use CMS\PhpBackup\Step\AbstractStep;
+
 if (!defined('ABS_PATH')) {
     return;
 }
@@ -28,7 +30,7 @@ final class StepManager
         }
 
         foreach ($steps as $step) {
-            if (!$step instanceof Step) {
+            if (!$step instanceof AbstractStep) {
                 throw new \InvalidArgumentException('All entries in the array must be Step instances.');
             }
         }
@@ -60,9 +62,9 @@ final class StepManager
     /**
      * Determines the next step to be executed based on the previous step information.
      *
-     * @return null|Step the next step to be executed, or null if there is no next step
+     * @return null|AbstractStep the next step to be executed, or null if there is no next step
      */
-    private function getNextStep(): ?Step
+    private function getNextStep(): ?AbstractStep
     {
         $prevStepInfo = false;
         if (file_exists($this->stepFile) && 0 !== filesize($this->stepFile)) {
