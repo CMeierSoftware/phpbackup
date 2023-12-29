@@ -58,12 +58,12 @@ abstract class FileHelper
 
         FileLogger::getInstance()->info("Delete directory {$dirname} recursively.");
 
-        $files = iterator_to_array(new \RecursiveIteratorIterator(
+        $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
-        ));
+        );
 
-        foreach (array_reverse($files) as $file) {
+        foreach ($files as $file) {
             if ($file->isDir()) {
                 rmdir($file->getPathname());
             } else {

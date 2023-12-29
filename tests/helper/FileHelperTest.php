@@ -28,7 +28,7 @@ final class FileHelperTest extends TestCase
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::TEST_DIR);
+        // FileHelper::deleteDirectory(self::TEST_DIR);
     }
 
     /**
@@ -85,13 +85,31 @@ final class FileHelperTest extends TestCase
      */
     public function testDeleteDirectorySuccess()
     {
-        self::assertFileExists(self::TEST_FILE);
-        self::assertDirectoryExists(self::TEST_DIR);
-
         FileHelper::deleteDirectory(self::TEST_DIR);
 
         self::assertFileDoesNotExist(self::TEST_FILE);
-        self::assertFileDoesNotExist(self::TEST_DIR);
+        self::assertDirectoryDoesNotExist(self::TEST_DIR);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::deleteDirectory()
+     */
+    public function testDeleteDirectoryWithSubDirSuccess()
+    {
+        $subDir = self::TEST_DIR . 'sub';
+        FileHelper::makeDir($subDir);
+        self::assertDirectoryExists($subDir);
+
+        $subFile = $subDir . DIRECTORY_SEPARATOR . 'f.txt';
+        copy(TEST_FIXTURES_FILE_1, $subFile);
+        self::assertFileExists($subFile);
+
+        FileHelper::deleteDirectory(self::TEST_DIR);
+
+        self::assertFileDoesNotExist($subFile);
+        self::assertDirectoryDoesNotExist($subDir);
+        self::assertFileDoesNotExist(self::TEST_FILE);
+        self::assertDirectoryDoesNotExist(self::TEST_DIR);
     }
 
     /**
