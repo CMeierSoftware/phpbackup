@@ -16,25 +16,25 @@ final class SendRemoteStep extends AbstractStep
     private readonly AbstractRemoteHandler $remote;
     private readonly string $backupDir;
     private readonly string $backupDirName;
-    private readonly array $archives;
+    private array $archives;
     private array $uploadedFiles = [];
 
     /**
      * SendRemoteStep constructor.
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
-     * @param string $backupDir local directory containing backup files
+     * @param string $dirToSend local directory containing backup files
      * @param array $archives array of backup archives to be sent
      * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
      */
-    public function __construct(AbstractRemoteHandler $remoteHandler, string $backupDir, array &$archives, int $delay = 0)
+    public function __construct(AbstractRemoteHandler $remoteHandler, string $dirToSend, array &$archives, int $delay = 0)
     {
         parent::__construct($delay);
 
         $this->remote = $remoteHandler;
-        $this->backupDir = rtrim($backupDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $this->backupDirName = basename($backupDir);
-        $this->archives = $archives;
+        $this->backupDir = rtrim($dirToSend, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $this->backupDirName = basename($dirToSend);
+        $this->archives = &$archives;
     }
 
     /**
@@ -59,7 +59,7 @@ final class SendRemoteStep extends AbstractStep
     private function getUploadedFiles(): void
     {
         try {
-            $this->uploadedFiles = $this->remote->dirList($this->backupDir);
+            $this->uploadedFiles = $this->remote->dirList($this->backupDirName);
         } catch (FileNotFoundException $th) {
             $this->uploadedFiles = [];
         }
@@ -100,6 +100,9 @@ final class SendRemoteStep extends AbstractStep
         file_put_contents($fileMapping, json_encode($this->archives, JSON_PRETTY_PRINT));
 
         $remotePath = $this->backupDirName . '/' . basename($fileMapping);
+        if ($this->remote->fileExists($remotePath)) {
+            $this->remote->fileDelete($remotePath);
+        }
 
         return $this->remote->fileUpload($fileMapping, $remotePath);
     }
