@@ -37,7 +37,7 @@ final class DatabaseBackupStepTest extends TestCase
 
         // Create a temporary test directory for the tests
         FileHelper::makeDir(self::TEST_DIR);
-        self::assertFileExists(self::TEST_DIR);
+        self::assertDirectoryExists(self::TEST_DIR);
     }
 
     protected function tearDown(): void

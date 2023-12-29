@@ -23,7 +23,6 @@ final class AbstractStepTest extends TestCase
     {
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
-        $step->expects(self::exactly(1))->method('validateArgs')->willReturn(true);
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
 
         $result = $step->execute();
@@ -35,7 +34,7 @@ final class AbstractStepTest extends TestCase
     {
         $step = $this->getMockedHandler();
 
-        $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":2:{i:0;i:0;}';
+        $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":1:{i:0;i:0;}';
 
         self::assertSame($expected, serialize($step));
     }
@@ -44,7 +43,7 @@ final class AbstractStepTest extends TestCase
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
-        $mockBuilder->onlyMethods(['_execute', 'validateArgs']);
+        $mockBuilder->onlyMethods(['_execute']);
 
         return $mockBuilder->getMock();
     }

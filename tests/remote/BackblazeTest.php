@@ -36,7 +36,7 @@ final class BackblazeTest extends TestCase
         $this->assertRemoteFileExists($this->workDir);
 
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
-        self::assertFileExists(self::WORK_DIR_LOCAL);
+        self::assertDirectoryExists(self::WORK_DIR_LOCAL);
     }
 
     protected function tearDown(): void

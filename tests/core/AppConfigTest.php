@@ -211,9 +211,9 @@ final class AppConfigTest extends TestCase
     public function testTempDir()
     {
         FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
-        self::assertFileDoesNotExist(self::TEST_TEMP_DIR);
+        self::assertDirectoryDoesNotExist(self::TEST_TEMP_DIR);
         self::assertSame(self::TEST_TEMP_DIR, $this->config->getTempDir());
-        self::assertFileExists(self::TEST_TEMP_DIR);
+        self::assertDirectoryExists(self::TEST_TEMP_DIR);
     }
 
     /**

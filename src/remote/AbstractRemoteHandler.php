@@ -361,7 +361,7 @@ abstract class AbstractRemoteHandler
      * @param bool $checkFilePath Whether to check if the path belongs to a file (default is true)
      *
      * @throws RemoteStorageNotConnectedException If the remote storage is not connected
-     * @throws InvalidArgumentException If the provided path belongs to a file, not a directory
+     * @throws \InvalidArgumentException If the provided path belongs to a file, not a directory
      */
     private function sanitizeFileCheck(string $remotePath, bool $checkFilePath = true): void
     {
@@ -380,7 +380,7 @@ abstract class AbstractRemoteHandler
      * @param bool $allowFilePaths Whether to allow file paths (default is false)
      *
      * @throws RemoteStorageNotConnectedException If the remote storage is not connected
-     * @throws InvalidArgumentException If the provided path belongs to a file, not a directory
+     * @throws \InvalidArgumentException If the provided path belongs to a file, not a directory
      */
     private function sanitizeDirCheck(string $remotePath, bool $allowFilePaths = false): void
     {

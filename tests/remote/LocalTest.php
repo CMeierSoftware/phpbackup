@@ -24,9 +24,9 @@ final class LocalTest extends TestCase
     protected function setUp(): void
     {
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
-        self::assertFileExists(self::WORK_DIR_LOCAL);
+        self::assertDirectoryExists(self::WORK_DIR_LOCAL);
         FileHelper::makeDir(self::WORK_DIR_REMOTE);
-        self::assertFileExists(self::WORK_DIR_REMOTE);
+        self::assertDirectoryExists(self::WORK_DIR_REMOTE);
 
         $this->remote = new Local(self::WORK_DIR_REMOTE);
         $this->remote->connect();
@@ -44,9 +44,9 @@ final class LocalTest extends TestCase
     public function testCreateRootDirIfNotExists(): void
     {
         FileHelper::deleteDirectory(self::WORK_DIR_REMOTE);
-        self::assertFileDoesNotExist(self::WORK_DIR_REMOTE);
+        self::assertDirectoryDoesNotExist(self::WORK_DIR_REMOTE);
         new Local(self::WORK_DIR_REMOTE);
-        self::assertFileExists(self::WORK_DIR_REMOTE);
+        self::assertDirectoryExists(self::WORK_DIR_REMOTE);
     }
 
     /**
@@ -187,7 +187,7 @@ final class LocalTest extends TestCase
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
 
         FileHelper::makeDir(self::WORK_DIR_REMOTE . 'sub');
-        self::assertFileExists(self::WORK_DIR_REMOTE . 'sub');
+        self::assertDirectoryExists(self::WORK_DIR_REMOTE . 'sub');
         copy(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . 'sub\\' . $file);
         self::assertFileExists(self::WORK_DIR_REMOTE . 'sub\\' . $file);
     }

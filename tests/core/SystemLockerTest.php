@@ -24,7 +24,7 @@ final class SystemLockerTest extends TestCase
     {
         FileHelper::makeDir(self::TEST_DIR);
 
-        self::assertFileExists(self::TEST_DIR);
+        self::assertDirectoryExists(self::TEST_DIR);
     }
 
     protected function tearDown(): void
@@ -69,7 +69,7 @@ final class SystemLockerTest extends TestCase
     public function testUnlockDoesNotAffectOtherLocks()
     {
         FileHelper::makeDir(self::TEST_DIR2);
-        self::assertFileExists(self::TEST_DIR2);
+        self::assertDirectoryExists(self::TEST_DIR2);
 
         try {
             SystemLocker::lock(self::TEST_DIR);

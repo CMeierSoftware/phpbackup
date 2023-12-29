@@ -23,7 +23,7 @@ final class FileHelperTest extends TestCase
         // Create a temporary test directory for the tests
         FileHelper::makeDir(self::TEST_DIR);
         copy(self::FIXTURES_DIR . 'zip\\file1.txt', self::TEST_FILE);
-        self::assertFileExists(self::TEST_DIR);
+        self::assertDirectoryExists(self::TEST_DIR);
         self::assertFileExists(self::TEST_FILE);
     }
 
@@ -90,7 +90,7 @@ final class FileHelperTest extends TestCase
     public function testDeleteDirectorySuccess()
     {
         self::assertFileExists(self::TEST_FILE);
-        self::assertFileExists(self::TEST_DIR);
+        self::assertDirectoryExists(self::TEST_DIR);
 
         FileHelper::deleteDirectory(self::TEST_DIR);
 

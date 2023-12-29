@@ -29,7 +29,7 @@ final class StepManagerTest extends TestCase
         }
 
         FileHelper::makeDir(self::SYSTEM_PATH);
-        self::assertFileExists(self::SYSTEM_PATH);
+        self::assertDirectoryExists(self::SYSTEM_PATH);
         self::assertFileDoesNotExist(self::STEP_FILE);
     }
 

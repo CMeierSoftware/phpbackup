@@ -29,9 +29,9 @@ final class AbstractRemoteHandlerTest extends TestCase
     protected function setUp(): void
     {
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
-        self::assertFileExists(self::WORK_DIR_LOCAL);
+        self::assertDirectoryExists(self::WORK_DIR_LOCAL);
         FileHelper::makeDir(self::WORK_DIR_REMOTE);
-        self::assertFileExists(self::WORK_DIR_REMOTE);
+        self::assertDirectoryExists(self::WORK_DIR_REMOTE);
 
         $this->mockedHandler = $this->getMockedHandler();
     }

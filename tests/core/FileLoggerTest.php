@@ -24,7 +24,7 @@ final class FileLoggerTest extends TestCase
     protected function setUp(): void
     {
         FileHelper::makeDir(self::WORK_PATH);
-        self::assertFileExists(self::WORK_PATH);
+        self::assertDirectoryExists(self::WORK_PATH);
         // clean the instance of the singleton to make mocking possible
         $ref = new \ReflectionProperty('CMS\PhpBackup\Core\FileLogger', 'instance');
         $ref->setAccessible(true);
