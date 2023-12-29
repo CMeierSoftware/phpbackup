@@ -13,25 +13,23 @@ if (!defined('ABS_PATH')) {
 abstract class AbstractStep
 {
     public readonly int $delay;
-    protected readonly array $arguments;
     protected FileLogger $logger;
 
     /**
      * Set the callback for the step with optional arguments.
      *
-     * @param array $arguments optional arguments to be passed to the callback
      * @param int $delay delay between this and the previous step
      */
-    public function __construct(array $arguments = [], int $delay = 0)
+    public function __construct(int $delay = 0)
     {
-        $this->delay = $delay;
-        $this->arguments = $arguments;
         $this->logger = FileLogger::getInstance();
+        $this->delay = $delay;
     }
-
+    
+    abstract public function validateArgs(): bool;
     public function __serialize(): array
     {
-        return [$this->delay, $this->arguments];
+        return [$this->delay];
     }
 
     /**

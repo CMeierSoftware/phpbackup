@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class AbstractStepTest extends TestCase
 {
+
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::execute()
      */
@@ -23,6 +24,7 @@ final class AbstractStepTest extends TestCase
     {
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
+        $step->expects(self::exactly(1))->method('validateArgs')->willReturn(true);
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
 
         $result = $step->execute();
@@ -34,16 +36,16 @@ final class AbstractStepTest extends TestCase
     {
         $step = $this->getMockedHandler();
 
-        $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":2:{i:0;i:0;i:1;a:0:{}}';
+        $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":2:{i:0;i:0;}';
 
         self::assertSame($expected, serialize($step));
     }
 
-    private function getMockedHandler(bool $connect = true): MockObject
+    private function getMockedHandler(): MockObject
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
-        $mockBuilder->onlyMethods(['_execute',]);
+        $mockBuilder->onlyMethods(['_execute', 'validateArgs']);
 
         return $mockBuilder->getMock();
     }
