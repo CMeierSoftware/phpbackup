@@ -24,7 +24,7 @@ final class StepManagerTest extends TestCase
     protected function setUp(): void
     {
         for ($i = 0; $i < 10; ++$i) {
-            $step = new StepClass('Hello World', (string)$i);
+            $step = new StepClass('Hello World', (string) $i);
             $this->steps[] = $step;
         }
 
@@ -101,6 +101,7 @@ final class StepClass extends AbstractStep
     private bool $repeated = false;
     private string $arg1;
     private string $arg2;
+
     public function __construct(string $arg1, string $arg2, int $delay = 0)
     {
         parent::__construct($delay);

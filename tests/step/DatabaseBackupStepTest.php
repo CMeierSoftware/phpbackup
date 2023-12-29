@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Backup\DatabaseBackupCreator;
-use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Step\DatabaseBackupStep;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
-use CMS\PhpBackup\Step\DatabaseBackupStep;
-use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @internal
+ *
+ * @covers \CMS\PhpBackup\Step\DatabaseBackupStep
+ */
 final class DatabaseBackupStepTest extends TestCase
 {
     private const TEST_DIR = ABS_PATH . 'tests\\work\\test_directory\\';
     private const LOG_FILE = self::TEST_DIR . self::class . '.log';
-            
+
     private const DB_CONFIG = ['host' => 'localhost', 'username' => 'root', 'password' => '', 'dbname' => 'test'];
     private $databaseBackupStep;
 
@@ -54,9 +56,9 @@ final class DatabaseBackupStepTest extends TestCase
         self::assertInstanceOf(StepResult::class, $actual);
 
         $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql\.gz$/';
-        $this->assertMatchesRegularExpression($dtPattern, basename($actual->returnValue));
-        $this->assertStringStartsWith(self::TEST_DIR, $actual->returnValue);
-        $this->assertSame($expected->repeat, $actual->repeat);
+        self::assertMatchesRegularExpression($dtPattern, basename($actual->returnValue));
+        self::assertStringStartsWith(self::TEST_DIR, $actual->returnValue);
+        self::assertSame($expected->repeat, $actual->repeat);
         self::assertFileExists($actual->returnValue);
     }
     // Add more test cases as needed

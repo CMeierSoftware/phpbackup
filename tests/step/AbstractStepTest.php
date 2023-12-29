@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class AbstractStepTest extends TestCase
 {
-
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::execute()
      */

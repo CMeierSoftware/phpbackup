@@ -25,7 +25,7 @@ abstract class AbstractStep
         $this->logger = FileLogger::getInstance();
         $this->delay = $delay;
     }
-    
+
     public function __serialize(): array
     {
         return [$this->delay];
