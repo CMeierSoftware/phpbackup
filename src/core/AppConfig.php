@@ -7,8 +7,8 @@ namespace CMS\PhpBackup\Core;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Config;
+use Laminas\Config\Exception\UnprocessableConfigException;
 use Laminas\Config\Factory as LaminasConfigFactory;
-use \Laminas\Config\Exception\UnprocessableConfigException;
 use Laminas\Config\Reader\Xml as XmlReader;
 use Laminas\Config\Writer\Xml as XmlWriter;
 
@@ -179,7 +179,8 @@ final class AppConfig
             return [];
         }
         $remoteClasses = array_keys($remoteClasses);
-        $remoteClasses = array_map(fn($cls) => 'CMS\PhpBackup\Remote\\' . ucfirst($cls), $remoteClasses);
+        $remoteClasses = array_map(static fn ($cls) => 'CMS\PhpBackup\Remote\\' . ucfirst($cls), $remoteClasses);
+
         return array_filter($remoteClasses, 'class_exists');
     }
 
