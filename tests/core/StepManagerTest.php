@@ -24,7 +24,7 @@ final class StepManagerTest extends TestCase
     protected function setUp(): void
     {
         for ($i = 0; $i < 10; ++$i) {
-            $step = new StepClass(['arg1' => 'Hello World', 'arg2' => $i]);
+            $step = new StepClass('Hello World', (string)$i);
             $this->steps[] = $step;
         }
 
@@ -67,6 +67,7 @@ final class StepManagerTest extends TestCase
      */
     public function testExecuteNextStep()
     {
+        self::assertTrue(1 < count($this->steps));
         for ($i = 0; $i < count($this->steps); ++$i) {
             $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
             $result = $stepManager->executeNextStep();
@@ -98,13 +99,19 @@ final class StepManagerTest extends TestCase
 final class StepClass extends AbstractStep
 {
     private bool $repeated = false;
+    private string $arg1;
+    private string $arg2;
+    public function __construct(string $arg1, string $arg2, int $delay = 0)
+    {
+        parent::__construct($delay);
+        $this->arg1 = $arg1;
+        $this->arg2 = $arg2;
+    }
 
     protected function _execute(): StepResult
     {
-        $this->repeated = (9 === $this->arguments['arg2'] && !$this->repeated);
-        $arg1 = $this->arguments['arg1'];
-        $arg2 = $this->arguments['arg2'];
+        $this->repeated = ('9' === $this->arg2 && !$this->repeated);
 
-        return new StepResult("Result: {$arg1} {$arg2}", $this->repeated);
+        return new StepResult("Result: {$this->arg1} {$this->arg2}", $this->repeated);
     }
 }
