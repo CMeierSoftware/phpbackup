@@ -34,28 +34,29 @@ final class FileBundleCreatorTest extends TestCase
     public function testCreateFileBundles(): void
     {
         $expectedResult = [
-            [self::TEST_DIR . 'test_file_large.txt'],
+            ['\test_file_large.txt'],
             [
-                self::TEST_DIR . 'test_file_3.txt',
-                self::TEST_DIR . 'test_file_2.txt',
+                '\test_file_3.txt',
+                '\test_file_2.txt',
             ],
             [
-                self::TEST_DIR . 'test_file_1.txt',
-                self::TEST_DIR . 'test_file_4.txt',
-                self::TEST_DIR . 'test_file_5.txt',
+                '\test_file_1.txt',
+                '\test_file_4.txt',
+                '\test_file_5.txt',
             ],
             [
-                self::TEST_DIR . 'sub\test_file_3.txt',
-                self::TEST_DIR . 'sub\test_file_2.txt',
+                '\sub\test_file_3.txt',
+                '\sub\test_file_2.txt',
             ],
             [
-                self::TEST_DIR . 'sub\test_file_1.txt',
+                '\sub\test_file_1.txt',
             ],
         ];
 
         $sizeLimitInMB = 1;
 
-        $fileBundles = FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB);
+        $fileBundles = [];
+        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
 
         self::assertNotEmpty($fileBundles);
         self::assertCount(5, $fileBundles);

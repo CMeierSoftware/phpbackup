@@ -19,7 +19,7 @@ final class FileBundleCreator
      *
      * @return array an array of arrays, where each inner array represents a bundle of files within the size limit
      */
-    public static function createFileBundles(string $rootDir, int $sizeLimitInMB): array
+    public static function createFileBundles(string $rootDir, int $sizeLimitInMB, array &$refBundles): void
     {
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
         $rootDir = rtrim($rootDir, '/\\' . DIRECTORY_SEPARATOR);
@@ -28,11 +28,9 @@ final class FileBundleCreator
         FileLogger::getInstance()->info("Calculating bundles for '{$rootDir}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
 
         $bundles = [];
-        self::packDirectory($rootDir, $sizeLimit, $bundles);
-        $bundleCount = count($bundles);
+        self::packDirectory($rootDir, $sizeLimit, $refBundles);
+        $bundleCount = count($refBundles);
         FileLogger::getInstance()->info("Calculated {$bundleCount} bundles for '{$rootDir}'.");
-
-        return $bundles;
     }
 
     /**
