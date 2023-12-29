@@ -26,7 +26,6 @@ abstract class AbstractStep
         $this->delay = $delay;
     }
     
-    abstract public function validateArgs(): bool;
     public function __serialize(): array
     {
         return [$this->delay];
