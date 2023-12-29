@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class StepManagerTest extends TestCase
 {
-    private const SYSTEM_PATH = ABS_PATH . 'tests\\work';
+    private const SYSTEM_PATH = TEST_WORK_DIR;
     private const STEP_FILE = self::SYSTEM_PATH . DIRECTORY_SEPARATOR . 'last.step';
     private array $steps = [];
 

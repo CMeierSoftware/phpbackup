@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class FileBackupCreatorTest extends TestCase
 {
-    private const FIXTURES_DIR = ABS_PATH . '\tests\fixtures';
     private FileBackupCreator $backupCreator;
 
     protected function setUp(): void
@@ -27,7 +26,7 @@ final class FileBackupCreatorTest extends TestCase
     public function testBackupInvalidDir(): void
     {
         $this->expectException(FileNotFoundException::class);
-        $this->backupCreator->backupAll(self::FIXTURES_DIR . '\invalid');
+        $this->backupCreator->backupAll(TEST_FIXTURES_DIR . 'invalid');
     }
 
     /**
@@ -35,11 +34,11 @@ final class FileBackupCreatorTest extends TestCase
      */
     public function testBackupIgnoreList(): void
     {
-        $backupCreator = new FileBackupCreator(['file1.txt', 'picture1.png']);
+        $backupCreator = new FileBackupCreator([basename(TEST_FIXTURES_FILE_1), 'picture1.png']);
 
-        $filename = $backupCreator->backupAll(self::FIXTURES_DIR . '\zip');
+        $filename = $backupCreator->backupAll(TEST_FIXTURES_FILE_DIR);
         self::assertFileExists($filename);
-        self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+        self::assertStringStartsWith(TEMP_DIR . 'backup_' . basename(TEST_FIXTURES_FILE_DIR), $filename);
         self::assertStringEndsWith('.zip', $filename);
         // check manually if the files are not included
     }
@@ -50,9 +49,9 @@ final class FileBackupCreatorTest extends TestCase
     public function testBackupFileName(): void
     {
         try {
-            $filename = $this->backupCreator->backupAll(self::FIXTURES_DIR . '\zip');
+            $filename = $this->backupCreator->backupAll(TEST_FIXTURES_FILE_DIR);
             self::assertFileExists($filename);
-            self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+            self::assertStringStartsWith(TEMP_DIR . 'backup_' . basename(TEST_FIXTURES_FILE_DIR), $filename);
             self::assertStringEndsWith('.zip', $filename);
         } finally {
             unlink($filename);
@@ -64,10 +63,14 @@ final class FileBackupCreatorTest extends TestCase
      */
     public function testBackupOnly(): void
     {
-        $files = ['file1.txt', 'pictures\\pics1.txt', 'pictures\\others\\others.1.txt', 'pictures\\others\\others2.txt'];
-        $filename = $this->backupCreator->backupOnly(self::FIXTURES_DIR . '\zip', $files);
-        self::assertFileExists($filename);
-        self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
-        self::assertStringEndsWith('.zip', $filename);
+        try {
+            $files = ['file1.txt', 'pictures\\pics1.txt', 'pictures\\others\\others.1.txt', 'pictures\\others\\others2.txt'];
+            $filename = $this->backupCreator->backupOnly(TEST_FIXTURES_DIR . '\zip', $files);
+            self::assertFileExists($filename);
+            self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+            self::assertStringEndsWith('.zip', $filename);
+        } finally {
+            unlink($filename);
+        }
     }
 }

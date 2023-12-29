@@ -15,25 +15,25 @@ use PHPUnit\Framework\TestCase;
  */
 final class BackblazeTest extends TestCase
 {
-    private const WORK_DIR_LOCAL = ABS_PATH . 'tests\\work\\Local\\';
-    private const TEST_FILE_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
+    private const WORK_DIR_LOCAL = TEST_WORK_DIR . 'Local' . DIRECTORY_SEPARATOR;
+    private const TEST_FILE_SRC = TEST_FIXTURES_FILE_1;
     private Backblaze $remote;
-    private readonly string $workDir;
+    private readonly string $remoteWorkDir;
     private readonly string $remoteFileDest;
 
     public function __construct(string $name)
     {
         parent::__construct($name);
-        $this->workDir = 'work/' . uniqid() . '/';
-        $this->remoteFileDest = $this->workDir . 'file.txt';
+        $this->remoteWorkDir = 'work/' . uniqid() . '/';
+        $this->remoteFileDest = $this->remoteWorkDir . 'file.txt';
     }
 
     protected function setUp(): void
     {
         $this->remote = new Backblaze('', '', '');
         $this->remote->connect();
-        $this->remote->dirCreate($this->workDir);
-        $this->assertRemoteFileExists($this->workDir);
+        $this->remote->dirCreate($this->remoteWorkDir);
+        $this->assertRemoteFileExists($this->remoteWorkDir);
 
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
         self::assertDirectoryExists(self::WORK_DIR_LOCAL);
@@ -42,7 +42,7 @@ final class BackblazeTest extends TestCase
     protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::WORK_DIR_LOCAL);
-        // $this->remote->fileDelete($this->testFileDest);
+        $this->remote->fileDelete($this->remoteWorkDir);
     }
 
     /**
@@ -85,14 +85,14 @@ final class BackblazeTest extends TestCase
     {
         $dirs = ['a/', '/b', 'foo/b/c/'];
         foreach ($dirs as $dir) {
-            $this->assertRemoteFileDoesNotExist($this->workDir . $dir);
-            self::assertTrue($this->remote->dirCreate($this->workDir . $dir));
-            $this->assertRemoteFileExists($this->workDir . $dir);
+            $this->assertRemoteFileDoesNotExist($this->remoteWorkDir . $dir);
+            self::assertTrue($this->remote->dirCreate($this->remoteWorkDir . $dir));
+            $this->assertRemoteFileExists($this->remoteWorkDir . $dir);
         }
 
-        $this->remote->dirCreate($this->workDir . 'bar/b/c/test.txt');
-        $this->assertRemoteFileExists($this->workDir . 'bar/b/c/');
-        $this->assertRemoteFileDoesNotExist($this->workDir . 'bar/b/c/test.txt');
+        $this->remote->dirCreate($this->remoteWorkDir . 'bar/b/c/test.txt');
+        $this->assertRemoteFileExists($this->remoteWorkDir . 'bar/b/c/');
+        $this->assertRemoteFileDoesNotExist($this->remoteWorkDir . 'bar/b/c/test.txt');
     }
 
     /**

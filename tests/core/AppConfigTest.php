@@ -18,14 +18,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class AppConfigTest extends TestCase
 {
-    private const TEST_TEMP_TEST_RESULT = ABS_PATH . 'tests\\fixtures\\config\\test_temp_data.xml';
+    private const TEST_TEMP_TEST_RESULT = TEST_FIXTURES_CONFIG_DIR . 'test_temp_data.xml';
     private const TEST_TEMP_DIR = CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
     private const APPS = [
-        'valid_app' => ABS_PATH . 'tests\\fixtures\\config\\config_full_valid.xml',
-        'empty_app' => ABS_PATH . 'tests\\fixtures\\config\\config_empty.xml',
-        'empty_elements' => ABS_PATH . 'tests\\fixtures\\config\\config_empty_elements.xml',
-        'valid_app_no_db' => ABS_PATH . 'tests\\fixtures\\config\\config_no_db.xml',
-        'valid_app_no_remote' => ABS_PATH . 'tests\\fixtures\\config\\config_no_remote.xml',
+        'valid_app' => TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml',
+        'empty_app' => TEST_FIXTURES_CONFIG_DIR . 'config_empty.xml',
+        'empty_elements' => TEST_FIXTURES_CONFIG_DIR . 'config_empty_elements.xml',
+        'valid_app_no_db' => TEST_FIXTURES_CONFIG_DIR . 'config_no_db.xml',
+        'valid_app_no_remote' => TEST_FIXTURES_CONFIG_DIR . 'config_no_remote.xml',
     ];
 
     private AppConfig $config;
@@ -43,9 +43,10 @@ final class AppConfigTest extends TestCase
 
     protected function tearDown(): void
     {
-        // FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
-        unlink(CONFIG_DIR . '\\empty_app.xml');
-        unlink(CONFIG_DIR . '\\valid_app.xml');
+        FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        foreach (self::APPS as $configName => $sourceFile) {
+            unlink(CONFIG_DIR . DIRECTORY_SEPARATOR . $configName . '.xml');
+        }
     }
 
     /**

@@ -17,13 +17,12 @@ use PHPUnit\Framework\TestCase;
  */
 final class SystemLockerTest extends TestCase
 {
-    private const TEST_DIR = ABS_PATH . 'tests\\work\\';
-    private const TEST_DIR2 = ABS_PATH . 'tests\\work2\\';
+    private const TEST_DIR = TEST_WORK_DIR . 'System1';
+    private const TEST_DIR2 = TEST_WORK_DIR . 'system2';
 
     protected function setUp(): void
     {
         FileHelper::makeDir(self::TEST_DIR);
-
         self::assertDirectoryExists(self::TEST_DIR);
     }
 

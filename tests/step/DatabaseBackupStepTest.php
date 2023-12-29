@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class DatabaseBackupStepTest extends TestCase
 {
-    private const TEST_DIR = ABS_PATH . 'tests\\work\\test_directory\\';
+    private const TEST_DIR = TEST_WORK_DIR;
     private const LOG_FILE = self::TEST_DIR . self::class . '.log';
 
     private const DB_CONFIG = ['host' => 'localhost', 'username' => 'root', 'password' => '', 'dbname' => 'test'];
@@ -35,7 +35,6 @@ final class DatabaseBackupStepTest extends TestCase
             0
         );
 
-        // Create a temporary test directory for the tests
         FileHelper::makeDir(self::TEST_DIR);
         self::assertDirectoryExists(self::TEST_DIR);
     }

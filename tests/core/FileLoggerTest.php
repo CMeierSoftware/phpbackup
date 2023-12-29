@@ -16,17 +16,17 @@ use PHPUnit\Framework\TestCase;
  */
 final class FileLoggerTest extends TestCase
 {
-    private const WORK_PATH = ABS_PATH . 'tests\\work';
-    private const LOG_FILE_PATH = self::WORK_PATH . '\\f.log';
+    private const LOG_FILE_PATH = TEST_WORK_DIR . '\\f.log';
 
     private FileLogger $logger;
 
     protected function setUp(): void
     {
-        FileHelper::makeDir(self::WORK_PATH);
-        self::assertDirectoryExists(self::WORK_PATH);
+        FileHelper::makeDir(TEST_WORK_DIR);
+        self::assertDirectoryExists(TEST_WORK_DIR);
+
         // clean the instance of the singleton to make mocking possible
-        $ref = new \ReflectionProperty('CMS\PhpBackup\Core\FileLogger', 'instance');
+        $ref = new \ReflectionProperty(FileLogger::class, 'instance');
         $ref->setAccessible(true);
         $ref->setValue(null, null);
 
@@ -37,7 +37,7 @@ final class FileLoggerTest extends TestCase
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::WORK_PATH);
+        FileHelper::deleteDirectory(TEST_WORK_DIR);
     }
 
     /**

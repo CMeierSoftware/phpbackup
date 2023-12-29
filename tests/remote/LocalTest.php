@@ -15,10 +15,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class LocalTest extends TestCase
 {
-    private const WORK_DIR_LOCAL = ABS_PATH . 'tests\\work\\Local\\';
-    private const WORK_DIR_REMOTE = ABS_PATH . 'tests\\work\\Remote\\';
-    private const TEST_FILE1_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file1.txt';
-    private const TEST_FILE2_SRC = ABS_PATH . 'tests\\fixtures\\zip\\file2.xls';
+    private const WORK_DIR_LOCAL = TEST_WORK_DIR . 'Local' . DIRECTORY_SEPARATOR;
+    private const WORK_DIR_REMOTE = TEST_WORK_DIR . 'Remote' . DIRECTORY_SEPARATOR;
+    private const TEST_FILE1_SRC = TEST_FIXTURES_FILE_1;
+    private const TEST_FILE2_SRC = TEST_FIXTURES_FILE_2;
     private Local $remote;
 
     protected function setUp(): void

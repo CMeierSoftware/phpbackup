@@ -14,25 +14,21 @@ use PHPUnit\Framework\TestCase;
  */
 final class FileHelperTest extends TestCase
 {
-    private const FIXTURES_DIR = ABS_PATH . '\\tests\\fixtures\\';
-    private const TEST_DIR = ABS_PATH . 'tests\\work\\test_directory\\';
+    private const TEST_DIR = TEST_WORK_DIR;
     private const TEST_FILE = self::TEST_DIR . 't.txt';
 
     protected function setUp(): void
     {
-        // Create a temporary test directory for the tests
         FileHelper::makeDir(self::TEST_DIR);
-        copy(self::FIXTURES_DIR . 'zip\\file1.txt', self::TEST_FILE);
         self::assertDirectoryExists(self::TEST_DIR);
+
+        copy(TEST_FIXTURES_FILE_1, self::TEST_FILE);
         self::assertFileExists(self::TEST_FILE);
     }
 
     protected function tearDown(): void
     {
-        // Clean up the test directory after tests
-        if (file_exists(self::TEST_DIR)) {
-            FileHelper::deleteDirectory(self::TEST_DIR);
-        }
+        FileHelper::deleteDirectory(self::TEST_DIR);
     }
 
     /**
@@ -54,8 +50,8 @@ final class FileHelperTest extends TestCase
      */
     public function testMoveFileFailure()
     {
-        $src = self::TEST_DIR . '/nonexistent_source.txt';
-        $dest = self::TEST_DIR . '/destination.txt';
+        $src = self::TEST_DIR . 'nonexistent_source.txt';
+        $dest = self::TEST_DIR . 'destination.txt';
 
         $this->expectException(\Exception::class);
         FileHelper::moveFile($src, $dest);
@@ -66,7 +62,7 @@ final class FileHelperTest extends TestCase
      */
     public function testMakeDirSuccess()
     {
-        $newDir = self::TEST_DIR . '/new_directory';
+        $newDir = self::TEST_DIR . 'new_directory';
 
         FileHelper::makeDir($newDir);
 
@@ -115,7 +111,7 @@ final class FileHelperTest extends TestCase
     {
         self::assertTrue(FileHelper::doesDirExists(self::TEST_DIR));
 
-        $nonExistingDir = self::TEST_DIR . '/nonexistent_directory';
+        $nonExistingDir = self::TEST_DIR . 'nonexistent_directory';
         self::assertFalse(FileHelper::doesDirExists($nonExistingDir));
     }
 
@@ -124,7 +120,7 @@ final class FileHelperTest extends TestCase
      */
     public function testChangePermissionSuccess()
     {
-        $filePath = self::TEST_DIR . '/file.txt';
+        $filePath = self::TEST_DIR . 'file.txt';
         touch($filePath);
         self::assertFileExists($filePath);
 
@@ -138,7 +134,7 @@ final class FileHelperTest extends TestCase
      */
     public function testChangePermissionFailure()
     {
-        $nonExistentFile = self::TEST_DIR . '/nonexistent_file.txt';
+        $nonExistentFile = self::TEST_DIR . 'nonexistent_file.txt';
 
         $this->expectException(\Exception::class);
         FileHelper::changePermission($nonExistentFile, 0o777);
