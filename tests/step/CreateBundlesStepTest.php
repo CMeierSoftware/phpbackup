@@ -4,41 +4,27 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\CreateBundlesStep
  */
-final class CreateBundlesStepTest extends TestCase
+final class CreateBundlesStepTest extends TestCaseWithAppConfig
 {
-    public const CONFIG_FILE = CONFIG_DIR . 'app.xml';
-
-    private const TEST_DIR = TEST_WORK_DIR;
-    private AppConfig $config;
-
     protected function setUp(): void
     {
-        copy(TEST_FIXTURES_CONFIG_DIR . 'config_create_bundle_step_test.xml', self::CONFIG_FILE);
-        self::assertFileExists(self::CONFIG_FILE);
-        $testDir = self::TEST_DIR;
-        $content = str_replace('<src>.</src>', "<src>{$testDir}</src>", file_get_contents(self::CONFIG_FILE));
-        file_put_contents(self::CONFIG_FILE, $content);
-
-        $this->config = AppConfig::loadAppConfig('app');
+        $this->setUpAppConfig('config_create_bundle_step_test', self::TEST_DIR);
 
         $this->createTestFiles(self::TEST_DIR);
     }
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::TEST_DIR);
-        unlink(CONFIG_DIR . DIRECTORY_SEPARATOR . 'app.xml');
+        parent::tearDown();
     }
 
     public function testFileBundle()
