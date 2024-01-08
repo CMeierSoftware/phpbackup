@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
+use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
@@ -20,17 +21,15 @@ final class DeleteOldFilesRemoteStep extends AbstractStep
      * SendRemoteStep constructor.
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
-     * @param int $keepBackupDays local directory containing backup files
-     * @param int $keepBackupAmount array of backup archives to be sent
      * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
      */
-    public function __construct(AbstractRemoteHandler $remoteHandler, int $keepBackupDays, int $keepBackupAmount, int $delay = 0)
+    public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config, int $delay = 0)
     {
-        parent::__construct($delay);
+        parent::__construct($config, $delay);
 
         $this->remote = $remoteHandler;
-        $this->keepBackupDays = $keepBackupDays;
-        $this->keepBackupAmount = $keepBackupAmount;
+        $this->keepBackupDays = (int) $this->config->getBackupSettings()['keepBackupDays'];
+        $this->keepBackupAmount = (int) $this->config->getBackupSettings()['keepBackupAmount'];
     }
 
     /**
@@ -44,5 +43,10 @@ final class DeleteOldFilesRemoteStep extends AbstractStep
         $result = $this->remote->deleteOld('', $this->keepBackupDays, $this->keepBackupAmount);
 
         return new StepResult($result, false);
+    }
+
+    protected function getRequiredStepDataKeys(): array
+    {
+        return [];
     }
 }

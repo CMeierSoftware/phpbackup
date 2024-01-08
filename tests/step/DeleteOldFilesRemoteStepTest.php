@@ -8,16 +8,15 @@ use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\DeleteOldFilesRemoteStep;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\DeleteOldFilesRemoteStep
  */
-final class DeleteOldFilesRemoteStepTest extends TestCase
+final class DeleteOldFilesRemoteStepTest extends TestCaseWithAppConfig
 {
-    private const WORK_DIR_REMOTE_BASE = TEST_WORK_DIR . 'Remote' . DIRECTORY_SEPARATOR;
+    private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private Local $remoteHandler;
 
     protected function setUp(): void
@@ -31,14 +30,24 @@ final class DeleteOldFilesRemoteStepTest extends TestCase
     protected function tearDown(): void
     {
         FileHelper::deleteDirectory(TEST_WORK_DIR);
+        parent::tearDown();
     }
 
     public function testDeleteOldFilesDaysSuccess()
     {
         $countToKeep = 7;
+
         list($expiredDirs, $validDirs) = self::setupRemoteStorage($countToKeep);
 
-        $sendRemoteStep = new DeleteOldFilesRemoteStep($this->remoteHandler, $countToKeep, 0);
+
+        $this->setUpAppConfig(
+            'config_full_valid', 
+            [
+                ['tag' => 'keepBackupDays', 'value' => (string) 0],
+                ['tag' => 'keepBackupAmount', 'value' => (string) $countToKeep],
+            ]
+        );
+        $sendRemoteStep = new DeleteOldFilesRemoteStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
 
@@ -52,9 +61,18 @@ final class DeleteOldFilesRemoteStepTest extends TestCase
     public function testDeleteOldFilesAmountSuccess()
     {
         $countToKeep = 7;
+
         list($expiredDirs, $validDirs) = self::setupRemoteStorage($countToKeep);
 
-        $sendRemoteStep = new DeleteOldFilesRemoteStep($this->remoteHandler, 0, $countToKeep);
+        $this->setUpAppConfig(
+            'config_full_valid', 
+            [
+                ['tag' => 'keepBackupDays', 'value' => (string) $countToKeep],
+                ['tag' => 'keepBackupAmount', 'value' => (string) 0],
+            ]
+        );
+
+        $sendRemoteStep = new DeleteOldFilesRemoteStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
 
