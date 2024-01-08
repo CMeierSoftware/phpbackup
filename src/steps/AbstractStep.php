@@ -17,7 +17,7 @@ abstract class AbstractStep
     public readonly int $delay;
     protected FileLogger $logger;
     protected AppConfig $config;
-    protected array $stepData;
+    protected array $stepData = [];
 
     /**
      * Set the callback for the step with optional arguments.
@@ -33,7 +33,6 @@ abstract class AbstractStep
         try {
             $this->stepData = $this->config->readTempData('StepData');
         } catch (FileNotFoundException) {
-            $this->stepData = [];
             $this->logger->info('No StepData found. Starting empty.');
         }
     }
@@ -52,13 +51,30 @@ abstract class AbstractStep
     {
         $class = self::class;
         $this->logger->info("Execute {$class}");
+        
+        $this->validateStepData();
 
         $result = $this->_execute();
 
-        $this->config->saveTempData('StepData', $this->stepData);
+        if (!empty($this->stepData)){
+            $this->config->saveTempData('StepData', $this->stepData);
+        }
 
         return $result;
     }
 
+    private function validateStepData() 
+    {
+        $requiredKeys = $this->getRequiredStepDataKeys();
+    
+        $missingKeys = array_diff($requiredKeys, array_keys($this->stepData));
+    
+        if (!empty($missingKeys)) {
+            throw new \InvalidArgumentException("Missing required keys: " . implode(', ', $missingKeys));
+        }
+    }
+    
+
     abstract protected function _execute(): StepResult;
+    abstract protected function getRequiredStepDataKeys(): array;
 }
