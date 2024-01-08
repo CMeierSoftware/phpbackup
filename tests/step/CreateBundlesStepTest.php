@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
+use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\StepResult;
@@ -16,22 +17,34 @@ use PHPUnit\Framework\TestCase;
  */
 final class CreateBundlesStepTest extends TestCase
 {
+    public const CONFIG_FILE = CONFIG_DIR . 'app.xml';
+
     private const TEST_DIR = TEST_WORK_DIR;
+    private AppConfig $config;
 
     protected function setUp(): void
     {
+        copy(TEST_FIXTURES_CONFIG_DIR . 'config_create_bundle_step_test.xml', self::CONFIG_FILE);
+        self::assertFileExists(self::CONFIG_FILE);
+        $testDir = self::TEST_DIR;
+        $content = str_replace('<src>.</src>', "<src>{$testDir}</src>", file_get_contents(self::CONFIG_FILE));
+        file_put_contents(self::CONFIG_FILE, $content);
+
+        $this->config = AppConfig::loadAppConfig('app');
+
         $this->createTestFiles(self::TEST_DIR);
     }
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(TEST_WORK_DIR);
+        // FileHelper::deleteDirectory(TEST_WORK_DIR);
+        // unlink(CONFIG_DIR . DIRECTORY_SEPARATOR . 'app.xml');
     }
 
     public function testFileBundle()
     {
         $expectedResult = [
-            ['\test_file_large.txt'],
+            '\test_file_large.txt',
             [
                 '\test_file_3.txt',
                 '\test_file_2.txt',
@@ -45,15 +58,12 @@ final class CreateBundlesStepTest extends TestCase
                 '\sub\test_file_3.txt',
                 '\sub\test_file_2.txt',
             ],
-            [
-                '\sub\test_file_1.txt',
-            ],
+            '\sub\test_file_1.txt',
         ];
 
-        $sizeLimitInMB = 1;
+        $step = new CreateBundlesStep($this->config);
 
-        $fileBundles = [];
-        $step = new CreateBundlesStep(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
+        $fileBundles = $this->config->readTempData('StepData')['bundles'];
 
         $step->execute();
 
@@ -64,12 +74,10 @@ final class CreateBundlesStepTest extends TestCase
 
     public function testBackupDir()
     {
-        $sizeLimitInMB = 1;
-
-        $fileBundles = [];
-        $step = new CreateBundlesStep(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
+        $step = new CreateBundlesStep($this->config);
 
         $result = $step->execute();
+
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);
         self::assertDirectoryExists($result->returnValue);

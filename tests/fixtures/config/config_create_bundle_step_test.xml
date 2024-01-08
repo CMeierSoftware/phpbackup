@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <backup>
+        <directory>
+            <src>.</src>
+        </directory>
+        <settings>
+            <maxArchiveSize>1</maxArchiveSize>
+        </settings>
+    </backup>
+</config>

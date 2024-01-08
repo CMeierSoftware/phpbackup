@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
+use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileBundleCreator;
 use CMS\PhpBackup\Helper\FileHelper;
 
@@ -22,13 +23,13 @@ final class CreateBundlesStep extends AbstractStep
      *
      * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
      */
-    public function __construct(string $srcDir, int $maxArchiveSize, array &$bundles, int $delay = 0)
+    public function __construct(AppConfig $config, int $delay = 0)
     {
-        parent::__construct($delay);
+        parent::__construct($config, $delay);
 
-        $this->srcDir = $srcDir;
-        $this->bundles = &$bundles;
-        $this->maxArchiveSize = $maxArchiveSize;
+        $this->srcDir = $this->config->getBackupDirectory()['src'];
+        $this->bundles = [];
+        $this->maxArchiveSize = (int) $this->config->getBackupSettings()['maxArchiveSize'];
     }
 
     /**
@@ -38,11 +39,18 @@ final class CreateBundlesStep extends AbstractStep
      */
     protected function _execute(): StepResult
     {
-        FileBundleCreator::createFileBundles($this->srcDir, $this->maxArchiveSize, $this->bundles);
+        $this->stepData['bundles'] = [];
+        FileBundleCreator::createFileBundles($this->srcDir, $this->maxArchiveSize, $this->stepData['bundles']);
 
-        $backup_folder = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
-        FileHelper::makeDir($backup_folder);
+        $backupFolder = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
+        FileHelper::makeDir($backupFolder);
+        $this->stepData['backup_folder'] = $backupFolder;
 
-        return new StepResult($backup_folder, false);
+        return new StepResult($backupFolder, false);
+    }
+
+    protected function getRequiredStepDataKeys(): array
+    {
+        return [];
     }
 }
