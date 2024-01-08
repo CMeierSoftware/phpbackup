@@ -85,6 +85,7 @@ final class DirectoryBackupStep extends AbstractStep
     {
         $backupFolder = rtrim($this->stepData['backupFolder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $newFile = $backupFolder . $newName;
+        FileHelper::makeDir($backupFolder);
         FileHelper::moveFile($file, $newFile);
 
         return $newFile;

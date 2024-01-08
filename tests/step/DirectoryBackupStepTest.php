@@ -15,17 +15,19 @@ use CMS\PhpBackup\Step\StepResult;
  */
 final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
 {
-    private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private array $oneBundle = [];
+    private array $bundles = [];
+    private array $bundlesResult = [];
 
     protected function setUp(): void
     {
-        $this->setUpAppConfig(TEST_FIXTURES_FILE_DIR);
-
-        FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
-        self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
+        $this->setUpAppConfig('config_full_valid', TEST_FIXTURES_FILE_DIR);
 
         $this->oneBundle = [basename(TEST_FIXTURES_FILE_1), basename(TEST_FIXTURES_FILE_2)];
+        $this->bundles = array_fill(0, 5, $this->oneBundle);
+        $this->bundlesResult = $this->bundles;
+
+        $this->setStepData(['bundles' => $this->bundles, 'backupFolder' => self::TEST_DIR]);
     }
 
     protected function tearDown(): void
@@ -34,54 +36,62 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
         parent::tearDown();
     }
 
-    public function testFirstStep()
+    public function testCreateBackupFolder()
     {
-        $bundles = array_fill(0, 5, $this->oneBundle);
+        self::assertDirectoryDoesNotExist(self::TEST_DIR);
 
-        $bundlesResult = array_fill(0, 5, $this->oneBundle);
-        $archivesResult = [
-            'archive_part_0.zip' => $this->oneBundle,
-        ];
-
-        $this->setStepData(['bundles' => $bundles, 'backupFolder' => self::TEST_DIR]);
+        $this->setStepData(['bundles' => $this->bundles, 'backupFolder' => self::TEST_DIR]);
 
         $step = new DirectoryBackupStep($this->config, 0);
 
         $result = $step->execute();
 
-        self::assertInstanceOf(StepResult::class, $result);
-        self::assertTrue($result->repeat);
+        self::assertStepResult(true, $result);
+    }
 
-        self::assertFileExists($result->returnValue);
+    public function testFirstStep()
+    {
+        $archivesResult = [
+            'archive_part_0.zip' => $this->oneBundle,
+        ];
+
+
+        $step = new DirectoryBackupStep($this->config, 0);
+
+        $result = $step->execute();
+
+        self::assertStepResult(true, $result);
 
         $stepData = $this->config->readTempData('StepData');
         self::assertSame($archivesResult, $stepData['archives']);
-        self::assertSame($bundlesResult, $stepData['bundles']);
+        self::assertSame($this->bundlesResult, $stepData['bundles']);
+    }
+
+    private static function assertStepResult(bool $expectedRepeat, mixed $actually)
+    {
+        self::assertInstanceOf(StepResult::class, $actually);
+        self::assertSame($expectedRepeat, $actually->repeat);
+
+        self::assertFileExists($actually->returnValue);
+        // the encryption is at least 84 bytes
+        self::assertGreaterThan(85, filesize($actually->returnValue));
     }
 
     public function testAllSteps()
     {
-        $count = 5;
-
-        $bundles = array_fill(0, $count, $this->oneBundle);
-        $archives = [];
-
-        $bundlesResult = array_fill(0, $count, $this->oneBundle);
+        $count = count($this->bundles);
         $archivesResult = [];
 
-        $step = new DirectoryBackupStep(TEST_FIXTURES_FILE_DIR, TEST_WORK_DIR, 'key', $bundles, $archives, 0);
-
         for ($i = 0; $i < $count; ++$i) {
+            $step = new DirectoryBackupStep($this->config, 0);
             $archivesResult["archive_part_{$i}.zip"] = $this->oneBundle;
             $result = $step->execute();
 
-            self::assertInstanceOf(StepResult::class, $result);
-            self::assertSame(count($archivesResult) < $count, $result->repeat);
+            self::assertStepResult(count($archivesResult) < $count, $result);
 
-            self::assertFileExists($result->returnValue);
-
-            self::assertSame($archivesResult, $archives);
-            self::assertSame($bundlesResult, $bundles);
+            $stepData = $this->config->readTempData('StepData');
+            self::assertSame($archivesResult, $stepData['archives']);
+            self::assertSame($this->bundlesResult, $stepData['bundles']);
         }
     }
 
