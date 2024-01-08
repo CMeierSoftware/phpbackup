@@ -18,6 +18,7 @@ if (!defined('ABS_PATH')) {
 final class AppConfig
 {
     private const TMP_DIR = 'temp_';
+    private const TEMP_DATA_KEY_SEP = '_-_';
     private array $config;
     private readonly string $configFile;
     private readonly string $tempDir;
@@ -114,7 +115,7 @@ final class AppConfig
         FileLogger::getInstance()->info("Read tempData from '{$filePath}'.");
 
         $data = $reader->fromFile($filePath);
-
+        // / TODO if file empty, its a string
         $this->processDataForRead($data);
 
         return $data;
@@ -207,7 +208,7 @@ final class AppConfig
             // only change keys when values are also arrays
             if (is_array($node[array_key_first($node)]) && $this->hasNumericKeys($node)) {
                 $node = array_combine(
-                    array_map(static fn ($k) => $key . '_' . $k, array_keys($node)),
+                    array_map(static fn ($k) => $key . self::TEMP_DATA_KEY_SEP . $k, array_keys($node)),
                     $node
                 );
             }
@@ -227,9 +228,9 @@ final class AppConfig
             $this->processDataForRead($data[$key]);
 
             $childKeys = array_keys($node);
-            if (is_string($childKeys[0]) && 0 === strpos($childKeys[0], $key . '_')) {
+            if (is_string($childKeys[0]) && 0 === strpos($childKeys[0], $key . self::TEMP_DATA_KEY_SEP)) {
                 $node = array_combine(
-                    array_map(static fn ($k) => (int) str_replace($key . '_', '', $k), array_keys($node)),
+                    array_map(static fn ($k) => (int) str_replace($key . self::TEMP_DATA_KEY_SEP, '', $k), array_keys($node)),
                     $node
                 );
             }

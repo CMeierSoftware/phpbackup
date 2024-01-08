@@ -32,8 +32,9 @@ final class AppConfigTest extends TestCase
 
     protected function setUp(): void
     {
+        FileHelper::makeDir(CONFIG_DIR);
         foreach (self::APPS as $configName => $sourceFile) {
-            $destinationFile = CONFIG_DIR . DIRECTORY_SEPARATOR . $configName . '.xml';
+            $destinationFile = CONFIG_DIR . $configName . '.xml';
             copy($sourceFile, $destinationFile);
             self::assertFileExists($destinationFile);
         }
@@ -44,9 +45,8 @@ final class AppConfigTest extends TestCase
     protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
-        foreach (self::APPS as $configName => $sourceFile) {
-            unlink(CONFIG_DIR . DIRECTORY_SEPARATOR . $configName . '.xml');
-        }
+        FileHelper::deleteDirectory(TEMP_DIR);
+        FileHelper::deleteDirectory(CONFIG_DIR);
     }
 
     /**
@@ -81,7 +81,7 @@ final class AppConfigTest extends TestCase
      */
     public function testLoadAppConfigWrongFileFormat(): void
     {
-        rename(CONFIG_DIR . '\\valid_app.xml', CONFIG_DIR . '\\valid_app.json');
+        rename(CONFIG_DIR . 'valid_app.xml', CONFIG_DIR . 'valid_app.json');
         self::expectException(FileNotFoundException::class);
         AppConfig::loadAppConfig('valid_app');
     }
@@ -178,10 +178,10 @@ final class AppConfigTest extends TestCase
     {
         $expectedConfig = [
             'adapter' => 'pdo_mysql',
-            'host' => 'db.example.com',
-            'username' => 'dbuser',
-            'password' => 'secret',
-            'dbname' => 'dbproduction',
+            'host' => 'localhost',
+            'username' => 'root',
+            'password' => '',
+            'dbname' => 'test',
         ];
 
         $actualConfig = $this->config->getBackupDatabase();
