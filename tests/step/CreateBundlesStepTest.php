@@ -37,8 +37,8 @@ final class CreateBundlesStepTest extends TestCase
 
     protected function tearDown(): void
     {
-        // FileHelper::deleteDirectory(TEST_WORK_DIR);
-        // unlink(CONFIG_DIR . DIRECTORY_SEPARATOR . 'app.xml');
+        FileHelper::deleteDirectory(self::TEST_DIR);
+        unlink(CONFIG_DIR . DIRECTORY_SEPARATOR . 'app.xml');
     }
 
     public function testFileBundle()
