@@ -9,39 +9,30 @@ use CMS\PhpBackup\Core\LogLevel;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\TestCase;
+use CMS\PhpBackup\Tests\TestCaseWithAppConfig;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\DatabaseBackupStep
  */
-final class DatabaseBackupStepTest extends TestCase
+final class DatabaseBackupStepTest extends TestCaseWithAppConfig
 {
-    private const TEST_DIR = TEST_WORK_DIR;
-    private const LOG_FILE = self::TEST_DIR . self::class . '.log';
-
-    private const DB_CONFIG = ['host' => 'localhost', 'username' => 'root', 'password' => '', 'dbname' => 'test'];
     private $databaseBackupStep;
 
     protected function setUp(): void
     {
-        FileLogger::getInstance()->setLogFile(self::LOG_FILE);
-        FileLogger::getInstance()->setLogLevel(LogLevel::INFO);
-        $this->databaseBackupStep = new DatabaseBackupStep(
-            self::DB_CONFIG,
-            self::TEST_DIR,
-            'encryption_key',
-            0
-        );
+        $this->setUpAppConfig('config_full_valid');
 
-        FileHelper::makeDir(self::TEST_DIR);
-        self::assertDirectoryExists(self::TEST_DIR);
+        $this->setStepData(['bundles' => ['something'], 'backupFolder' => self::TEST_DIR]);
+
+        $this->databaseBackupStep = new DatabaseBackupStep($this->config, 0);
     }
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::TEST_DIR);
+        FileHelper::deleteDirectory(TEMP_DIR);
+        parent::tearDown();
     }
 
     /**
@@ -49,16 +40,43 @@ final class DatabaseBackupStepTest extends TestCase
      */
     public function testExecuteWithSuccessfulBackup(): void
     {
-        $expected = new StepResult('', false);
+        $expected = new StepResult('unknown', false);
         $actual = $this->databaseBackupStep->execute();
-
+        
         self::assertInstanceOf(StepResult::class, $actual);
-
-        $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql\.gz$/';
+        
+        // $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql\.gz$/';
+        $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/';
         self::assertMatchesRegularExpression($dtPattern, basename($actual->returnValue));
         self::assertStringStartsWith(self::TEST_DIR, $actual->returnValue);
         self::assertSame($expected->repeat, $actual->repeat);
         self::assertFileExists($actual->returnValue);
+
+        // the encryption is at least 84 bytes
+        self::assertGreaterThan(85, filesize($actual->returnValue));
+        
+        $stepData = $this->config->readTempData('StepData');
+        $archivesResult = [basename($actual->returnValue) => 'Database backup.'];
+        self::assertSame($archivesResult, $stepData['archives']);
     }
-    // Add more test cases as needed
+    
+    public function testExecuteMissingBackupFolder()
+    {
+        $this->setStepData(['bundles' => 'some value']);
+        $step = new DatabaseBackupStep($this->config);
+
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Missing required keys: backupFolder');
+        $step->execute();
+    }
+
+    public function testExecuteMissingBundle()
+    {
+        $this->setStepData(['backupFolder' => 'some value']);
+        $step = new DatabaseBackupStep($this->config);
+
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Missing required keys: bundles');
+        $step->execute();
+    }
 }

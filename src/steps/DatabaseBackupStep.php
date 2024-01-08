@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Backup\DatabaseBackupCreator;
+use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Helper\FileHelper;
 
@@ -25,12 +26,13 @@ final class DatabaseBackupStep extends AbstractStep
      * @param string $encryptionKey encryption key for securing the backup
      * @param int $delay delay in seconds before executing the backup step (optional, default is 0)
      */
-    public function __construct(array $dbConfig, string $backupFolder, string $encryptionKey, int $delay = 0)
+    public function __construct(AppConfig $config, int $delay = 0)
     {
-        parent::__construct($delay);
-        $this->dbConfig = $dbConfig;
-        $this->backupFolder = rtrim($backupFolder, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR; // Ensure the path ends with a separator
-        $this->encryptionKey = $encryptionKey;
+        parent::__construct($config, $delay);
+
+        $this->srcDir = $this->config->getBackupDirectory()['src'];
+        $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
+        $this->dbConfig = $this->config->getBackupDatabase();
     }
 
     /**
@@ -40,9 +42,15 @@ final class DatabaseBackupStep extends AbstractStep
      */
     protected function _execute(): StepResult
     {
+        $bundles = &$this->stepData['bundles'];
+
+        if (!isset($this->stepData['archives'])) {
+            $this->stepData['archives'] = [];
+        }
+        $archives = &$this->stepData['archives'];
+
         $this->logger->info("Starting database dump of ({$this->dbConfig['host']}, {$this->dbConfig['dbname']})");
 
-        // Create a new instance of DatabaseBackupCreator with provided database configuration
         $db = new DatabaseBackupCreator(
             $this->dbConfig['host'],
             $this->dbConfig['username'],
@@ -50,8 +58,7 @@ final class DatabaseBackupStep extends AbstractStep
             $this->dbConfig['dbname']
         );
 
-        // Perform MySQL backup
-        $result = $db->backupMySql();
+        $result = $db->backupMySql('None');
 
         if (!$result) {
             $this->logger->warning('Database dump could not be created.');
@@ -64,8 +71,14 @@ final class DatabaseBackupStep extends AbstractStep
         FileCrypt::encryptFile($result, $this->encryptionKey);
 
         $result = $this->moveToBackupFolder($result, basename($result));
+        $archives[basename($result)] = 'Database backup.';
 
         return new StepResult($result, false);
+    }
+
+    protected function getRequiredStepDataKeys(): array
+    {
+        return ['backupFolder', 'bundles'];
     }
 
     /**
@@ -78,7 +91,9 @@ final class DatabaseBackupStep extends AbstractStep
      */
     private function moveToBackupFolder(string $file, string $newName): string
     {
-        $newFile = $this->backupFolder . $newName;
+        $backupFolder = rtrim($this->stepData['backupFolder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $newFile = $backupFolder . $newName;
+        FileHelper::makeDir($backupFolder);
         FileHelper::moveFile($file, $newFile);
 
         return $newFile;
