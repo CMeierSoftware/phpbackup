@@ -3,10 +3,10 @@
     <backup>
         <database>
             <adapter>pdo_mysql</adapter>
-            <host>db.example.com</host>
-            <username>dbuser</username>
-            <password>secret</password>
-            <dbname>dbproduction</dbname>
+            <host>localhost</host>
+            <username>root</username>
+            <password></password>
+            <dbname>test</dbname>
         </database>
         <directory>
             <src>.</src>
