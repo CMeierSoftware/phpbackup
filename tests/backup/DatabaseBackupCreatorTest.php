@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use CMS\PhpBackup\Backup\DatabaseBackupCreator;
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
+use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,6 +23,11 @@ final class DatabaseBackupCreatorTest extends TestCase
     protected function setUp(): void
     {
         $this->backupCreator = new DatabaseBackupCreator(self::HOST, self::USERNAME, self::PASSWORD, self::DB);
+    }
+
+    protected function tearDown(): void 
+    {
+        FileHelper::deleteDirectory(TEMP_DIR);
     }
 
     /**
@@ -49,16 +55,12 @@ final class DatabaseBackupCreatorTest extends TestCase
      */
     public function testBackup()
     {
-        try {
             $backupFile = $this->backupCreator->backupMySql('None');
             // Assert that the backup file exists
             self::assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
             self::assertStringEndsWith('.sql', $backupFile);
             self::assertFileExists($backupFile);
             self::assertNotEmpty(file_get_contents($backupFile));
-        } finally {
-            unlink($backupFile);
-        }
     }
 
     /**
