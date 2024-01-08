@@ -20,6 +20,9 @@ if (!defined('TEST_FIXTURES_CONFIG_DIR')) {
 if (!defined('TEST_FIXTURES_ENCRYPTION_DIR')) {
     define('TEST_FIXTURES_ENCRYPTION_DIR', TEST_FIXTURES_DIR . 'encryption' . DIRECTORY_SEPARATOR);
 }
+if (!defined('TEST_FIXTURES_STEPS_DIR')) {
+    define('TEST_FIXTURES_STEPS_DIR', TEST_FIXTURES_DIR . 'steps' . DIRECTORY_SEPARATOR);
+}
 
 use PHPUnit\Framework\Assert;
 

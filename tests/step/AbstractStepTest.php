@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
+use CMS\PhpBackup\Core\AppConfig;
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -16,6 +18,26 @@ use PHPUnit\Framework\TestCase;
  */
 final class AbstractStepTest extends TestCase
 {
+    public const CONFIG_FILE = CONFIG_DIR . 'valid_app.xml';
+    public const CONFIG_TEMP_DIR = CONFIG_DIR . 'temp_valid_app';
+    public const CONFIG_STEP_RESULT_FILE = self::CONFIG_TEMP_DIR . DIRECTORY_SEPARATOR . 'StepData.xml';
+    private AppConfig $config;
+
+    protected function setUp(): void
+    {
+        copy(TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml', self::CONFIG_FILE);
+        self::assertFileExists(self::CONFIG_FILE);
+
+        $this->config = AppConfig::loadAppConfig('valid_app');
+    }
+
+    protected function tearDown(): void
+    {
+        FileHelper::deleteDirectory(TEST_WORK_DIR);
+        FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
+        unlink(self::CONFIG_FILE);
+    }
+
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::execute()
      */
@@ -28,6 +50,7 @@ final class AbstractStepTest extends TestCase
         $result = $step->execute();
 
         self::assertSame($stepResult, $result);
+        self::assertStepResultFile(TEST_FIXTURES_STEPS_DIR . 'StepData.xml');
     }
 
     public function testSerialize(): void
@@ -43,8 +66,17 @@ final class AbstractStepTest extends TestCase
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
+        $mockBuilder->setConstructorArgs([$this->config]);
         $mockBuilder->onlyMethods(['_execute']);
 
         return $mockBuilder->getMock();
+    }
+
+    private static function assertStepResultFile(string $expected)
+    {
+        self::assertDirectoryExists(self::CONFIG_TEMP_DIR);
+        self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
+
+        self::assertXmlFileEqualsXmlFile($expected, self::CONFIG_STEP_RESULT_FILE);
     }
 }
