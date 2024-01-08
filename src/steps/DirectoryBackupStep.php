@@ -13,7 +13,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-final class CreateDirectoryBackupStep extends AbstractStep
+final class DirectoryBackupStep extends AbstractStep
 {
     private readonly string $srcDir;
     private array $bundles;

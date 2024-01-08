@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Step\CreateDirectoryBackupStep;
+use CMS\PhpBackup\Step\DirectoryBackupStep;
 use CMS\PhpBackup\Step\StepResult;
 
 /**
@@ -45,7 +45,7 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
 
         $this->setStepData(['bundles' => $bundles, 'backupFolder' => self::TEST_DIR]);
 
-        $step = new CreateDirectoryBackupStep($this->config, 0);
+        $step = new DirectoryBackupStep($this->config, 0);
 
         $result = $step->execute();
 
@@ -69,7 +69,7 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
         $bundlesResult = array_fill(0, $count, $this->oneBundle);
         $archivesResult = [];
 
-        $step = new CreateDirectoryBackupStep(TEST_FIXTURES_FILE_DIR, TEST_WORK_DIR, 'key', $bundles, $archives, 0);
+        $step = new DirectoryBackupStep(TEST_FIXTURES_FILE_DIR, TEST_WORK_DIR, 'key', $bundles, $archives, 0);
 
         for ($i = 0; $i < $count; ++$i) {
             $archivesResult["archive_part_{$i}.zip"] = $this->oneBundle;
@@ -88,7 +88,7 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteMissingBackupFolder()
     {
         $this->setStepData(['bundles' => 'some value']);
-        $step = new CreateDirectoryBackupStep($this->config);
+        $step = new DirectoryBackupStep($this->config);
 
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: backupFolder');
@@ -98,7 +98,7 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteMissingBundle()
     {
         $this->setStepData(['backupFolder' => 'some value']);
-        $step = new CreateDirectoryBackupStep($this->config);
+        $step = new DirectoryBackupStep($this->config);
 
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: bundles');
