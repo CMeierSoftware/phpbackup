@@ -7,20 +7,21 @@ namespace CMS\PhpBackup\Tests;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\CreateDirectoryBackupStep;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\CreateDirectoryBackupStep
  */
-final class CreateDirectoryBackupStepTest extends TestCase
+final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
 {
-    private const WORK_DIR_REMOTE_BASE = TEST_WORK_DIR . 'Remote' . DIRECTORY_SEPARATOR;
+    private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private array $oneBundle = [];
 
     protected function setUp(): void
     {
+        $this->setUpAppConfig(TEST_FIXTURES_FILE_DIR);
+
         FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
         self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
 
@@ -29,20 +30,22 @@ final class CreateDirectoryBackupStepTest extends TestCase
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(TEST_WORK_DIR);
+        FileHelper::deleteDirectory(TEMP_DIR);
+        parent::tearDown();
     }
 
     public function testFirstStep()
     {
         $bundles = array_fill(0, 5, $this->oneBundle);
-        $archives = [];
 
         $bundlesResult = array_fill(0, 5, $this->oneBundle);
         $archivesResult = [
             'archive_part_0.zip' => $this->oneBundle,
         ];
 
-        $step = new CreateDirectoryBackupStep(TEST_FIXTURES_FILE_DIR, TEST_WORK_DIR, 'key', $bundles, $archives, 0);
+        $this->setStepData(['bundles' => $bundles, 'backupFolder' => self::TEST_DIR]);
+
+        $step = new CreateDirectoryBackupStep($this->config, 0);
 
         $result = $step->execute();
 
@@ -51,8 +54,9 @@ final class CreateDirectoryBackupStepTest extends TestCase
 
         self::assertFileExists($result->returnValue);
 
-        self::assertSame($archivesResult, $archives);
-        self::assertSame($bundlesResult, $bundles);
+        $stepData = $this->config->readTempData('StepData');
+        self::assertSame($archivesResult, $stepData['archives']);
+        self::assertSame($bundlesResult, $stepData['bundles']);
     }
 
     public function testAllSteps()
@@ -79,5 +83,25 @@ final class CreateDirectoryBackupStepTest extends TestCase
             self::assertSame($archivesResult, $archives);
             self::assertSame($bundlesResult, $bundles);
         }
+    }
+
+    public function testExecuteMissingBackupFolder()
+    {
+        $this->setStepData(['bundles' => 'some value']);
+        $step = new CreateDirectoryBackupStep($this->config);
+
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Missing required keys: backupFolder');
+        $step->execute();
+    }
+
+    public function testExecuteMissingBundle()
+    {
+        $this->setStepData(['backupFolder' => 'some value']);
+        $step = new CreateDirectoryBackupStep($this->config);
+
+        self::expectException(\InvalidArgumentException::class);
+        self::expectExceptionMessage('Missing required keys: bundles');
+        $step->execute();
     }
 }
