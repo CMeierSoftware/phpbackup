@@ -21,9 +21,6 @@ final class DatabaseBackupStep extends AbstractStep
     /**
      * DatabaseBackupStep constructor.
      *
-     * @param array $dbConfig database configuration parameters
-     * @param string $backupFolder path to the backup folder
-     * @param string $encryptionKey encryption key for securing the backup
      * @param int $delay delay in seconds before executing the backup step (optional, default is 0)
      */
     public function __construct(AppConfig $config, int $delay = 0)

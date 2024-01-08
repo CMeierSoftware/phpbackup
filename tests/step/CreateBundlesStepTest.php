@@ -17,7 +17,7 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
 {
     protected function setUp(): void
     {
-        $this->setUpAppConfig('config_create_bundle_step_test', self::TEST_DIR);
+        $this->setUpAppConfig('config_create_bundle_step_test', [['tag' => 'src', 'value' => self::TEST_DIR]]);
 
         $this->createTestFiles(self::TEST_DIR);
     }
@@ -49,9 +49,9 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
 
         $step = new CreateBundlesStep($this->config);
 
-        $fileBundles = $this->config->readTempData('StepData')['bundles'];
-
         $step->execute();
+
+        $fileBundles = $this->config->readTempData('StepData')['bundles'];
 
         self::assertNotEmpty($fileBundles);
         self::assertCount(5, $fileBundles);

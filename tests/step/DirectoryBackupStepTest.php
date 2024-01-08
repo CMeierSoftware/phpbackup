@@ -13,7 +13,7 @@ use CMS\PhpBackup\Step\StepResult;
  *
  * @covers \CMS\PhpBackup\Step\CreateDirectoryBackupStep
  */
-final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
+final class DirectoryBackupStepTest extends TestCaseWithAppConfig
 {
     private array $oneBundle = [];
     private array $bundles = [];
@@ -55,7 +55,6 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
             'archive_part_0.zip' => $this->oneBundle,
         ];
 
-
         $step = new DirectoryBackupStep($this->config, 0);
 
         $result = $step->execute();
@@ -65,16 +64,6 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
         $stepData = $this->config->readTempData('StepData');
         self::assertSame($archivesResult, $stepData['archives']);
         self::assertSame($this->bundlesResult, $stepData['bundles']);
-    }
-
-    private static function assertStepResult(bool $expectedRepeat, mixed $actually)
-    {
-        self::assertInstanceOf(StepResult::class, $actually);
-        self::assertSame($expectedRepeat, $actually->repeat);
-
-        self::assertFileExists($actually->returnValue);
-        // the encryption is at least 84 bytes
-        self::assertGreaterThan(85, filesize($actually->returnValue));
     }
 
     public function testAllSteps()
@@ -113,5 +102,15 @@ final class CreateDirectoryBackupStepTest extends TestCaseWithAppConfig
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: bundles');
         $step->execute();
+    }
+
+    private static function assertStepResult(bool $expectedRepeat, mixed $actually)
+    {
+        self::assertInstanceOf(StepResult::class, $actually);
+        self::assertSame($expectedRepeat, $actually->repeat);
+
+        self::assertFileExists($actually->returnValue);
+        // the encryption is at least 84 bytes
+        self::assertGreaterThan(85, filesize($actually->returnValue));
     }
 }

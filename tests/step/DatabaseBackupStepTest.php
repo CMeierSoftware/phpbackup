@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\FileLogger;
-use CMS\PhpBackup\Core\LogLevel;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
 use CMS\PhpBackup\Step\StepResult;
-use CMS\PhpBackup\Tests\TestCaseWithAppConfig;
 
 /**
  * @internal
@@ -42,9 +39,9 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
     {
         $expected = new StepResult('unknown', false);
         $actual = $this->databaseBackupStep->execute();
-        
+
         self::assertInstanceOf(StepResult::class, $actual);
-        
+
         // $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql\.gz$/';
         $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/';
         self::assertMatchesRegularExpression($dtPattern, basename($actual->returnValue));
@@ -54,12 +51,12 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
 
         // the encryption is at least 84 bytes
         self::assertGreaterThan(85, filesize($actual->returnValue));
-        
+
         $stepData = $this->config->readTempData('StepData');
         $archivesResult = [basename($actual->returnValue) => 'Database backup.'];
         self::assertSame($archivesResult, $stepData['archives']);
     }
-    
+
     public function testExecuteMissingBackupFolder()
     {
         $this->setStepData(['bundles' => 'some value']);

@@ -30,14 +30,14 @@ class TestCaseWithAppConfig extends TestCase
         parent::tearDown();
     }
 
-    protected function setUpAppConfig(string $configFile, string $backupPath = '.'): void
+    protected function setUpAppConfig(string $configFile, array $replaceTags = []): void
     {
         copy(TEST_FIXTURES_CONFIG_DIR . "{$configFile}.xml", self::CONFIG_FILE);
         self::assertFileExists(self::CONFIG_FILE);
 
-        $content = file_get_contents(self::CONFIG_FILE);
-        $content = str_replace('<src>.</src>', "<src>{$backupPath}</src>", $content);
-        file_put_contents(self::CONFIG_FILE, $content);
+        foreach ($replaceTags as $tag) {
+            self::replaceConfigValue($tag['tag'], $tag['value']);
+        }
 
         $this->config = AppConfig::loadAppConfig('app');
     }
@@ -45,5 +45,12 @@ class TestCaseWithAppConfig extends TestCase
     protected function setStepData(array $data)
     {
         $this->config->saveTempData('StepData', $data);
+    }
+
+    private function replaceConfigValue(string $tag, string $newValue)
+    {
+        $content = file_get_contents(self::CONFIG_FILE);
+        $content = preg_replace("/<{$tag}>(.*?)<\\/{$tag}>/", "<{$tag}>{$newValue}</{$tag}>", $content);
+        file_put_contents(self::CONFIG_FILE, $content);
     }
 }

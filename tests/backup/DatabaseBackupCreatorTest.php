@@ -25,7 +25,7 @@ final class DatabaseBackupCreatorTest extends TestCase
         $this->backupCreator = new DatabaseBackupCreator(self::HOST, self::USERNAME, self::PASSWORD, self::DB);
     }
 
-    protected function tearDown(): void 
+    protected function tearDown(): void
     {
         FileHelper::deleteDirectory(TEMP_DIR);
     }
@@ -55,12 +55,12 @@ final class DatabaseBackupCreatorTest extends TestCase
      */
     public function testBackup()
     {
-            $backupFile = $this->backupCreator->backupMySql('None');
-            // Assert that the backup file exists
-            self::assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
-            self::assertStringEndsWith('.sql', $backupFile);
-            self::assertFileExists($backupFile);
-            self::assertNotEmpty(file_get_contents($backupFile));
+        $backupFile = $this->backupCreator->backupMySql('None');
+        // Assert that the backup file exists
+        self::assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
+        self::assertStringEndsWith('.sql', $backupFile);
+        self::assertFileExists($backupFile);
+        self::assertNotEmpty(file_get_contents($backupFile));
     }
 
     /**
