@@ -44,7 +44,7 @@ final class AbstractStepTest extends TestCase
     public function testExecuteNoStepData()
     {
         self::assertFileDoesNotExist(self::CONFIG_STEP_RESULT_FILE);
-        
+
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
@@ -62,7 +62,7 @@ final class AbstractStepTest extends TestCase
     public function testAddStepData()
     {
         self::assertFileDoesNotExist(self::CONFIG_STEP_RESULT_FILE);
-        
+
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
@@ -87,7 +87,7 @@ final class AbstractStepTest extends TestCase
         FileHelper::makeDir(self::CONFIG_TEMP_DIR);
         copy(TEST_FIXTURES_STEPS_DIR . 'StepData.xml', self::CONFIG_STEP_RESULT_FILE);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-        
+
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
@@ -107,7 +107,7 @@ final class AbstractStepTest extends TestCase
         FileHelper::makeDir(self::CONFIG_TEMP_DIR);
         copy(TEST_FIXTURES_STEPS_DIR . 'StepData.xml', self::CONFIG_STEP_RESULT_FILE);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-        
+
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
@@ -127,7 +127,7 @@ final class AbstractStepTest extends TestCase
         FileHelper::makeDir(self::CONFIG_TEMP_DIR);
         copy(TEST_FIXTURES_STEPS_DIR . 'StepData.xml', self::CONFIG_STEP_RESULT_FILE);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-        
+
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::never())->method('_execute')->willReturn($stepResult);

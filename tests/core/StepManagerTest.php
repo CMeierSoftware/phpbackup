@@ -115,9 +115,9 @@ final class StepClass extends AbstractStep
 
         return new StepResult("Result: {$this->arg1} {$this->arg2}", $this->repeated);
     }
+
     protected function getRequiredStepDataKeys(): array
     {
         return [];
     }
-
 }

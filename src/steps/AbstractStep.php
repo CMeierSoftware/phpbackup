@@ -51,30 +51,30 @@ abstract class AbstractStep
     {
         $class = self::class;
         $this->logger->info("Execute {$class}");
-        
+
         $this->validateStepData();
 
         $result = $this->_execute();
 
-        if (!empty($this->stepData)){
+        if (!empty($this->stepData)) {
             $this->config->saveTempData('StepData', $this->stepData);
         }
 
         return $result;
     }
 
-    private function validateStepData() 
+    abstract protected function _execute(): StepResult;
+
+    abstract protected function getRequiredStepDataKeys(): array;
+
+    private function validateStepData()
     {
         $requiredKeys = $this->getRequiredStepDataKeys();
-    
+
         $missingKeys = array_diff($requiredKeys, array_keys($this->stepData));
-    
+
         if (!empty($missingKeys)) {
-            throw new \InvalidArgumentException("Missing required keys: " . implode(', ', $missingKeys));
+            throw new \InvalidArgumentException('Missing required keys: ' . implode(', ', $missingKeys));
         }
     }
-    
-
-    abstract protected function _execute(): StepResult;
-    abstract protected function getRequiredStepDataKeys(): array;
 }
