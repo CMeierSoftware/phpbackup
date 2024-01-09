@@ -8,118 +8,49 @@ use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\RemoteSendFileStep;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\SendRemoteStep
  */
-final class RemoteSendFileStepTest extends TestCase
+final class RemoteSendFileStepTest extends TestCaseWithAppConfig
 {
-    private const WORK_DIR_LOCAL = TEST_WORK_DIR . 'Local' . DIRECTORY_SEPARATOR;
-    private const WORK_DIR_REMOTE_BASE = TEST_WORK_DIR . 'Remote' . DIRECTORY_SEPARATOR;
+    private const WORK_DIR_LOCAL = self::TEST_DIR . 'Local' . DIRECTORY_SEPARATOR;
+    private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private const TEST_FILE1_SRC = TEST_FIXTURES_FILE_1;
     private const TEST_FILE2_SRC = TEST_FIXTURES_FILE_2;
+    private const TEST_FILE3_SRC = TEST_FIXTURES_FILE_3;
     private Local $remoteHandler;
     private string $workDirRemote;
+    private string $fileMappingPath;
+    private array $archives;
 
     protected function setUp(): void
     {
-        FileHelper::makeDir(self::WORK_DIR_LOCAL);
-        self::assertDirectoryExists(self::WORK_DIR_LOCAL);
-
-        FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
-        self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
-
-        $this->workDirRemote = self::WORK_DIR_REMOTE_BASE . basename(self::WORK_DIR_LOCAL);
+        $this->workDirRemote = self::WORK_DIR_REMOTE_BASE . basename(self::WORK_DIR_LOCAL) . DIRECTORY_SEPARATOR;
         self::assertDirectoryDoesNotExist($this->workDirRemote);
 
-        self::setupLocalStorage();
+        $this->fileMappingPath = $this->workDirRemote . 'file_mapping.json';
+
+        $files = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC, self::TEST_FILE3_SRC];
+        $this->setupLocalStorage($files);
 
         $this->remoteHandler = new Local(self::WORK_DIR_REMOTE_BASE);
+
+        $this->archives = [
+            basename(self::TEST_FILE1_SRC) => 'content1',
+            basename(self::TEST_FILE2_SRC) => 'content2',
+            basename(self::TEST_FILE3_SRC) => 'content3',
+        ];
+
+        $this->setUpAppConfig('config_full_valid');
+        $this->setStepData(['archives' => $this->archives, 'backupFolder' => self::WORK_DIR_LOCAL]);
     }
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::WORK_DIR_LOCAL);
-        FileHelper::deleteDirectory(self::WORK_DIR_REMOTE_BASE);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     */
-    public function testExecute()
-    {
-        $archives = [
-            basename(self::TEST_FILE1_SRC) => 'content1',
-            basename(self::TEST_FILE2_SRC) => 'content2',
-        ];
-
-        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
-
-        $result = $sendRemoteStep->execute();
-
-        // Assert that the result is as expected
-        self::assertInstanceOf(StepResult::class, $result);
-        self::assertFalse($result->repeat);
-
-        self::assertRemoteStorage($archives);
-    }
-
-    /**
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     *
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     */
-    public function testReentry()
-    {
-        $archives = [
-            basename(self::TEST_FILE1_SRC) => 'content1',
-            basename(self::TEST_FILE2_SRC) => 'content2',
-        ];
-
-        FileHelper::makeDir($this->workDirRemote);
-        $remotePathFile1 = $this->workDirRemote . DIRECTORY_SEPARATOR . basename(self::TEST_FILE1_SRC);
-        copy(self::TEST_FILE1_SRC, $remotePathFile1);
-        self::assertFileExists($remotePathFile1);
-
-        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
-        $sendRemoteStep->execute();
-
-        self::assertRemoteStorage($archives);
-    }
-
-    /**
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     *
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::uploadFileMapping()
-     */
-    public function testReplaceFileMapping()
-    {
-        $archives = [
-            basename(self::TEST_FILE1_SRC) => 'content1',
-            basename(self::TEST_FILE2_SRC) => 'content2',
-        ];
-
-        FileHelper::makeDir($this->workDirRemote);
-        $fileMappingPath = $this->workDirRemote . DIRECTORY_SEPARATOR . 'file_mapping.json';
-        touch($fileMappingPath);
-        self::assertFileExists($fileMappingPath);
-
-        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
-        $sendRemoteStep->execute();
-
-        self::assertRemoteStorage($archives);
+        parent::tearDown();
     }
 
     /**
@@ -132,38 +63,157 @@ final class RemoteSendFileStepTest extends TestCase
      */
     public function testCreateBaseDir()
     {
-        $archives = [
-            basename(self::TEST_FILE1_SRC) => 'content1',
-            basename(self::TEST_FILE2_SRC) => 'content2',
-        ];
-
         FileHelper::deleteDirectory($this->workDirRemote);
         self::assertDirectoryDoesNotExist($this->workDirRemote);
 
-        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
         $sendRemoteStep->execute();
 
-        self::assertRemoteStorage($archives);
+        self::assertRemoteStorage($this->archives);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     */
+    public function testExecute()
+    {
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
+
+        $result = $sendRemoteStep->execute();
+
+        // Assert that the result is as expected
+        self::assertInstanceOf(StepResult::class, $result);
+        self::assertFalse($result->repeat);
+
+        self::assertRemoteStorage($this->archives);
+    }
+
+    /**
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
+     *
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     */
+    public function testReentryFileMappingDoesMatch()
+    {
+        $files = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC];
+        $ts = $this->setupRemoteStorage($files);
+
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
+        $sendRemoteStep->execute();
+
+        self::assertRemoteStorage($this->archives);
+        foreach ($ts as $path => $fileTime) {
+            self::assertSame($fileTime, filemtime($path), "File {$path} was modified.");
+        }
+    }
+
+    /**
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
+     *
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     */
+    public function testReentryFileMappingDoesNotMatch()
+    {
+        $filesUploaded = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC];
+        $filesInFileMapping = [self::TEST_FILE1_SRC];
+        $ts = $this->setupRemoteStorage($filesUploaded, $filesInFileMapping);
+
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
+        $sendRemoteStep->execute();
+
+        self::assertRemoteStorage($this->archives);
+
+        foreach ($filesUploaded as $localPath) {
+            $remotePath = $this->workDirRemote . basename($localPath);
+            if (in_array($localPath, $filesInFileMapping, true)) {
+                self::assertSame($ts[$remotePath], filemtime($remotePath), "File {$remotePath} was modified.");
+            } else {
+                self::assertGreaterThan($ts[$remotePath], filemtime($remotePath), "File {$remotePath} was not updated.");
+            }
+        }
+    }
+
+    /**
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
+     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     *
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::updateFileMapping()
+     */
+    public function testUpdateFileMapping()
+    {
+        $this->setupRemoteStorage([]);
+
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
+        $sendRemoteStep->execute();
+
+        self::assertRemoteStorage($this->archives);
     }
 
     private function assertRemoteStorage(array $archives)
     {
         foreach ($archives as $fileName => $content) {
-            self::assertFileExists($this->workDirRemote . DIRECTORY_SEPARATOR . $fileName);
+            $localFile = self::WORK_DIR_LOCAL . $fileName;
+            $remoteFile = $this->workDirRemote . $fileName;
+            self::assertFileExists($remoteFile);
+            self::assertFileEquals($localFile, $remoteFile);
         }
-        $fileMappingPath = $this->workDirRemote . DIRECTORY_SEPARATOR . 'file_mapping.json';
 
-        self::assertFileExists($fileMappingPath);
-        self::assertJsonStringEqualsJsonFile($fileMappingPath, json_encode($archives, JSON_PRETTY_PRINT));
+        self::assertFileExists($this->fileMappingPath);
+        self::assertJsonStringEqualsJsonFile($this->fileMappingPath, json_encode($archives, JSON_PRETTY_PRINT));
     }
 
-    private static function setupLocalStorage(): void
+    private function setupLocalStorage(array $files): void
     {
-        $files = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC];
+        FileHelper::makeDir(self::WORK_DIR_LOCAL);
+        self::assertDirectoryExists(self::WORK_DIR_LOCAL);
+
+        FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
+        self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
+
         foreach ($files as $f) {
-            $fn = basename($f);
-            copy($f, self::WORK_DIR_LOCAL . $fn);
-            self::assertFileExists(self::WORK_DIR_LOCAL . $fn);
+            $fn = self::WORK_DIR_LOCAL . basename($f);
+            copy($f, $fn);
+            self::assertFileExists($fn);
         }
+    }
+
+    private function setupRemoteStorage(array $files, array $fileMapping = []): array
+    {
+        FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
+        self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
+
+        FileHelper::makeDir($this->workDirRemote);
+        self::assertDirectoryExists($this->workDirRemote);
+
+        $ts = [];
+
+        foreach ($files as $f) {
+            $remoteFile = $this->workDirRemote . basename($f);
+            copy($f, $remoteFile);
+            self::assertFileExists($remoteFile);
+            $ts[$remoteFile] = filemtime($remoteFile);
+        }
+
+        $filesToEncode = empty($fileMapping) ? $files : $fileMapping;
+        file_put_contents(
+            $this->fileMappingPath,
+            json_encode(array_map('basename', $filesToEncode), JSON_PRETTY_PRINT)
+        );
+
+        // we need to sleep, to be able to detect changes in filemtime
+        sleep(2);
+
+        return $ts;
     }
 }
