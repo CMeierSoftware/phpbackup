@@ -4,38 +4,29 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests;
 
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\AbstractStep
  */
-final class AbstractStepTest extends TestCase
+final class AbstractStepTest extends TestCaseWithAppConfig
 {
-    public const CONFIG_FILE = CONFIG_DIR . 'valid_app.xml';
-    public const CONFIG_TEMP_DIR = CONFIG_DIR . 'temp_valid_app';
-    public const CONFIG_STEP_RESULT_FILE = self::CONFIG_TEMP_DIR . DIRECTORY_SEPARATOR . 'StepData.xml';
-    private AppConfig $config;
+    private const WATCHDOG_FILE = self::CONFIG_TEMP_DIR . 'send_remote_watchdog.xml';
+    private const CONFIG_STEP_RESULT_FILE = self::CONFIG_TEMP_DIR . 'StepData.xml';
 
     protected function setUp(): void
     {
-        copy(TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml', self::CONFIG_FILE);
-        self::assertFileExists(self::CONFIG_FILE);
-
-        $this->config = AppConfig::loadAppConfig('valid_app');
+        $this->setUpAppConfig('config_full_valid');
     }
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(TEST_WORK_DIR);
-        FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
-        unlink(self::CONFIG_FILE);
+        parent::tearDown();
     }
 
     /**
@@ -144,6 +135,69 @@ final class AbstractStepTest extends TestCase
         $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":1:{i:0;i:0;}';
 
         self::assertSame($expected, serialize($step));
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     *
+     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     */
+    public function testWatchdogFileCreated()
+    {
+        self::assertFileDoesNotExist(self::WATCHDOG_FILE);
+        $step = $this->getMockedHandler();
+
+        $reflectionClass = new \ReflectionClass(get_class($step));
+        $method = $reflectionClass->getMethod('incrementAttemptsCount');
+        $method->setAccessible(true);
+
+        $method->invoke($step);
+        self::assertFileExists(self::WATCHDOG_FILE);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Step\AbstractStep::incrementAttemptsCount()
+     *
+     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     */
+    public function testAttemptsIncrementSuccess()
+    {
+        $count = 3;
+        $step = $this->getMockedHandler();
+
+        $reflectionClass = new \ReflectionClass(get_class($step));
+        $methodIncrementAttemptsCount = $reflectionClass->getMethod('incrementAttemptsCount');
+        $methodIncrementAttemptsCount->setAccessible(true);
+
+        for ($i = 0; $i < $count; ++$i) {
+            $methodIncrementAttemptsCount->invoke($step);
+        }
+
+        self::assertFileExists(self::WATCHDOG_FILE);
+        self::assertStringContainsString("<attempts>{$count}</attempts>", file_get_contents(self::WATCHDOG_FILE));
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Step\AbstractStep::incrementAttemptsCount()
+     *
+     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     * @uses \CMS\PhpBackup\Step\AbstractStep::incrementAttemptsCount()
+     */
+    public function testAttemptsResetSuccess()
+    {
+        $step = $this->getMockedHandler();
+
+        $reflectionClass = new \ReflectionClass(get_class($step));
+        $methodIncrementAttemptsCount = $reflectionClass->getMethod('incrementAttemptsCount');
+        $methodIncrementAttemptsCount->setAccessible(true);
+        $methodResetAttemptsCount = $reflectionClass->getMethod('resetAttemptsCount');
+        $methodResetAttemptsCount->setAccessible(true);
+
+        $methodIncrementAttemptsCount->invoke($step);
+
+        self::assertStringContainsString('<attempts>1</attempts>', file_get_contents(self::WATCHDOG_FILE));
+        $methodResetAttemptsCount->invoke($step);
+        self::assertStringContainsString('<attempts>0</attempts>', file_get_contents(self::WATCHDOG_FILE));
     }
 
     private function getMockedHandler(): MockObject
