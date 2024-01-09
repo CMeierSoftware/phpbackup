@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\DeleteOldFilesRemoteStep;
+use CMS\PhpBackup\Step\RemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\StepResult;
 
 /**
@@ -14,7 +14,7 @@ use CMS\PhpBackup\Step\StepResult;
  *
  * @covers \CMS\PhpBackup\Step\DeleteOldFilesRemoteStep
  */
-final class DeleteOldFilesRemoteStepTest extends TestCaseWithAppConfig
+final class RemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
 {
     private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private Local $remoteHandler;
@@ -47,7 +47,7 @@ final class DeleteOldFilesRemoteStepTest extends TestCaseWithAppConfig
                 ['tag' => 'keepBackupAmount', 'value' => (string) $countToKeep],
             ]
         );
-        $sendRemoteStep = new DeleteOldFilesRemoteStep($this->remoteHandler, $this->config);
+        $sendRemoteStep = new RemoteDeleteOldFilesStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
 
@@ -72,7 +72,7 @@ final class DeleteOldFilesRemoteStepTest extends TestCaseWithAppConfig
             ]
         );
 
-        $sendRemoteStep = new DeleteOldFilesRemoteStep($this->remoteHandler, $this->config);
+        $sendRemoteStep = new RemoteDeleteOldFilesStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
 

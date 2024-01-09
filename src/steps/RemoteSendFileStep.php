@@ -11,7 +11,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-final class SendRemoteStep extends AbstractStep
+final class RemoteSendFileStep extends AbstractStep
 {
     private readonly AbstractRemoteHandler $remote;
     private readonly string $backupDir;
@@ -87,6 +87,9 @@ final class SendRemoteStep extends AbstractStep
             $this->remote->fileUpload($localPath, $remotePath);
             $this->uploadedFiles[] = $archiveFileName;
         }
+        // / todo: watchdog for failing sending the same file again and again (timeout)
+        // / todo: update filemapping after each file.
+        // / todo: check filemapping about last file and continue from there
     }
 
     /**
@@ -105,5 +108,10 @@ final class SendRemoteStep extends AbstractStep
         }
 
         return $this->remote->fileUpload($fileMapping, $remotePath);
+    }
+
+    protected function getRequiredStepDataKeys(): array
+    {
+        return [];
     }
 }

@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\SendRemoteStep;
+use CMS\PhpBackup\Step\RemoteSendFileStep;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \CMS\PhpBackup\Step\SendRemoteStep
  */
-final class SendRemoteStepTest extends TestCase
+final class RemoteSendFileStepTest extends TestCase
 {
     private const WORK_DIR_LOCAL = TEST_WORK_DIR . 'Local' . DIRECTORY_SEPARATOR;
     private const WORK_DIR_REMOTE_BASE = TEST_WORK_DIR . 'Remote' . DIRECTORY_SEPARATOR;
@@ -59,7 +59,7 @@ final class SendRemoteStepTest extends TestCase
             basename(self::TEST_FILE2_SRC) => 'content2',
         ];
 
-        $sendRemoteStep = new SendRemoteStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
 
         $result = $sendRemoteStep->execute();
 
@@ -90,7 +90,7 @@ final class SendRemoteStepTest extends TestCase
         copy(self::TEST_FILE1_SRC, $remotePathFile1);
         self::assertFileExists($remotePathFile1);
 
-        $sendRemoteStep = new SendRemoteStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($archives);
@@ -116,7 +116,7 @@ final class SendRemoteStepTest extends TestCase
         touch($fileMappingPath);
         self::assertFileExists($fileMappingPath);
 
-        $sendRemoteStep = new SendRemoteStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($archives);
@@ -140,7 +140,7 @@ final class SendRemoteStepTest extends TestCase
         FileHelper::deleteDirectory($this->workDirRemote);
         self::assertDirectoryDoesNotExist($this->workDirRemote);
 
-        $sendRemoteStep = new SendRemoteStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
+        $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, self::WORK_DIR_LOCAL, $archives);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($archives);
