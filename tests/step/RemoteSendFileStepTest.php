@@ -88,6 +88,29 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
     }
 
     /**
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     */
+    public function testExecuteReinitialization()
+    {
+        $archives = [];
+        foreach ($this->archives as $file => $content) {
+            $archives[$file] = $content;
+            $this->setStepData(['archives' => $archives, 'backupFolder' => self::WORK_DIR_LOCAL]);
+            
+            $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
+            $result = $sendRemoteStep->execute();
+
+            self::assertInstanceOf(StepResult::class, $result);
+            self::assertFalse($result->repeat);
+
+            self::assertRemoteStorage($archives);
+        }
+    }
+
+    /**
      * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
      * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
      * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()

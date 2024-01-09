@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
@@ -48,8 +49,11 @@ final class RemoteSendFileStep extends AbstractStep
         $this->remote->connect();
         $this->getUploadedFiles();
         $this->createBaseDirectory();
-        $this->sendArchives();
-        $this->updateFileMapping();
+
+        $filesToUpload = array_diff(array_keys($this->archives), $this->uploadedFiles);
+        foreach ($filesToUpload as $archiveFileName) {
+            $this->sendArchives($archiveFileName);
+        }
 
         return new StepResult('', count($this->archives) !== count($this->uploadedFiles));
     }
@@ -79,7 +83,7 @@ final class RemoteSendFileStep extends AbstractStep
             $this->remote->fileDelete($this->backupDirName . '/' . $remoteFile);
         }
 
-        $this->uploadedFiles = $this->remote->dirList($this->backupDirName, true);
+        $this->uploadedFiles = array_diff($this->remote->dirList($this->backupDirName, true), $filesInFileMapping, [self::FILE_MAPPING_NAME]);
     }
 
     /**
@@ -95,16 +99,20 @@ final class RemoteSendFileStep extends AbstractStep
     /**
      * Sends the backup archives to the remote server.
      */
-    private function sendArchives(): void
+    private function sendArchives(string $archiveFileName): void
     {
-        $notUploadedFiles = array_diff_key($this->archives, array_flip($this->uploadedFiles));
-        foreach ($notUploadedFiles as $archiveFileName => $content) {
-            $localPath = $this->backupDir . $archiveFileName;
-            $remotePath = $this->backupDirName . '/' . basename($archiveFileName);
-            $this->remote->fileUpload($localPath, $remotePath);
-            $this->uploadedFiles[] = $archiveFileName;
-            $this->updateFileMapping();
+        $this->incrementAttemptsCount();
+
+        if ($this->getAttemptCount() > self::MAX_ATTEMPTS) {
+            throw new MaximalAttemptsReachedException("Maximal attempts to upload '{$archiveFileName}' reached (max. " . (string) self::MAX_ATTEMPTS . 'attempts)');
         }
+
+        $localPath = $this->backupDir . $archiveFileName;
+        $remotePath = $this->backupDirName . '/' . basename($archiveFileName);
+        $this->remote->fileUpload($localPath, $remotePath);
+        $this->uploadedFiles[] = $archiveFileName;
+        $this->updateFileMapping();
+        $this->resetAttemptsCount();
     }
 
     /**
@@ -140,6 +148,6 @@ final class RemoteSendFileStep extends AbstractStep
             return [];
         }
 
-        return json_decode(file_get_contents($fileMapping));
+        return json_decode(file_get_contents($fileMapping), true);
     }
 }
