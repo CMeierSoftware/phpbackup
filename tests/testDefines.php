@@ -34,3 +34,7 @@ if (!defined('TEST_FIXTURES_FILE_2')) {
     define('TEST_FIXTURES_FILE_2', TEST_FIXTURES_FILE_DIR . 'file2.xls');
     Assert::assertFileExists(TEST_FIXTURES_FILE_2);
 }
+if (!defined('TEST_FIXTURES_FILE_3')) {
+    define('TEST_FIXTURES_FILE_3', TEST_FIXTURES_FILE_DIR . 'file3.txt');
+    Assert::assertFileExists(TEST_FIXTURES_FILE_3);
+}
