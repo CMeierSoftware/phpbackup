@@ -170,7 +170,7 @@ abstract class AbstractRemoteHandler
      *
      * @throws RemoteStorageNotConnectedException If the remote storage is not connected
      */
-    public function dirList(string $remotePath): array
+    public function dirList(string $remotePath, bool $onlyFiles = false): array
     {
         $this->sanitizeDirCheck($remotePath);
 
@@ -178,17 +178,22 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("The directory '{$remotePath}' was not found in remote storage.");
         }
 
-        FileLogger::getInstance()->info("Create remote directory '{$remotePath}'.");
+        FileLogger::getInstance()->info("List remote directory '{$remotePath}'.");
 
         $result = $this->_dirList($remotePath);
         $result = array_values(array_diff($result, ['..', '.']));
+
         $resultCache = array_map(
             static fn ($path) => rtrim($remotePath, '\\/') . DIRECTORY_SEPARATOR . $path,
             $result
         );
         $this->fileExistsCache += array_fill_keys($resultCache, true);
 
-        return $result;
+        if ($onlyFiles) {
+            $result = array_filter($result, [self::class, 'isFilePath']);
+        }
+
+        return array_values($result);
     }
 
     /**
