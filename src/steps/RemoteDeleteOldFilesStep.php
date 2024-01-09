@@ -21,6 +21,7 @@ final class RemoteDeleteOldFilesStep extends AbstractStep
      * SendRemoteStep constructor.
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
+     * @param AppConfig $config configuration for this step
      * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
      */
     public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config, int $delay = 0)

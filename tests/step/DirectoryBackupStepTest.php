@@ -21,7 +21,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
 
     protected function setUp(): void
     {
-        $this->setUpAppConfig('config_full_valid', TEST_FIXTURES_FILE_DIR);
+        $this->setUpAppConfig('config_full_valid');
 
         $this->oneBundle = [basename(TEST_FIXTURES_FILE_1), basename(TEST_FIXTURES_FILE_2)];
         $this->bundles = array_fill(0, 5, $this->oneBundle);
@@ -40,10 +40,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     {
         self::assertDirectoryDoesNotExist(self::TEST_DIR);
 
-        $this->setStepData(['bundles' => $this->bundles, 'backupFolder' => self::TEST_DIR]);
-
-        $step = new DirectoryBackupStep($this->config, 0);
-
+        $step = new DirectoryBackupStep($this->config);
         $result = $step->execute();
 
         self::assertStepResult(true, $result);
@@ -55,15 +52,11 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
             'archive_part_0.zip' => $this->oneBundle,
         ];
 
-        $step = new DirectoryBackupStep($this->config, 0);
-
+        $step = new DirectoryBackupStep($this->config);
         $result = $step->execute();
 
         self::assertStepResult(true, $result);
-
-        $stepData = $this->config->readTempData('StepData');
-        self::assertSame($archivesResult, $stepData['archives']);
-        self::assertSame($this->bundlesResult, $stepData['bundles']);
+        $this->assertStepData($archivesResult);
     }
 
     public function testAllSteps()
@@ -72,15 +65,13 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
         $archivesResult = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $step = new DirectoryBackupStep($this->config, 0);
+            $step = new DirectoryBackupStep($this->config);
             $archivesResult["archive_part_{$i}.zip"] = $this->oneBundle;
             $result = $step->execute();
 
             self::assertStepResult(count($archivesResult) < $count, $result);
 
-            $stepData = $this->config->readTempData('StepData');
-            self::assertSame($archivesResult, $stepData['archives']);
-            self::assertSame($this->bundlesResult, $stepData['bundles']);
+            $this->assertStepData($archivesResult);
         }
     }
 
@@ -104,6 +95,23 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
         $step->execute();
     }
 
+    /**
+     * Asserts that the step data matches the expected archives & bundle result in the DirectoryBackupStepTest.
+     *
+     * @param array $archivesResult the expected archives result, where keys are archive filenames and values are bundles
+     */
+    private function assertStepData(array $archivesResult)
+    {
+        $stepData = $this->config->readTempData('StepData');
+        self::assertSame($archivesResult, $stepData['archives']);
+        self::assertSame($this->bundlesResult, $stepData['bundles']);
+    }
+
+    /**
+     * Asserts the result of a step in the directory backup process.
+     *
+     * @param bool $expectedRepeat the expected value for the 'repeat' property in the StepResult
+     */
     private static function assertStepResult(bool $expectedRepeat, mixed $actually)
     {
         self::assertInstanceOf(StepResult::class, $actually);

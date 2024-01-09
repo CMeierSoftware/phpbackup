@@ -47,7 +47,7 @@ final class RemoteSendFileStep extends AbstractStep
 
         $this->remote->connect();
         $this->getUploadedFiles();
-        $this->createBaseDir();
+        $this->createBaseDirectory();
         $this->sendArchives();
         $this->updateFileMapping();
 
@@ -85,7 +85,7 @@ final class RemoteSendFileStep extends AbstractStep
     /**
      * Creates the base directory on the remote server if it does not exist.
      */
-    private function createBaseDir(): void
+    private function createBaseDirectory(): void
     {
         if (!$this->remote->fileExists($this->backupDirName)) {
             $this->remote->dirCreate($this->backupDirName);

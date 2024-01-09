@@ -15,13 +15,14 @@ if (!defined('ABS_PATH')) {
 final class CreateBundlesStep extends AbstractStep
 {
     private readonly string $srcDir;
-    private array $bundles;
     private readonly int $maxArchiveSize;
+    private array $bundles;
 
     /**
-     * SendRemoteStep constructor.
+     * CreateBundlesStep constructor.
      *
-     * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
+     * @param AppConfig $config configuration for this step
+     * @param int $delay delay between this and the previous step
      */
     public function __construct(AppConfig $config, int $delay = 0)
     {
@@ -31,17 +32,12 @@ final class CreateBundlesStep extends AbstractStep
         $this->maxArchiveSize = (int) $this->config->getBackupSettings()['maxArchiveSize'];
     }
 
-    /**
-     * Executes the remote step to send backup archives to a remote server.
-     *
-     * @return StepResult the result of the step execution
-     */
     protected function _execute(): StepResult
     {
         $this->stepData['bundles'] = [];
         FileBundleCreator::createFileBundles($this->srcDir, $this->maxArchiveSize, $this->stepData['bundles']);
 
-        $backupFolder = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
+        $backupFolder = TEMP_DIR . 'backup_' . (new \DateTime())->format('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
         FileHelper::makeDir($backupFolder);
         $this->stepData['backup_folder'] = $backupFolder;
 

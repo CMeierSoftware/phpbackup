@@ -18,9 +18,6 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
 {
     private const WORK_DIR_LOCAL = self::TEST_DIR . 'Local' . DIRECTORY_SEPARATOR;
     private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
-    private const TEST_FILE1_SRC = TEST_FIXTURES_FILE_1;
-    private const TEST_FILE2_SRC = TEST_FIXTURES_FILE_2;
-    private const TEST_FILE3_SRC = TEST_FIXTURES_FILE_3;
     private Local $remoteHandler;
     private string $workDirRemote;
     private string $fileMappingPath;
@@ -33,15 +30,15 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
 
         $this->fileMappingPath = $this->workDirRemote . 'file_mapping.json';
 
-        $files = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC, self::TEST_FILE3_SRC];
+        $files = [TEST_FIXTURES_FILE_1, TEST_FIXTURES_FILE_2, TEST_FIXTURES_FILE_3];
         $this->setupLocalStorage($files);
 
         $this->remoteHandler = new Local(self::WORK_DIR_REMOTE_BASE);
 
         $this->archives = [
-            basename(self::TEST_FILE1_SRC) => 'content1',
-            basename(self::TEST_FILE2_SRC) => 'content2',
-            basename(self::TEST_FILE3_SRC) => 'content3',
+            basename(TEST_FIXTURES_FILE_1) => 'content1',
+            basename(TEST_FIXTURES_FILE_2) => 'content2',
+            basename(TEST_FIXTURES_FILE_3) => 'content3',
         ];
 
         $this->setUpAppConfig('config_full_valid');
@@ -84,7 +81,6 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
 
         $result = $sendRemoteStep->execute();
 
-        // Assert that the result is as expected
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);
 
@@ -101,7 +97,7 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
      */
     public function testReentryFileMappingDoesMatch()
     {
-        $files = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC];
+        $files = [TEST_FIXTURES_FILE_1, TEST_FIXTURES_FILE_2];
         $ts = $this->setupRemoteStorage($files);
 
         $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
@@ -123,8 +119,8 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
      */
     public function testReentryFileMappingDoesNotMatch()
     {
-        $filesUploaded = [self::TEST_FILE1_SRC, self::TEST_FILE2_SRC];
-        $filesInFileMapping = [self::TEST_FILE1_SRC];
+        $filesUploaded = [TEST_FIXTURES_FILE_1, TEST_FIXTURES_FILE_2];
+        $filesInFileMapping = [TEST_FIXTURES_FILE_1];
         $ts = $this->setupRemoteStorage($filesUploaded, $filesInFileMapping);
 
         $sendRemoteStep = new RemoteSendFileStep($this->remoteHandler, $this->config);
@@ -177,9 +173,6 @@ final class RemoteSendFileStepTest extends TestCaseWithAppConfig
     {
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
         self::assertDirectoryExists(self::WORK_DIR_LOCAL);
-
-        FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
-        self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
 
         foreach ($files as $f) {
             $fn = self::WORK_DIR_LOCAL . basename($f);

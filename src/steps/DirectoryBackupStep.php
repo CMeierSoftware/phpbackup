@@ -15,15 +15,16 @@ if (!defined('ABS_PATH')) {
 
 final class DirectoryBackupStep extends AbstractStep
 {
-    private readonly string $srcDir;
     private array $bundles;
     private array $archives;
+    private readonly string $srcDir;
     private readonly string $encryptionKey;
     private readonly string $backupFolder;
 
     /**
-     * SendRemoteStep constructor.
+     * DirectoryBackupStep constructor.
      *
+     * @param AppConfig $config configuration for this step
      * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
      */
     public function __construct(AppConfig $config, int $delay = 0)
@@ -51,21 +52,21 @@ final class DirectoryBackupStep extends AbstractStep
         $idx = count($archives);
         $f = new FileBackupCreator();
 
-        $result = $f->backupOnly($this->srcDir, $bundles[$idx]);
-        $this->logger->Info("Archive files to '{$result}'");
+        $backupFileName = $f->backupOnly($this->srcDir, $bundles[$idx]);
+        $this->logger->Info("Archive files to '{$backupFileName}'");
 
-        FileCrypt::encryptFile($result, $this->encryptionKey);
+        FileCrypt::encryptFile($backupFileName, $this->encryptionKey);
 
-        $result = $this->moveToBackupFolder($result, "archive_part_{$idx}.zip");
+        $backupFileName = $this->moveToBackupDirectory($backupFileName, "archive_part_{$idx}.zip");
 
-        $archives[basename($result)] = $bundles[$idx];
+        $archives[basename($backupFileName)] = $bundles[$idx];
 
         $cntBundles = count($bundles);
         $cntArchives = count($archives);
 
         $this->logger->Info("Archived {$cntArchives} of {$cntBundles} bundles.");
 
-        return new StepResult($result, $cntArchives < $cntBundles);
+        return new StepResult($backupFileName, $cntArchives < $cntBundles);
     }
 
     protected function getRequiredStepDataKeys(): array
@@ -74,18 +75,18 @@ final class DirectoryBackupStep extends AbstractStep
     }
 
     /**
-     * Moves the file to the backup folder and logs the action.
+     * Moves the file to the backup directory and logs the action.
      *
      * @param string $file original file path
      * @param string $newName new name for the file
      *
      * @return string the path to the moved file
      */
-    private function moveToBackupFolder(string $file, string $newName): string
+    private function moveToBackupDirectory(string $file, string $newName): string
     {
-        $backupFolder = rtrim($this->stepData['backupFolder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $newFile = $backupFolder . $newName;
-        FileHelper::makeDir($backupFolder);
+        $backupDirectory = rtrim($this->stepData['backupFolder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $newFile = $backupDirectory . $newName;
+        FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);
 
         return $newFile;

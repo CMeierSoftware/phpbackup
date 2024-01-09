@@ -19,7 +19,7 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
     {
         $this->setUpAppConfig('config_create_bundle_step_test', [['tag' => 'src', 'value' => self::TEST_DIR]]);
 
-        $this->createTestFiles(self::TEST_DIR);
+        $this->createTestFileStructure(self::TEST_DIR);
     }
 
     protected function tearDown(): void
@@ -27,38 +27,7 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
         parent::tearDown();
     }
 
-    public function testFileBundle()
-    {
-        $expectedResult = [
-            '\test_file_large.txt',
-            [
-                '\test_file_3.txt',
-                '\test_file_2.txt',
-            ],
-            [
-                '\test_file_1.txt',
-                '\test_file_4.txt',
-                '\test_file_5.txt',
-            ],
-            [
-                '\sub\test_file_3.txt',
-                '\sub\test_file_2.txt',
-            ],
-            '\sub\test_file_1.txt',
-        ];
-
-        $step = new CreateBundlesStep($this->config);
-
-        $step->execute();
-
-        $fileBundles = $this->config->readTempData('StepData')['bundles'];
-
-        self::assertNotEmpty($fileBundles);
-        self::assertCount(5, $fileBundles);
-        self::assertSame($expectedResult, $fileBundles);
-    }
-
-    public function testBackupDir()
+    public function testBackupDirectoryCreation()
     {
         $step = new CreateBundlesStep($this->config);
 
@@ -69,34 +38,70 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
         self::assertDirectoryExists($result->returnValue);
     }
 
-    private function createTestFiles(string $directory): void
+    public function testFileBundlesAreCreatedCorrectly()
     {
-        FileHelper::makeDir($directory);
+        $expectedResult = [
+            '\test_file_5.txt',
+            [
+                '\test_file_2.txt',
+                '\test_file_1.txt',
+            ],
+            '\sub\test_file_5.txt',
+            [
+                '\test_file_0.txt',
+                '\test_file_3.txt',
+                '\test_file_4.txt',
+                '\sub\test_file_3.txt',
+            ],
+            [
+                '\sub\test_file_2.txt',
+                '\sub\test_file_1.txt',
+            ],
+            [
+                '\sub\test_file_0.txt',
+                '\sub\test_file_4.txt',
+            ],
+        ];
 
-        // Create 5 test files with random content
-        for ($i = 1; $i <= 3; ++$i) {
-            $this->createTestFile("{$directory}test_file_{$i}.txt", 500 * 1024);
-        }
+        $step = new CreateBundlesStep($this->config);
 
-        $this->createTestFile("{$directory}test_file_4.txt", 150 * 1024);
-        $this->createTestFile("{$directory}test_file_5.txt", 140 * 1024);
-        $this->createTestFile("{$directory}test_file_large.txt", 2000 * 1024);
+        $step->execute();
 
-        $subDirectory = "{$directory}sub" . DIRECTORY_SEPARATOR;
-        FileHelper::makeDir($subDirectory);
+        $fileBundles = $this->config->readTempData('StepData')['bundles'];
 
-        for ($i = 1; $i <= 3; ++$i) {
-            $subFileName = "{$subDirectory}test_file_{$i}.txt";
-            $this->createTestFile($subFileName, 500 * 1024);
-        }
+        self::assertNotEmpty($fileBundles);
+        self::assertCount(count($expectedResult), $fileBundles);
+        self::assertSame($expectedResult, $fileBundles);
     }
 
-    /**
-     * Create a test file with random content and assert its existence.
-     */
-    private function createTestFile(string $fileName, int $size): void
+    private function createTestFileStructure(string $directory): void
     {
-        file_put_contents($fileName, random_bytes($size));
-        self::assertFileExists($fileName);
+        $fileSizes = [
+            500 * 1024 => 3,
+            150 * 1024 => 1,
+            140 * 1024 => 1,
+            2000 * 1024 => 1,
+        ];
+
+        $this->createTestFiles($directory, $fileSizes);
+
+        $directory = "{$directory}sub" . DIRECTORY_SEPARATOR;
+        $this->createTestFiles($directory, $fileSizes);
+    }
+
+    private function createTestFiles(string $directory, array $fileSizes): void
+    {
+        FileHelper::makeDir($directory);
+        self::assertDirectoryExists($directory);
+
+        $idx = 0;
+        foreach ($fileSizes as $size => $count) {
+            for ($i = 0; $i < $count; ++$i) {
+                $f = "{$directory}test_file_{$idx}.txt";
+                file_put_contents($f, random_bytes($size));
+                self::assertFileExists($f);
+                ++$idx;
+            }
+        }
     }
 }

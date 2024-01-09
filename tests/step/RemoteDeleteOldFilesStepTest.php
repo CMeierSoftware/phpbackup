@@ -29,45 +29,28 @@ final class RemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(TEST_WORK_DIR);
         parent::tearDown();
     }
 
     public function testDeleteOldFilesDaysSuccess()
     {
-        $countToKeep = 7;
-
-        list($expiredDirs, $validDirs) = self::setupRemoteStorage($countToKeep);
-
-        $this->setUpAppConfig(
-            'config_full_valid',
-            [
-                ['tag' => 'keepBackupDays', 'value' => (string) 0],
-                ['tag' => 'keepBackupAmount', 'value' => (string) $countToKeep],
-            ]
-        );
-        $sendRemoteStep = new RemoteDeleteOldFilesStep($this->remoteHandler, $this->config);
-
-        $result = $sendRemoteStep->execute();
-
-        self::assertInstanceOf(StepResult::class, $result);
-        self::assertFalse($result->repeat);
-
-        $this->assertDirectoriesExist($validDirs);
-        $this->assertDirectoriesDoNotExist($expiredDirs);
+        $this->executeDeleteOldFilesTest(7, 0);
     }
 
     public function testDeleteOldFilesAmountSuccess()
     {
-        $countToKeep = 7;
+        $this->executeDeleteOldFilesTest(0, 7);
+    }
 
-        list($expiredDirs, $validDirs) = self::setupRemoteStorage($countToKeep);
+    private function executeDeleteOldFilesTest($keepDays, $keepAmount)
+    {
+        list($expiredDirs, $validDirs) = self::setupRemoteStorage(7);
 
         $this->setUpAppConfig(
             'config_full_valid',
             [
-                ['tag' => 'keepBackupDays', 'value' => (string) $countToKeep],
-                ['tag' => 'keepBackupAmount', 'value' => (string) 0],
+                ['tag' => 'keepBackupDays', 'value' => (string) $keepDays],
+                ['tag' => 'keepBackupAmount', 'value' => (string) $keepAmount],
             ]
         );
 
