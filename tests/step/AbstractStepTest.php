@@ -140,7 +140,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
      *
-     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptCount()
      */
     public function testWatchdogFileCreated()
     {
@@ -158,7 +158,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::incrementAttemptsCount()
      *
-     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptCount()
      */
     public function testAttemptsIncrementSuccess()
     {
@@ -180,7 +180,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::incrementAttemptsCount()
      *
-     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
+     * @uses \CMS\PhpBackup\Step\AbstractStep::getAttemptCount()
      * @uses \CMS\PhpBackup\Step\AbstractStep::incrementAttemptsCount()
      */
     public function testAttemptsResetSuccess()

@@ -87,7 +87,7 @@ abstract class AbstractStep
      */
     protected function incrementAttemptsCount()
     {
-        $attempts = $this->getAttemptsCount();
+        $attempts = $this->getAttemptCount();
         $this->updateWatchdog(['attempts' => ++$attempts, 'last_attempt_time' => time()]);
     }
 
@@ -110,7 +110,7 @@ abstract class AbstractStep
         }
     }
 
-    private function getAttemptsCount(): int
+    protected function getAttemptCount(): int
     {
         try {
             $watchdogData = $this->config->readTempData('send_remote_watchdog');
