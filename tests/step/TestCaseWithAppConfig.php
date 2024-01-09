@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @coversNothing
  */
-class TestCaseWithAppConfig extends TestCase
+abstract class TestCaseWithAppConfig extends TestCase
 {
     protected const CONFIG_FILE = CONFIG_DIR . 'app.xml';
     protected const CONFIG_TEMP_DIR = CONFIG_DIR . 'temp_app';

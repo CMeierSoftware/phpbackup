@@ -39,9 +39,8 @@ final class RemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
 
         list($expiredDirs, $validDirs) = self::setupRemoteStorage($countToKeep);
 
-
         $this->setUpAppConfig(
-            'config_full_valid', 
+            'config_full_valid',
             [
                 ['tag' => 'keepBackupDays', 'value' => (string) 0],
                 ['tag' => 'keepBackupAmount', 'value' => (string) $countToKeep],
@@ -65,7 +64,7 @@ final class RemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
         list($expiredDirs, $validDirs) = self::setupRemoteStorage($countToKeep);
 
         $this->setUpAppConfig(
-            'config_full_valid', 
+            'config_full_valid',
             [
                 ['tag' => 'keepBackupDays', 'value' => (string) $countToKeep],
                 ['tag' => 'keepBackupAmount', 'value' => (string) 0],
