@@ -31,8 +31,8 @@ abstract class AbstractRunner
         $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
         $this->logger->setLogLevel(LogLevel::INFO);
         $this->logger->activateEchoLogs();
-        $this->setupSteps();
-        $this->stepManager = new StepManager($this->steps, $this->config->getTempDir());
+        $this->steps = $this->setupSteps();
+        $this->stepManager = new StepManager($this->steps, $this->config);
     }
 
     public function __destruct()
@@ -70,8 +70,9 @@ abstract class AbstractRunner
      */
     public function unlockBackupDir(): void
     {
-        SystemLocker::unlock($this->config->getTempDir());
+        if (SystemLocker::isLocked($this->config->getTempDir()))
+            SystemLocker::unlock($this->config->getTempDir());
     }
 
-    abstract protected function setupSteps();
+    abstract protected function setupSteps(): array;
 }
