@@ -7,9 +7,7 @@ namespace CMS\PhpBackup\Tests;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractRemoteDeleteOldFilesStep;
-use CMS\PhpBackup\Step\RemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @internal

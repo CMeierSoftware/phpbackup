@@ -80,13 +80,13 @@ final class AbstractRemoteHandlerTest extends TestCase
     public static function provideExceptionOnMissingConnectionCases(): iterable
     {
         return [
-            [['function' => 'fileUpload', 'args' => ['', '']]],  
-            [['function' => 'fileDownload', 'args' => ['', '']]],  
-            [['function' => 'fileDelete', 'args' => ['']]],  
-            [['function' => 'fileExists', 'args' => ['']]],  
-            [['function' => 'dirCreate', 'args' => ['']]],  
-            [['function' => 'dirList', 'args' => ['', false]]],  
-            [['function' => 'dirDelete', 'args' => ['']]],  
+            [['function' => 'fileUpload', 'args' => ['', '']]],
+            [['function' => 'fileDownload', 'args' => ['', '']]],
+            [['function' => 'fileDelete', 'args' => ['']]],
+            [['function' => 'fileExists', 'args' => ['']]],
+            [['function' => 'dirCreate', 'args' => ['']]],
+            [['function' => 'dirList', 'args' => ['', false]]],
+            [['function' => 'dirDelete', 'args' => ['']]],
         ];
     }
 
@@ -115,7 +115,7 @@ final class AbstractRemoteHandlerTest extends TestCase
         $srcFile = self::TEST_FILE1_SRC . 'invalid';
         $destFile = 'file.txt';
         self::assertFileDoesNotExist($srcFile);
-        
+
         $this->expectException(FileNotFoundException::class);
         self::expectExceptionMessage("The file '{$srcFile}' was not found in local storage.");
         $this->mockedHandler->fileUpload($srcFile, $destFile);

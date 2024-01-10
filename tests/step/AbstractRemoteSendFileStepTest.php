@@ -99,7 +99,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
         foreach ($this->archives as $file => $content) {
             $archives[$file] = $content;
             $this->setStepData(['archives' => $archives, 'backupFolder' => self::WORK_DIR_LOCAL]);
-            
+
             $sendRemoteStep = $this->getMockedClass();
             $result = $sendRemoteStep->execute();
 

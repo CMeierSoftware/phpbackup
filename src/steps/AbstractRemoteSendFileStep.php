@@ -78,11 +78,11 @@ abstract class AbstractRemoteSendFileStep extends AbstractStep
 
         $filesInFileMapping = $this->downloadFileMapping();
         $diff = array_diff($this->uploadedFiles, $filesInFileMapping, [self::FILE_MAPPING_NAME]);
-        
+
         foreach ($diff as $remoteFile) {
             $this->remote->fileDelete($this->backupDirName . '/' . $remoteFile);
         }
-        
+
         $this->uploadedFiles = array_diff($this->remote->dirList($this->backupDirName, true), [self::FILE_MAPPING_NAME]);
     }
 

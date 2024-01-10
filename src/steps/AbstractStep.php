@@ -99,17 +99,6 @@ abstract class AbstractStep
         $this->updateWatchdog(['attempts' => 0, 'last_attempt_time' => null]);
     }
 
-    private function validateStepData()
-    {
-        $requiredKeys = $this->getRequiredStepDataKeys();
-
-        $missingKeys = array_diff($requiredKeys, array_keys($this->stepData));
-
-        if (!empty($missingKeys)) {
-            throw new \InvalidArgumentException('Missing required keys: ' . implode(', ', $missingKeys));
-        }
-    }
-
     protected function getAttemptCount(): int
     {
         try {
@@ -119,6 +108,17 @@ abstract class AbstractStep
         }
 
         return isset($watchdogData['attempts']) ? (int) $watchdogData['attempts'] : 0;
+    }
+
+    private function validateStepData()
+    {
+        $requiredKeys = $this->getRequiredStepDataKeys();
+
+        $missingKeys = array_diff($requiredKeys, array_keys($this->stepData));
+
+        if (!empty($missingKeys)) {
+            throw new \InvalidArgumentException('Missing required keys: ' . implode(', ', $missingKeys));
+        }
     }
 
     private function updateWatchdog($data)
