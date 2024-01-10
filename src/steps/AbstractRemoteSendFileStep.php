@@ -13,7 +13,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-final class RemoteSendFileStep extends AbstractStep
+abstract class AbstractRemoteSendFileStep extends AbstractStep
 {
     private const FILE_MAPPING_NAME = 'file_mapping.json';
     private readonly AbstractRemoteHandler $remote;
@@ -78,12 +78,12 @@ final class RemoteSendFileStep extends AbstractStep
 
         $filesInFileMapping = $this->downloadFileMapping();
         $diff = array_diff($this->uploadedFiles, $filesInFileMapping, [self::FILE_MAPPING_NAME]);
-
+        
         foreach ($diff as $remoteFile) {
             $this->remote->fileDelete($this->backupDirName . '/' . $remoteFile);
         }
-
-        $this->uploadedFiles = array_diff($this->remote->dirList($this->backupDirName, true), $filesInFileMapping, [self::FILE_MAPPING_NAME]);
+        
+        $this->uploadedFiles = array_diff($this->remote->dirList($this->backupDirName, true), [self::FILE_MAPPING_NAME]);
     }
 
     /**
