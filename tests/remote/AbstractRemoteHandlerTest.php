@@ -361,9 +361,8 @@ final class AbstractRemoteHandlerTest extends TestCase
         $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(true);
         $this->mockedHandler->expects(self::exactly(1))->method('_dirDelete')->willReturn(true);
 
-        $reflectionClass = new \ReflectionClass($this->mockedHandler);
-        $property = $reflectionClass->getProperty('fileExistsCache');
-        $property->setAccessible(true); // Make the protected property accessible
+        $property = new \ReflectionProperty($this->mockedHandler, 'fileExistsCache');
+        $property->setAccessible(true);
         $property->setValue($this->mockedHandler, $dirs);
 
         self::assertTrue($this->mockedHandler->dirDelete(self::WORK_DIR_LOCAL . 'test'));
@@ -390,9 +389,8 @@ final class AbstractRemoteHandlerTest extends TestCase
         $this->mockedHandler->expects(self::exactly(1))->method('_fileExists')->willReturn(false);
         $this->mockedHandler->expects(self::never())->method('_dirDelete');
 
-        $reflectionClass = new \ReflectionClass($this->mockedHandler);
-        $property = $reflectionClass->getProperty('fileExistsCache');
-        $property->setAccessible(true); // Make the protected property accessible
+        $property = new \ReflectionProperty($this->mockedHandler, 'fileExistsCache');
+        $property->setAccessible(true);
         $property->setValue($this->mockedHandler, $dirs);
 
         self::assertFalse($this->mockedHandler->dirDelete(self::WORK_DIR_LOCAL . 'test'));
@@ -488,9 +486,8 @@ final class AbstractRemoteHandlerTest extends TestCase
         $handler = $this->getMockedHandler();
 
         // Assume some entries in the cache
-        $reflectionClass = new \ReflectionClass($handler);
-        $property = $reflectionClass->getProperty('fileExistsCache');
-        $property->setAccessible(true); // Make the protected property accessible
+        $property = new \ReflectionProperty($handler, 'fileExistsCache');
+        $property->setAccessible(true);
         $property->setValue($handler, ['/remote/file1.txt' => true]);
         self::assertNotEmpty($property->getValue($handler));
 
@@ -502,9 +499,8 @@ final class AbstractRemoteHandlerTest extends TestCase
 
     public function assertMockedCache(array $excepted)
     {
-        $reflectionClass = new \ReflectionClass($this->mockedHandler);
-        $property = $reflectionClass->getProperty('fileExistsCache');
-        $property->setAccessible(true); // Make the protected property accessible
+        $property = new \ReflectionProperty($this->mockedHandler,'fileExistsCache');
+        $property->setAccessible(true);
         self::assertSame($excepted, $property->getValue($this->mockedHandler));
     }
 
@@ -521,9 +517,8 @@ final class AbstractRemoteHandlerTest extends TestCase
         $handler = $mockBuilder->getMockForAbstractClass();
 
         if ($connect) {
-            $reflectionClass = new \ReflectionClass($handler);
-            $property = $reflectionClass->getProperty('connection');
-            $property->setAccessible(true); // Make the protected property accessible
+            $property = new \ReflectionProperty($handler, 'connection');
+            $property->setAccessible(true);
             $property->setValue($handler, true);
         }
 

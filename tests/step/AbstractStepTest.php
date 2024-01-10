@@ -59,10 +59,9 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
         $step->expects(self::exactly(1))->method('getRequiredStepDataKeys')->willReturn([]);
 
-        $reflectionClass = new \ReflectionClass($step);
-        $property = $reflectionClass->getProperty('stepData');
-        $property->setAccessible(true);
-        $property->setValue($step, ['key' => 'value', 'key2' => 't']);
+        $reflectionProp = new \ReflectionProperty($step, 'stepData');
+        $reflectionProp->setAccessible(true);
+        $reflectionProp->setValue($step, ['key' => 'value', 'key2' => 't']);
 
         $result = $step->execute();
 
@@ -138,11 +137,10 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         self::assertFileDoesNotExist(self::WATCHDOG_FILE);
         $step = $this->getMockedHandler();
 
-        $reflectionClass = new \ReflectionClass(get_class($step));
-        $method = $reflectionClass->getMethod('incrementAttemptsCount');
-        $method->setAccessible(true);
+        $reflectionMethod = new \ReflectionMethod(get_class($step), 'incrementAttemptsCount');
+        $reflectionMethod->setAccessible(true);
 
-        $method->invoke($step);
+        $reflectionMethod->invoke($step);
         self::assertFileExists(self::WATCHDOG_FILE);
     }
 
@@ -156,12 +154,11 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $count = 3;
         $step = $this->getMockedHandler();
 
-        $reflectionClass = new \ReflectionClass(get_class($step));
-        $methodIncrementAttemptsCount = $reflectionClass->getMethod('incrementAttemptsCount');
-        $methodIncrementAttemptsCount->setAccessible(true);
+        $reflectionMethod = new \ReflectionMethod(get_class($step), 'incrementAttemptsCount');
+        $reflectionMethod->setAccessible(true);
 
         for ($i = 0; $i < $count; ++$i) {
-            $methodIncrementAttemptsCount->invoke($step);
+            $reflectionMethod->invoke($step);
         }
 
         self::assertFileExists(self::WATCHDOG_FILE);
