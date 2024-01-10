@@ -10,6 +10,7 @@ use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Exception\RuntimeException;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;
+
 /**
  * @internal
  *
@@ -308,7 +309,7 @@ final class AppConfigTest extends TestCase
     public function testReadTempDataOnEmptyData()
     {
         $type = 'test';
-    
+
         $data = [];
         $this->config->saveTempData($type, $data);
         $result = $this->config->readTempData($type);

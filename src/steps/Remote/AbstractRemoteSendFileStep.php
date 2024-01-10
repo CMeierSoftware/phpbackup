@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Step;
+namespace CMS\PhpBackup\Step\Remote;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
+use CMS\PhpBackup\Step\AbstractStep;
 
 if (!defined('ABS_PATH')) {
     return;
