@@ -18,7 +18,6 @@ if (!defined('ABS_PATH')) {
 abstract class AbstractStep
 {
     protected const MAX_ATTEMPTS = 3;
-    public readonly int $delay;
     protected readonly FileLogger $logger;
     protected readonly AppConfig $config;
     protected array $stepData = [];
@@ -29,22 +28,16 @@ abstract class AbstractStep
      * @param AppConfig $config configuration for this step
      * @param int $delay delay between this and the previous step
      */
-    public function __construct(AppConfig $config, int $delay = 0)
+    public function __construct(AppConfig $config)
     {
         $this->logger = FileLogger::getInstance();
         $this->config = $config;
-        $this->delay = $delay;
 
         try {
             $this->stepData = $this->config->readTempData('StepData');
         } catch (FileNotFoundException) {
             $this->logger->info('No StepData found. Starting empty.');
         }
-    }
-
-    public function __serialize(): array
-    {
-        return [$this->delay];
     }
 
     /**

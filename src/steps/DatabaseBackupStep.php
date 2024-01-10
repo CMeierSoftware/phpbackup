@@ -22,11 +22,10 @@ final class DatabaseBackupStep extends AbstractStep
      * DatabaseBackupStep constructor.
      *
      * @param AppConfig $config configuration for this step
-     * @param int $delay delay in seconds before executing the backup step (optional, default is 0)
      */
-    public function __construct(AppConfig $config, int $delay = 0)
+    public function __construct(AppConfig $config)
     {
-        parent::__construct($config, $delay);
+        parent::__construct($config);
 
         $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];

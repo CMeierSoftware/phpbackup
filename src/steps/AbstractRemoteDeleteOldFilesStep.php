@@ -22,11 +22,10 @@ abstract class AbstractRemoteDeleteOldFilesStep extends AbstractStep
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
      * @param AppConfig $config configuration for this step
-     * @param int $delay delay in seconds before executing the remote step (optional, default is 0)
      */
-    public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config, int $delay = 0)
+    public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config)
     {
-        parent::__construct($config, $delay);
+        parent::__construct($config);
 
         $this->remote = $remoteHandler;
         $this->keepBackupDays = (int) $this->config->getBackupSettings()['keepBackupDays'];

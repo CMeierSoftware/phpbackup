@@ -128,15 +128,6 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $step->execute();
     }
 
-    public function testSerialize(): void
-    {
-        $step = $this->getMockedHandler();
-
-        $expected = 'O:' . strlen($step::class) . ':"' . $step::class . '":1:{i:0;i:0;}';
-
-        self::assertSame($expected, serialize($step));
-    }
-
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::getAttemptsCount()
      *

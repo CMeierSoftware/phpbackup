@@ -23,7 +23,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
 
         $this->setStepData(['bundles' => ['something'], 'backupFolder' => self::TEST_DIR]);
 
-        $this->databaseBackupStep = new DatabaseBackupStep($this->config, 0);
+        $this->databaseBackupStep = new DatabaseBackupStep($this->config);
     }
 
     protected function tearDown(): void

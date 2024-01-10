@@ -18,11 +18,10 @@ final class LocalRemoteSendFileStep extends AbstractRemoteSendFileStep
      * LocalRemoteSendFileStep constructor.
      *
      * @param AppConfig $config configuration for this step
-     * @param int $delay delay between this and the previous step
      */
-    public function __construct(AppConfig $config, int $delay = 0)
+    public function __construct(AppConfig $config)
     {
         $remote = new Local($config->getRemoteSettings()['local']['rootDir']);
-        parent::__construct($remote, $config, $delay);
+        parent::__construct($remote, $config);
     }
 }

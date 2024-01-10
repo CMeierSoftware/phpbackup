@@ -22,11 +22,10 @@ final class CreateBundlesStep extends AbstractStep
      * CreateBundlesStep constructor.
      *
      * @param AppConfig $config configuration for this step
-     * @param int $delay delay between this and the previous step
      */
-    public function __construct(AppConfig $config, int $delay = 0)
+    public function __construct(AppConfig $config)
     {
-        parent::__construct($config, $delay);
+        parent::__construct($config);
 
         $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->maxArchiveSize = (int) $this->config->getBackupSettings()['maxArchiveSize'];
