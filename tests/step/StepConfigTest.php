@@ -2,34 +2,41 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests;
+namespace CMS\PhpBackup\Tests\Steps;
 
-use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Core\StepManager;
-use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepConfig;
 use CMS\PhpBackup\Step\StepResult;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Core\StepConfig
  */
-final class StepConfigTest extends TestCase
+final class StepConfigTest extends TestCaseWithAppConfig
 {
+    protected function setUp(): void
+    {
+        $this->setUpAppConfig('config_full_valid');
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
     /**
      * @covers \CMS\PhpBackup\Core\StepConfig::__construct()
-     * @dataProvider provideInvalidStepValue
+     *
+     * @dataProvider provideInvalidStepValueClassCases
      */
-    public function testInvalidStepValueClass(string $step, $delay)
+    public function testInvalidStepValueClass(string $step, int $delay)
     {
         $this->expectException(\UnexpectedValueException::class);
         new StepConfig($step, $delay);
     }
 
-    public static function provideInvalidStepValue()
+    public static function provideInvalidStepValueClassCases(): iterable
     {
         $invalidClassNames = ['nonExistent', \stdClass::class, 'null'];
         $invalidDelays = [-1];
@@ -44,10 +51,41 @@ final class StepConfigTest extends TestCase
         }
 
         foreach ($invalidDelays as $delay) {
-            $result[] = [StepClass::class, $delay];
+            $result[] = [StepStub::class, $delay];
         }
 
         return $result;
     }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\StepConfig::getStepObject()
+     */
+    public function testGetStepObject()
+    {
+        $stepConfig = new StepConfig(StepStub::class);
+
+        $obj = $stepConfig->getStepObject($this->config);
+
+        self::assertIsObject($obj);
+        self::assertInstanceOf(StepStub::class, $obj);
+
+        $expected = new StepResult('', false);
+        $actual = $obj->execute();
+        self::assertSame($expected->returnValue, $actual->returnValue);
+        self::assertSame($expected->repeat, $actual->repeat);
+    }
 }
 
+// Define a static class with a method for testing
+final class StepStub extends AbstractStep
+{
+    protected function _execute(): StepResult
+    {
+        return new StepResult('', false);
+    }
+
+    protected function getRequiredStepDataKeys(): array
+    {
+        return [];
+    }
+}
