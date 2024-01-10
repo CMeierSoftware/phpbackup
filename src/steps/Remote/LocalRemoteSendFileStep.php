@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Step\Remote;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\AbstractRemoteSendFileStep;
+use CMS\PhpBackup\Step\Remote\AbstractRemoteSendFileStep;
 
 if (!defined('ABS_PATH')) {
     return;
