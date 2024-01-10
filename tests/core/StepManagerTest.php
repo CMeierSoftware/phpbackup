@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests;
+namespace CMS\PhpBackup\Tests\Core;
 
+use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\AbstractStep;
+use CMS\PhpBackup\Step\StepConfig;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
 
@@ -17,16 +19,21 @@ use PHPUnit\Framework\TestCase;
  */
 final class StepManagerTest extends TestCase
 {
+    private const CONFIG_FILE = CONFIG_DIR . 'app.xml';
+    private const CONFIG_TEMP_DIR = CONFIG_DIR . 'temp_app' . DIRECTORY_SEPARATOR;
     private const SYSTEM_PATH = TEST_WORK_DIR;
     private const STEP_FILE = self::SYSTEM_PATH . DIRECTORY_SEPARATOR . 'last.step';
+    private const STUBS = [StepStub1::class, StepStub2::class, StepStub3::class];
     private array $steps = [];
+    private AppConfig $config;
 
     protected function setUp(): void
     {
-        for ($i = 0; $i < 10; ++$i) {
-            $step = new StepClass('Hello World', (string) $i);
-            $this->steps[] = $step;
-        }
+        copy(TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml', self::CONFIG_FILE);
+        self::assertFileExists(self::CONFIG_FILE);
+        $this->config = AppConfig::loadAppConfig('app');
+
+        $this->steps = array_map(static fn($stub) => new StepConfig($stub), self::STUBS);
 
         FileHelper::makeDir(self::SYSTEM_PATH);
         self::assertDirectoryExists(self::SYSTEM_PATH);
@@ -35,6 +42,8 @@ final class StepManagerTest extends TestCase
 
     protected function tearDown(): void
     {
+        unlink(self::CONFIG_FILE);
+        FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
         FileHelper::deleteDirectory(self::SYSTEM_PATH);
     }
 
@@ -45,21 +54,26 @@ final class StepManagerTest extends TestCase
     {
         $steps = [];
         $this->expectException(\LengthException::class);
-        new StepManager($steps, self::SYSTEM_PATH);
+        new StepManager($steps, $this->config);
     }
 
     /**
      * @covers \CMS\PhpBackup\Core\StepManager::__construct()
+     *
+     * @dataProvider provideMissingStepArgumentsCases
+     *
+     * @param mixed $step
      */
-    public function testInvalidStepArray()
+    public function testMissingStepArguments($step)
     {
-        // Create an array with a non-Step instance
-        $invalidStep = new \stdClass(); // Not an instance of Step
+        $this->expectException(\UnexpectedValueException::class);
+        self::expectExceptionMessage('All entries in the array must be of type ' . StepConfig::class);
+        new StepManager([$step], $this->config);
+    }
 
-        // Instantiate the StepManager with the invalid array
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('All entries in the array must be Step instances.');
-        new StepManager([$invalidStep], self::SYSTEM_PATH);
+    public static function provideMissingStepArgumentsCases(): iterable
+    {
+        return [['string'], [0], [null]];
     }
 
     /**
@@ -67,14 +81,14 @@ final class StepManagerTest extends TestCase
      */
     public function testExecuteNextStep()
     {
-        self::assertTrue(1 < count($this->steps));
-        for ($i = 0; $i < count($this->steps); ++$i) {
-            $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
+        $calledStubs = array_merge(self::STUBS, [StepStub3::class], self::STUBS);
+
+        for ($i = 0; $i < count($calledStubs); ++$i) {
+            $stepManager = new StepManager($this->steps, $this->config);
             $result = $stepManager->executeNextStep();
-            self::assertSame('Result: Hello World ' . (string) $i, $result);
+
+            self::assertSame('Result: Hello ' . $calledStubs[$i], $result);
         }
-        $result = $stepManager->executeNextStep();
-        self::assertSame('Result: Hello World 9', $result);
     }
 
     /**
@@ -82,38 +96,50 @@ final class StepManagerTest extends TestCase
      */
     public function testStepsChanged()
     {
-        $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
+        $stepManager = new StepManager($this->steps, $this->config);
         $result = $stepManager->executeNextStep();
-        self::assertSame('Result: Hello World 0', $result);
-        $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
+        self::assertSame('Result: Hello ' . StepStub1::class, $result);
+        $stepManager = new StepManager($this->steps, $this->config);
         $result = $stepManager->executeNextStep();
-        self::assertSame('Result: Hello World 1', $result);
+        self::assertSame('Result: Hello ' . StepStub2::class, $result);
         array_pop($this->steps);
-        $stepManager = new StepManager($this->steps, self::SYSTEM_PATH);
+        $stepManager = new StepManager($this->steps, $this->config);
         $result = $stepManager->executeNextStep();
-        self::assertSame('Result: Hello World 0', $result);
+        self::assertSame('Result: Hello ' . StepStub1::class, $result);
     }
 }
 
-// Define a static class with a method for testing
-final class StepClass extends AbstractStep
+final class StepStub1 extends AbstractStep
 {
-    private bool $repeated = false;
-    private string $arg1;
-    private string $arg2;
-
-    public function __construct(string $arg1, string $arg2, int $delay = 0)
-    {
-        parent::__construct($delay);
-        $this->arg1 = $arg1;
-        $this->arg2 = $arg2;
-    }
-
     protected function _execute(): StepResult
     {
-        $this->repeated = ('9' === $this->arg2 && !$this->repeated);
+        return new StepResult('Result: Hello ' . self::class, false);
+    }
 
-        return new StepResult("Result: {$this->arg1} {$this->arg2}", $this->repeated);
+    protected function getRequiredStepDataKeys(): array
+    {
+        return [];
+    }
+}
+final class StepStub2 extends AbstractStep
+{
+    protected function _execute(): StepResult
+    {
+        return new StepResult('Result: Hello ' . self::class, false);
+    }
+
+    protected function getRequiredStepDataKeys(): array
+    {
+        return [];
+    }
+}
+final class StepStub3 extends AbstractStep
+{
+    private static $repeat = true;
+    protected function _execute(): StepResult
+    {
+        self::$repeat = !self::$repeat;
+        return new StepResult('Result: Hello ' . self::class, !self::$repeat);
     }
 
     protected function getRequiredStepDataKeys(): array

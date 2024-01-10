@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
-use CMS\PhpBackup\Step\AbstractStep;
+use CMS\PhpBackup\Step\StepConfig;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -15,6 +15,7 @@ final class StepManager
     private readonly string $stepFile;
     private readonly array $steps;
     private ?int $currentStepIdx = null;
+    private AppConfig $config;
 
     /**
      * Constructs a StepManager instance with an array of possible steps.
@@ -23,20 +24,21 @@ final class StepManager
      *
      * @throws \LengthException if the array of steps is empty
      */
-    public function __construct(array $steps, string $systemDir)
+    public function __construct(array $steps, AppConfig $config)
     {
         if (count($steps) < 1) {
             throw new \LengthException('At least one step required.');
         }
 
         foreach ($steps as $step) {
-            if (!$step instanceof AbstractStep) {
-                throw new \InvalidArgumentException('All entries in the array must be Step instances.');
+            if (!$step instanceof StepConfig) {
+                throw new \UnexpectedValueException('All entries in the array must be of type ' . StepConfig::class);
             }
         }
 
         $this->steps = $steps;
-        $this->stepFile = $systemDir . DIRECTORY_SEPARATOR . 'last.step';
+        $this->config = $config;
+        $this->stepFile = $this->config->getTempDir() . DIRECTORY_SEPARATOR . 'last.step';
     }
 
     /**
@@ -52,7 +54,9 @@ final class StepManager
             return 'No next step.';
         }
 
-        $result = $currentStep->execute();
+        $stepObj = $currentStep->getStepObject($this->config);
+
+        $result = $stepObj->execute();
 
         $this->saveCurrentStep($result->repeat);
 
@@ -62,9 +66,9 @@ final class StepManager
     /**
      * Determines the next step to be executed based on the previous step information.
      *
-     * @return null|AbstractStep the next step to be executed, or null if there is no next step
+     * @return null|StepConfig the next step to be executed, or null if there is no next step
      */
-    private function getNextStep(): ?AbstractStep
+    private function getNextStep(): ?StepConfig
     {
         $prevStepInfo = false;
         if (file_exists($this->stepFile) && 0 !== filesize($this->stepFile)) {
