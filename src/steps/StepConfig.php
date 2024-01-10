@@ -12,8 +12,8 @@ if (!defined('ABS_PATH')) {
 
 final class StepConfig
 {
+    public readonly int $delay;
     private readonly string $stepClass;
-    private readonly int $delay;
 
     public function __construct(string $stepClass, int $delay = 0)
     {
