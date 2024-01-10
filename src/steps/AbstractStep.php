@@ -26,7 +26,6 @@ abstract class AbstractStep
      * AbstractStep constructor.
      *
      * @param AppConfig $config configuration for this step
-     * @param int $delay delay between this and the previous step
      */
     public function __construct(AppConfig $config)
     {
@@ -54,9 +53,7 @@ abstract class AbstractStep
 
         $result = $this->_execute();
 
-        if (!empty($this->stepData)) {
-            $this->config->saveTempData('StepData', $this->stepData);
-        }
+        $this->config->saveTempData('StepData', $this->stepData);
 
         return $result;
     }

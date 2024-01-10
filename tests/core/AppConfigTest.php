@@ -10,7 +10,6 @@ use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Exception\RuntimeException;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;
-
 /**
  * @internal
  *
@@ -299,6 +298,22 @@ final class AppConfigTest extends TestCase
         $result = $this->config->readTempData($type);
 
         self::assertSame($data, $result);
+    }
+
+    /**
+     * @uses \CMS\PhpBackup\Core\AppConfig::getTempDir()
+     *
+     * @covers \CMS\PhpBackup\Core\AppConfig::readTempData()
+     */
+    public function testReadTempDataOnEmptyData()
+    {
+        $type = 'test';
+    
+        $data = [];
+        $this->config->saveTempData($type, $data);
+        $result = $this->config->readTempData($type);
+
+        self::assertSame([], $result);
     }
 
     /**

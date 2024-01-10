@@ -114,8 +114,8 @@ final class AppConfig
 
         FileLogger::getInstance()->info("Read tempData from '{$filePath}'.");
 
-        $data = $reader->fromFile($filePath);
-        // / TODO if file empty, its a string
+        $data = is_array($result = $reader->fromFile($filePath))? $result : [];
+
         $this->processDataForRead($data);
 
         return $data;

@@ -33,7 +33,7 @@ final class StepManagerTest extends TestCase
         self::assertFileExists(self::CONFIG_FILE);
         $this->config = AppConfig::loadAppConfig('app');
 
-        $this->steps = array_map(static fn($stub) => new StepConfig($stub), self::STUBS);
+        $this->steps = array_map(static fn ($stub) => new StepConfig($stub), self::STUBS);
 
         FileHelper::makeDir(self::SYSTEM_PATH);
         self::assertDirectoryExists(self::SYSTEM_PATH);
@@ -136,9 +136,11 @@ final class StepStub2 extends AbstractStep
 final class StepStub3 extends AbstractStep
 {
     private static $repeat = true;
+
     protected function _execute(): StepResult
     {
         self::$repeat = !self::$repeat;
+
         return new StepResult('Result: Hello ' . self::class, !self::$repeat);
     }
 
