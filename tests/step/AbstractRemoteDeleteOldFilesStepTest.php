@@ -6,15 +6,17 @@ namespace CMS\PhpBackup\Tests;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
+use CMS\PhpBackup\Step\AbstractRemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\RemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\StepResult;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\DeleteOldFilesRemoteStep
  */
-final class RemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
+final class AbstractRemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
 {
     private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private Local $remoteHandler;
@@ -54,7 +56,10 @@ final class RemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
             ]
         );
 
-        $sendRemoteStep = new RemoteDeleteOldFilesStep($this->remoteHandler, $this->config);
+        $mockBuilder = $this->getMockBuilder(AbstractRemoteDeleteOldFilesStep::class);
+        $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
+
+        $sendRemoteStep = $mockBuilder->getMockForAbstractClass();
 
         $result = $sendRemoteStep->execute();
 

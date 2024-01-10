@@ -11,7 +11,7 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-final class RemoteDeleteOldFilesStep extends AbstractStep
+abstract class AbstractRemoteDeleteOldFilesStep extends AbstractStep
 {
     private readonly AbstractRemoteHandler $remote;
     private readonly int $keepBackupDays;
