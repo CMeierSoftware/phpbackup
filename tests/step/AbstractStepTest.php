@@ -206,7 +206,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $mockBuilder->setConstructorArgs([$this->config]);
         $mockBuilder->onlyMethods(['_execute', 'getRequiredStepDataKeys']);
 
-        return $mockBuilder->getMock();
+        return $mockBuilder->getMockForAbstractClass();
     }
 
     private static function assertStepResultFile(string $expected)
