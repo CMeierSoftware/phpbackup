@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests;
+namespace CMS\PhpBackup\Tests\Steps;
 
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;

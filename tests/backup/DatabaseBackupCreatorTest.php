@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace CMS\PhpBackup\Tests\Backup;
+
 use CMS\PhpBackup\Backup\DatabaseBackupCreator;
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
 use CMS\PhpBackup\Helper\FileHelper;

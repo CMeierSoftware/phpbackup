@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests;
+namespace CMS\PhpBackup\Tests\Remote;
 
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;

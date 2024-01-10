@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests;
+namespace CMS\PhpBackup\Tests\Helper;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;

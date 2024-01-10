@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests;
+namespace CMS\PhpBackup\Tests\Core;
 
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace CMS\PhpBackup\Tests\Backup;
+
 use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use PHPUnit\Framework\TestCase;
