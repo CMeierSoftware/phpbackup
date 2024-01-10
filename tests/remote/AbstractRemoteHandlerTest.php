@@ -58,6 +58,7 @@ final class AbstractRemoteHandlerTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirCreate()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirDelete()
+     * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::dirList()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileDelete()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileDownload()
      * @covers \CMS\PhpBackup\Remote\AbstractRemoteHandler::fileExists()
@@ -67,19 +68,26 @@ final class AbstractRemoteHandlerTest extends TestCase
      *
      * @dataProvider provideExceptionOnMissingConnectionCases
      */
-    public function testExceptionOnMissingConnection(string $function)
+    public function testExceptionOnMissingConnection(array $data)
     {
         $handler = $this->getMockedHandler(false);
         self::assertFalse($handler->isConnected());
 
         self::expectException(RemoteStorageNotConnectedException::class);
-        $handler->{$function}('', '');
+        $handler->{$data['function']}(...$data['args']);
     }
 
     public static function provideExceptionOnMissingConnectionCases(): iterable
     {
-        return [['fileUpload'], ['fileDownload'], ['fileDelete'], ['fileExists'],
-            ['dirCreate'], ['dirList'], ['dirDelete'], ];
+        return [
+            [['function' => 'fileUpload', 'args' => ['', '']]],  
+            [['function' => 'fileDownload', 'args' => ['', '']]],  
+            [['function' => 'fileDelete', 'args' => ['']]],  
+            [['function' => 'fileExists', 'args' => ['']]],  
+            [['function' => 'dirCreate', 'args' => ['']]],  
+            [['function' => 'dirList', 'args' => ['', false]]],  
+            [['function' => 'dirDelete', 'args' => ['']]],  
+        ];
     }
 
     /**
@@ -107,6 +115,7 @@ final class AbstractRemoteHandlerTest extends TestCase
         $srcFile = self::TEST_FILE1_SRC . 'invalid';
         $destFile = 'file.txt';
         self::assertFileDoesNotExist($srcFile);
+        
         $this->expectException(FileNotFoundException::class);
         self::expectExceptionMessage("The file '{$srcFile}' was not found in local storage.");
         $this->mockedHandler->fileUpload($srcFile, $destFile);
@@ -509,7 +518,7 @@ final class AbstractRemoteHandlerTest extends TestCase
             'connect', 'disconnect',
         ]);
 
-        $handler = $mockBuilder->getMock();
+        $handler = $mockBuilder->getMockForAbstractClass();
 
         if ($connect) {
             $reflectionClass = new \ReflectionClass($handler);
