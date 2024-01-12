@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Remote;
 
+use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Helper\FileHelper;
 
 /**
@@ -15,8 +16,8 @@ class Local extends AbstractRemoteHandler
 
     public function __construct(string $remoteRootPath)
     {
+        FileLogger::getInstance()->info("Local base directory '{$remoteRootPath}'.");
         FileHelper::makeDir($remoteRootPath);
-        $this->remoteRootPath = realpath($remoteRootPath);
     }
 
     public function connect(): bool
