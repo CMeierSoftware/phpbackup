@@ -20,7 +20,7 @@ final class LocalRemoteDeleteOldFilesStep extends AbstractRemoteDeleteOldFilesSt
      */
     public function __construct(AppConfig $config)
     {
-        $rootDir = $this->config->toAbsolutePath($config->getRemoteSettings()['local']['rootDir']);
+        $rootDir = $config->toAbsolutePath($config->getRemoteSettings()['local']['rootDir']);
         $remote = new Local($rootDir);
         parent::__construct($remote, $config);
     }
