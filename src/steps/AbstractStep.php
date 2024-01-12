@@ -46,7 +46,7 @@ abstract class AbstractStep
      */
     public function execute(): StepResult
     {
-        $class = self::class;
+        $class = $this::class;
         $this->logger->info("Execute {$class}");
 
         $this->validateStepData();

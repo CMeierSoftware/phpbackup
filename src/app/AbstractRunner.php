@@ -47,7 +47,7 @@ abstract class AbstractRunner
 
             $result = $this->stepManager->executeNextStep();
 
-            $this->logger->Info($result);
+            $this->logger->Info((string) $result);
         } catch (\Exception $e) {
             $this->logger->Error($e->getMessage());
 
