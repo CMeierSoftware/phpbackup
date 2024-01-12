@@ -6,7 +6,6 @@ namespace CMS\PhpBackup\Step\Remote;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
 
 if (!defined('ABS_PATH')) {
     return;

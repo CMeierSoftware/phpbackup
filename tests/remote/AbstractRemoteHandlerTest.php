@@ -499,7 +499,7 @@ final class AbstractRemoteHandlerTest extends TestCase
 
     public function assertMockedCache(array $excepted)
     {
-        $property = new \ReflectionProperty($this->mockedHandler,'fileExistsCache');
+        $property = new \ReflectionProperty($this->mockedHandler, 'fileExistsCache');
         $property->setAccessible(true);
         self::assertSame($excepted, $property->getValue($this->mockedHandler));
     }
