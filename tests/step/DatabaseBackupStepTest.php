@@ -57,7 +57,21 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
         self::assertSame($archivesResult, $stepData['archives']);
     }
 
-    public function testExecuteMissingbackupDirectory()
+    /**
+     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
+     */
+    public function testExecuteNoDbInConfig(): void
+    {
+        $this->setUpAppConfig('config_no_db');
+        $this->databaseBackupStep = new DatabaseBackupStep($this->config);
+
+        $actual = $this->databaseBackupStep->execute();
+
+        self::assertFalse($actual->repeat);
+        self::assertSame('No database defined. Skip step.', $actual->returnValue);
+    }
+
+    public function testExecuteMissingBackupDirectory()
     {
         $this->setStepData(['bundles' => 'some value']);
         $step = new DatabaseBackupStep($this->config);

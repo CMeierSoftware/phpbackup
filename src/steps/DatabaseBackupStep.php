@@ -27,7 +27,6 @@ final class DatabaseBackupStep extends AbstractStep
     {
         parent::__construct($config);
 
-        $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
         $this->dbConfig = $this->config->getBackupDatabase();
     }
@@ -39,6 +38,12 @@ final class DatabaseBackupStep extends AbstractStep
      */
     protected function _execute(): StepResult
     {
+        if (empty($this->dbConfig)) {
+            $this->logger->info('No database defined. Skip step.');
+
+            return new StepResult('No database defined. Skip step.', false);
+        }
+
         $bundles = &$this->stepData['bundles'];
 
         if (!isset($this->stepData['archives'])) {
