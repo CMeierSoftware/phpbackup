@@ -1,0 +1,12 @@
+Order Deny,Allow
+Deny from All
+
+<Files *>
+  Order Deny,Allow
+  Deny from all
+</Files>
+
+<Files backup.php>
+  Order Deny,Allow
+  Allow from all
+</Files>
