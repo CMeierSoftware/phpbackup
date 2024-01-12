@@ -30,7 +30,7 @@ final class DirectoryBackupStep extends AbstractStep
     {
         parent::__construct($config);
 
-        $this->srcDir = $this->config->toAbsolutePath($this->config->getBackupDirectory()['src']);
+        $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
     }
 

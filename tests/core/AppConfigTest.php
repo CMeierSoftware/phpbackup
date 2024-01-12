@@ -95,7 +95,7 @@ final class AppConfigTest extends TestCase
     public function testDirectoryConfig(): void
     {
         $expectedConfig = [
-            'src' => '.',
+            'src' => CONFIG_DIR,
         ];
 
         $actualConfig = $this->config->getBackupDirectory();
@@ -144,6 +144,7 @@ final class AppConfigTest extends TestCase
 
         self::assertSame($expectedConfig, $actualConfig);
     }
+
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
      */
@@ -155,20 +156,21 @@ final class AppConfigTest extends TestCase
 
         self::assertSame($expectedConfig, $actualConfig);
     }
-    
+
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
      */
     public function testRemoteConfigRequired(): void
     {
         $expectedConfig = [
-            'accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name'
+            'accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
         ];
 
         $actualConfig = $this->config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
 
         self::assertSame($expectedConfig, $actualConfig);
     }
+
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
      */
@@ -259,7 +261,7 @@ final class AppConfigTest extends TestCase
     {
         $config = AppConfig::loadAppConfig('valid_app_no_db');
         $actualDatabaseConfig = $config->getBackupDatabase();
-        self::assertNull($actualDatabaseConfig);
+        self::assertEmpty($actualDatabaseConfig);
     }
 
     /**

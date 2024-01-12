@@ -124,70 +124,66 @@ final class AppConfig
     /**
      * Returns the backup database settings from the configuration file.
      *
-     * @return null|array the backup database settings
+     * @return array the backup database settings
      */
-    public function getBackupDatabase(): ?array
+    public function getBackupDatabase(): array
     {
-        return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : null;
+        return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : [];
     }
 
     /**
      * Returns the backup directory settings from the configuration file.
      *
-     * @return null|array the backup directory settings
+     * @return array the backup directory settings
      */
-    public function getBackupDirectory(): ?array
+    public function getBackupDirectory(): array
     {
         if (isset($this->config['backup']['directory'])) {
-            if (str_contains($this->config['backup']['directory']['src'], '..')) {
-                $this->config['backup']['directory']['src'] = realpath(CONFIG_DIR . $this->config['backup']['directory']['src']);
-                if (!$this->config['backup']['directory']['src'] || !file_exists($this->config['backup']['directory']['src'])) {
-                    throw new FileNotFoundException('Directory source for backup does not exists. It must be relative from config dir.');
-                }
-            }
+            $this->config['backup']['directory']['src'] = $this->toAbsolutePath($this->config['backup']['directory']['src']);
 
             return $this->config['backup']['directory'];
         }
 
-        return null;
+        return [];
     }
 
     /**
      * Returns the backup settings from the configuration file.
      *
-     * @return null|array the backup settings
+     * @return array the backup settings
      */
-    public function getBackupSettings(): ?array
+    public function getBackupSettings(): array
     {
-        return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : null;
+        return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : [];
     }
 
-/**
- * Returns the remote settings from the configuration file.
- *
- * @param string $type (Optional) The type of remote settings to retrieve.
- * @param array $requiredSettings (Optional) An array of required settings to check for existence.
- *
- * @return array The remote settings. If $type is provided, returns settings for that type; otherwise, returns all remote settings.
- * @throws \InvalidArgumentException If any required setting is not present in the configuration.
- */
-public function getRemoteSettings(string $type = '', array $requiredSettings = []): array
-{
-    $remoteSettings = $this->config['remote'] ?? [];
+    /**
+     * Returns the remote settings from the configuration file.
+     *
+     * @param string $type (Optional) The type of remote settings to retrieve
+     * @param array $requiredSettings (Optional) An array of required settings to check for existence
+     *
+     * @return array The remote settings. If $type is provided, returns settings for that type; otherwise, returns all remote settings.
+     *
+     * @throws \InvalidArgumentException if any required setting is not present in the configuration
+     */
+    public function getRemoteSettings(string $type = '', array $requiredSettings = []): array
+    {
+        $remoteSettings = $this->config['remote'] ?? [];
 
-    if (!empty($type)) {
-        $remoteSettings = $remoteSettings[$type] ?? [];
-        
-        $missingSettings = array_diff_key(array_flip($requiredSettings), $remoteSettings);
-        if (!empty($missingSettings)) {
-            $missingSettingsList = implode(', ', array_keys($missingSettings));
-            throw new \InvalidArgumentException("Required setting(s) '$missingSettingsList' is/are missing in the remote configuration.");
+        if (!empty($type)) {
+            $remoteSettings = $remoteSettings[$type] ?? [];
+
+            $missingSettings = array_diff_key(array_flip($requiredSettings), $remoteSettings);
+            if (!empty($missingSettings)) {
+                $missingSettingsList = implode(', ', array_keys($missingSettings));
+
+                throw new \InvalidArgumentException("Required setting(s) '{$missingSettingsList}' is/are missing in the remote configuration.");
+            }
         }
+
+        return $remoteSettings;
     }
-
-    return $remoteSettings;
-}
-
 
     public function getDefinedRemoteClasses(string $baseClass): array
     {
@@ -211,6 +207,7 @@ public function getRemoteSettings(string $type = '', array $requiredSettings = [
         $parts = preg_split("/[{$regex}]/", $relativePath);
 
         $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
+        $isWin = 1 === preg_match('/^[A-Za-z]:/', $absoluteParts[0]);
 
         foreach ($parts as $part) {
             if ('..' === $part) {
@@ -222,7 +219,9 @@ public function getRemoteSettings(string $type = '', array $requiredSettings = [
 
         $absoluteParts = array_filter($absoluteParts);
 
-        return trim(implode(DIRECTORY_SEPARATOR, $absoluteParts), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = trim(implode(DIRECTORY_SEPARATOR, $absoluteParts), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+        return $isWin ? $path : DIRECTORY_SEPARATOR . $path;
     }
 
     private function hasNumericKeys(array &$array): bool
