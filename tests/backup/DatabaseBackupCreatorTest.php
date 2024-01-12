@@ -77,7 +77,7 @@ final class DatabaseBackupCreatorTest extends TestCase
         $database = 'incorrect_database';
 
         $backupCreator = new DatabaseBackupCreator($host, $username, $password, $database);
-        $this->expectException(mysqli_sql_exception::class);
+        $this->expectException(\mysqli_sql_exception::class);
         $backupCreator->backupMySql();
     }
 }
