@@ -20,7 +20,8 @@ final class LocalRemoteSendFileStep extends AbstractRemoteSendFileStep
      */
     public function __construct(AppConfig $config)
     {
-        $remote = new Local($config->getRemoteSettings()['local']['rootDir']);
+        $rootDir = $this->config->toAbsolutePath($config->getRemoteSettings()['local']['rootDir']);
+        $remote = new Local($rootDir);
         parent::__construct($remote, $config);
     }
 }
