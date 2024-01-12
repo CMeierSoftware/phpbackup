@@ -16,8 +16,9 @@ class Local extends AbstractRemoteHandler
 
     public function __construct(string $remoteRootPath)
     {
-        FileLogger::getInstance()->info("Local base directory '{$remoteRootPath}'.");
-        FileHelper::makeDir($remoteRootPath);
+        $this->remoteRootPath = $remoteRootPath;
+        FileLogger::getInstance()->info("Local base directory '{$this->remoteRootPath}'.");
+        FileHelper::makeDir($this->remoteRootPath);
     }
 
     public function connect(): bool
