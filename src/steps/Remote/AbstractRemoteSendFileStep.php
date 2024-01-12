@@ -77,7 +77,7 @@ abstract class AbstractRemoteSendFileStep extends AbstractStep
             return;
         }
 
-        $filesInFileMapping = $this->downloadFileMapping();
+        $filesInFileMapping = array_keys($this->downloadFileMapping());
         $diff = array_diff($this->uploadedFiles, $filesInFileMapping, [self::FILE_MAPPING_NAME]);
 
         foreach ($diff as $remoteFile) {
