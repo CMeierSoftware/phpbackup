@@ -9,17 +9,17 @@ use CMS\PhpBackup\Core\AppConfig;
 if (!defined('ABS_PATH')) {
     return;
 }
+
 /**
- * Class StepConfig
+ * Class StepConfig.
  *
  * Represents a configuration for a step in a workflow, including the step class and an optional delay.
- *
- * @final
  */
 final class StepConfig
 {
     /**
-     * @var int $delay The delay (in seconds) before executing the step.
+     * @var int the delay (in seconds) before executing the step
+     *
      * @readonly
      */
     public readonly int $delay;
@@ -29,10 +29,10 @@ final class StepConfig
     /**
      * StepConfig constructor.
      *
-     * @param string $stepClass The fully qualified class name of the step extending AbstractStep.
+     * @param string $stepClass the fully qualified class name of the step extending AbstractStep
      * @param int $delay (Optional) The delay (in seconds) before executing the step. Defaults to 0.
      *
-     * @throws \UnexpectedValueException If $stepClass is not a class extending AbstractStep or if $delay is less than 0.
+     * @throws \UnexpectedValueException if $stepClass is not a class extending AbstractStep or if $delay is less than 0
      */
     public function __construct(string $stepClass, int $delay = 0)
     {
@@ -51,9 +51,9 @@ final class StepConfig
     /**
      * Creates and returns an instance of the step class with the provided AppConfig and delay.
      *
-     * @param AppConfig $appConfig The application configuration.
+     * @param AppConfig $appConfig the application configuration
      *
-     * @return AbstractStep The instance of the step class.
+     * @return AbstractStep the instance of the step class
      */
     public function getStepObject(AppConfig $appConfig): AbstractStep
     {

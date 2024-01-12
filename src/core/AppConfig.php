@@ -223,6 +223,11 @@ final class AppConfig
         return $isWin ? $path : DIRECTORY_SEPARATOR . $path;
     }
 
+    public function getAppName(): string
+    {
+        return pathinfo($this->configFile, PATHINFO_FILENAME);
+    }
+
     private function hasNumericKeys(array &$array): bool
     {
         foreach (array_keys($array) as $key) {
