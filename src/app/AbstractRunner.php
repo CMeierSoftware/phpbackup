@@ -51,7 +51,7 @@ abstract class AbstractRunner
         } catch (\Exception $e) {
             $this->logger->Error($e->getMessage());
 
-            throw new \Exception($e->getMessage());
+            throw $e;
         }
 
         $this->logger->Info('Backup done.');
