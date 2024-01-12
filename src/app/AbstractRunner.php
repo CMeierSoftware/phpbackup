@@ -53,8 +53,10 @@ abstract class AbstractRunner
     public function __construct(AppConfig $config)
     {
         $this->config = $config;
-        $this->logger = FileLogger::GetInstance();
         $this->configureLogger();
+        
+        $this->logger->info('Run App "' . $this->config->getAppName() . '"');
+
         $this->steps = $this->setupSteps();
         $this->stepManager = new StepManager($this->steps, $this->config);
     }
@@ -72,29 +74,37 @@ abstract class AbstractRunner
      */
     protected function configureLogger(): void
     {
+        $this->logger = FileLogger::GetInstance();
         $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
         $this->logger->setLogLevel(LogLevel::INFO);
         $this->logger->activateEchoLogs();
     }
 
-    /**
-     * Runs the backup process.
-     *
-     * @throws \Exception If an error occurs during the backup process.
-     */
-    public function run(): void
-    {
-        try {
-            $this->lockBackupDir();
-            $result = $this->stepManager->executeNextStep();
-            $this->logger->Info((string) $result);
-        } catch (\Exception $e) {
-            $this->logger->Error($e->getMessage());
-            throw $e;
-        } finally {
-            $this->logger->Info('Backup done.');
-        }
+/**
+ * Executes the next backup step.
+ *
+ * @return bool True if a step was executed, false if there is no next step.
+ * @throws \Exception If an error occurs during the backup process.
+ */
+public function run(): bool
+{
+    try {
+        $this->lockBackupDir();
+        $result = $this->stepManager->executeNextStep();
+
+        $stepExecuted = ($result !== null);
+
+        $this->logger->Info($stepExecuted ? (string) $result : 'No next step.');
+    } catch (\Exception $e) {
+        $this->logger->Error($e->getMessage());
+        throw $e;
+    } finally {
+        $this->logger->Info('Step done.');
     }
+
+    return $stepExecuted;
+}
+
 
     /**
      * Locks the backup directory with the system locker.
