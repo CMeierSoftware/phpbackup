@@ -54,7 +54,9 @@ final class DirectoryBackupStep extends AbstractStep
         $backupFileName = $f->backupOnly($this->srcDir, $bundles[$idx]);
         $this->logger->Info("Archive files to '{$backupFileName}'");
 
-        FileCrypt::encryptFile($backupFileName, $this->encryptionKey);
+        if (!empty($this->encryptionKey)) {
+            FileCrypt::encryptFile($backupFileName, $this->encryptionKey);
+        }
 
         $backupFileName = $this->moveToBackupDirectory($backupFileName, "archive_part_{$idx}.zip");
 
