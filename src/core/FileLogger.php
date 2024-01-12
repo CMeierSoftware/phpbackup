@@ -136,15 +136,15 @@ final class FileLogger
     private function concatEntry(LogLevel $level, string $message): string
     {
         $timestamp = date('d.m.Y H:i:s');
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 4);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4)[3];
         $class = '';
-        if (isset($trace[3]['object'])) {
-            $class = get_class($trace[3]['object']);
+        if (isset($trace['class'])) {
+            $class = $trace['class'];
         } else {
-            $class = basename($trace[3]['file']);
+            $class = basename($trace['file']);
         }
 
-        return $level->name . "\t" . $timestamp . "\t" . $class . ': ' . $message . "\n";
+        return $level->name . "\t" . $timestamp . "\t" . $class . ": \t" . $message . "\n";
     }
 
     /**

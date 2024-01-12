@@ -55,7 +55,7 @@ final class DatabaseBackupStep extends AbstractStep
             $this->dbConfig['dbname']
         );
 
-        $backupFileName = $db->backupMySql('None');
+        $backupFileName = $db->backupMySql();
 
         if (!$backupFileName) {
             $this->logger->warning('Database dump could not be created.');

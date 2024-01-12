@@ -58,7 +58,6 @@ class Local extends AbstractRemoteHandler
         }
 
         if (!FileHelper::doesDirExists($absolutePath)) {
-            // Create the directory and its parents if they don't exist
             FileHelper::makeDir($absolutePath);
         }
 
