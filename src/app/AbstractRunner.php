@@ -70,8 +70,9 @@ abstract class AbstractRunner
      */
     public function unlockBackupDir(): void
     {
-        if (SystemLocker::isLocked($this->config->getTempDir()))
+        if (SystemLocker::isLocked($this->config->getTempDir())) {
             SystemLocker::unlock($this->config->getTempDir());
+        }
     }
 
     abstract protected function setupSteps(): array;

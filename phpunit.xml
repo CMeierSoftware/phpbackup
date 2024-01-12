@@ -17,6 +17,9 @@
          displayDetailsOnTestsThatTriggerNotices="true"
         >
     <testsuites>
+        <testsuite name="App">
+            <directory>tests\app</directory>
+        </testsuite>
         <testsuite name="Core">
             <directory>tests\core</directory>
         </testsuite>
