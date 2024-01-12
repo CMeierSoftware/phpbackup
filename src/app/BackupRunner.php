@@ -21,8 +21,9 @@ class BackupRunner extends AbstractRunner
     protected function setupSteps(): array
     {
         $steps = [];
+        $repeatDelay = (int) $this->config->getBackupSettings()['executeEveryDays'];
 
-        $steps[] = new StepConfig(CreateBundlesStep::class);
+        $steps[] = new StepConfig(CreateBundlesStep::class, $repeatDelay * 24 * 60);
         $steps[] = new StepConfig(DirectoryBackupStep::class);
         $steps[] = new StepConfig(DatabaseBackupStep::class);
 

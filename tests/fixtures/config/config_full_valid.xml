@@ -12,6 +12,7 @@
             <src>.</src>
         </directory>
         <settings>
+            <executeEveryDays>5</executeEveryDays>
             <maxArchiveSize>5</maxArchiveSize>
             <encryptionKey>some_random_Key</encryptionKey>
             <keepBackupAmount>2</keepBackupAmount>

@@ -85,7 +85,6 @@ final class AppConfig
 
         $sanitizedType = str_replace([DIRECTORY_SEPARATOR, '\\', '/'], '_', $type);
         $filePath = $this->getTempDir() . $sanitizedType . '.xml';
-        FileLogger::getInstance()->info("Will write tempData to '{$filePath}'.");
 
         $config = new Config($data, false);
         $writer = new XmlWriter();

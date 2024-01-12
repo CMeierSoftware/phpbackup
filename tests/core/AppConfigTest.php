@@ -99,13 +99,7 @@ final class AppConfigTest extends TestCase
         ];
 
         $actualConfig = $this->config->getBackupDirectory();
-
-        self::assertIsArray($actualConfig);
-
-        foreach ($expectedConfig as $key => $value) {
-            self::assertArrayHasKey($key, $actualConfig);
-            self::assertSame($value, $actualConfig[$key]);
-        }
+        self::assertSame($expectedConfig, $actualConfig);
     }
 
     /**
@@ -114,6 +108,7 @@ final class AppConfigTest extends TestCase
     public function testBackupSettingsConfig(): void
     {
         $expectedConfig = [
+            'executeEveryDays' => '5',
             'maxArchiveSize' => '5',
             'encryptionKey' => 'some_random_Key',
             'keepBackupAmount' => '2',
@@ -122,12 +117,7 @@ final class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getBackupSettings();
 
-        self::assertIsArray($actualConfig);
-
-        foreach ($expectedConfig as $key => $value) {
-            self::assertArrayHasKey($key, $actualConfig);
-            self::assertSame($value, $actualConfig[$key]);
-        }
+        self::assertSame($expectedConfig, $actualConfig);
     }
 
     /**
@@ -244,12 +234,7 @@ final class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getBackupDatabase();
 
-        self::assertIsArray($actualConfig);
-
-        foreach ($expectedConfig as $key => $value) {
-            self::assertArrayHasKey($key, $actualConfig);
-            self::assertSame($value, $actualConfig[$key]);
-        }
+        self::assertSame($expectedConfig, $actualConfig);
     }
 
     /**
