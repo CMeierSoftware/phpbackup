@@ -53,6 +53,6 @@ final class CleanUpStepTest extends TestCaseWithAppConfig
         self::assertFalse($result->repeat);
         self::assertSame('Backup process done.', $result->returnValue);
 
-        self::assertSame([], $this->config->readTempData('StepData'));
+        self::assertEmpty($this->config->readTempData('StepData'));
     }
 }

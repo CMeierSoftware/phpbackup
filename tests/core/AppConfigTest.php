@@ -202,7 +202,7 @@ final class AppConfigTest extends TestCase
     {
         $actualConfig = $this->config->getRemoteSettings('invalid');
 
-        self::assertSame([], $actualConfig);
+        self::assertEmpty($actualConfig);
     }
 
     /**
@@ -372,7 +372,7 @@ final class AppConfigTest extends TestCase
         $this->config->saveTempData($type, $data);
         $result = $this->config->readTempData($type);
 
-        self::assertSame([], $result);
+        self::assertEmpty($result);
     }
 
     /**
