@@ -67,6 +67,31 @@ final class AbstractRemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
         $this->assertDirectoriesExist($validDirs);
         $this->assertDirectoriesDoNotExist($expiredDirs);
     }
+    public function testDeleteDeactivated()
+    {
+        list($expiredDirs, $validDirs) = self::setupRemoteStorage(7);
+
+        $this->setUpAppConfig(
+            'config_full_valid',
+            [
+                ['tag' => 'keepBackupDays', 'value' => (string) 0],
+                ['tag' => 'keepBackupAmount', 'value' => (string) 0],
+            ]
+        );
+
+        $mockBuilder = $this->getMockBuilder(AbstractRemoteDeleteOldFilesStep::class);
+        $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
+
+        $sendRemoteStep = $mockBuilder->getMockForAbstractClass();
+
+        $result = $sendRemoteStep->execute();
+
+        self::assertInstanceOf(StepResult::class, $result);
+        self::assertFalse($result->repeat);
+
+        $this->assertDirectoriesExist($validDirs);
+        $this->assertDirectoriesExist($expiredDirs);
+    }
 
     private function assertDirectoriesExist(array $dirs): void
     {
