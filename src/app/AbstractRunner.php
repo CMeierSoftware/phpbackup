@@ -13,34 +13,36 @@ use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\SystemLocker;
+
 /**
- * Class AbstractRunner
+ * Class AbstractRunner.
  *
  * Represents an abstract runner for executing backup steps.
- *
- * @abstract
  */
 abstract class AbstractRunner
 {
     /**
-     * @var FileLogger $logger The logger for recording backup activities.
+     * @var FileLogger the logger for recording backup activities
+     *
      * @readonly
      */
     protected readonly FileLogger $logger;
 
     /**
-     * @var AppConfig $config The application configuration.
+     * @var AppConfig the application configuration
+     *
      * @readonly
      */
     protected readonly AppConfig $config;
 
     /**
-     * @var array $steps An array of steps to be executed during the backup process.
+     * @var array an array of steps to be executed during the backup process
      */
     protected array $steps = [];
 
     /**
-     * @var StepManager $stepManager The step manager for coordinating the execution of backup steps.
+     * @var StepManager the step manager for coordinating the execution of backup steps
+     *
      * @readonly
      */
     protected readonly StepManager $stepManager;
@@ -48,13 +50,13 @@ abstract class AbstractRunner
     /**
      * AbstractRunner constructor.
      *
-     * @param AppConfig $config The application configuration.
+     * @param AppConfig $config the application configuration
      */
     public function __construct(AppConfig $config)
     {
         $this->config = $config;
         $this->configureLogger();
-        
+
         $this->logger->info('Run App "' . $this->config->getAppName() . '"');
 
         $this->steps = $this->setupSteps();
@@ -70,41 +72,31 @@ abstract class AbstractRunner
     }
 
     /**
-     * Configures the logger with default settings.
+     * Executes the next backup step.
+     *
+     * @return bool true if a step was executed, false if there is no next step
+     *
+     * @throws \Exception if an error occurs during the backup process
      */
-    protected function configureLogger(): void
+    public function run(): bool
     {
-        $this->logger = FileLogger::GetInstance();
-        $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
-        $this->logger->setLogLevel(LogLevel::INFO);
-        $this->logger->activateEchoLogs();
+        try {
+            $this->lockBackupDir();
+            $result = $this->stepManager->executeNextStep();
+
+            $stepExecuted = (null !== $result);
+
+            $this->logger->Info($stepExecuted ? (string) $result : 'No next step.');
+        } catch (\Exception $e) {
+            $this->logger->Error($e->getMessage());
+
+            throw $e;
+        } finally {
+            $this->logger->Info('Step done.');
+        }
+
+        return $stepExecuted;
     }
-
-/**
- * Executes the next backup step.
- *
- * @return bool True if a step was executed, false if there is no next step.
- * @throws \Exception If an error occurs during the backup process.
- */
-public function run(): bool
-{
-    try {
-        $this->lockBackupDir();
-        $result = $this->stepManager->executeNextStep();
-
-        $stepExecuted = ($result !== null);
-
-        $this->logger->Info($stepExecuted ? (string) $result : 'No next step.');
-    } catch (\Exception $e) {
-        $this->logger->Error($e->getMessage());
-        throw $e;
-    } finally {
-        $this->logger->Info('Step done.');
-    }
-
-    return $stepExecuted;
-}
-
 
     /**
      * Locks the backup directory with the system locker.
@@ -125,9 +117,20 @@ public function run(): bool
     }
 
     /**
+     * Configures the logger with default settings.
+     */
+    protected function configureLogger(): void
+    {
+        $this->logger = FileLogger::GetInstance();
+        $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
+        $this->logger->setLogLevel(LogLevel::INFO);
+        $this->logger->activateEchoLogs();
+    }
+
+    /**
      * Sets up and returns the array of backup steps to be executed.
      *
-     * @return array The array of backup steps.
+     * @return array the array of backup steps
      */
     abstract protected function setupSteps(): array;
 }

@@ -51,7 +51,7 @@ final class StepManager
         $currentStep = $this->getNextStep();
 
         if (null === $currentStep) {
-            return 'No next step.';
+            return null;
         }
 
         $stepObj = $currentStep->getStepObject($this->config);
