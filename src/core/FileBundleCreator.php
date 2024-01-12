@@ -19,18 +19,21 @@ final class FileBundleCreator
      *
      * @param string $rootDir the path to the directory
      * @param int $sizeLimitInMB the size limit for each bundle in megabytes
-     *
-     * @return array an array of arrays, where each inner array represents a bundle of files within the size limit
+     * @param array $refBundles an array to store the file bundles
+     * @param array $excludedDirs an array of directories to exclude from bundling
      */
-    public static function createFileBundles(string $rootDir, int $sizeLimitInMB, array &$refBundles): void
+    public static function createFileBundles(string $rootDir, int $sizeLimitInMB, array &$refBundles, array $excludedDirs = []): void
     {
         $sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
-        $rootDir = rtrim($rootDir, '/\\' . DIRECTORY_SEPARATOR);
+        $separator = '/\\' . DIRECTORY_SEPARATOR;
+        $rootDir = rtrim($rootDir, $separator);
         self::$rootDir = $rootDir;
+
+        $excludedDirs = array_map(static fn ($dir) => $rootDir . DIRECTORY_SEPARATOR . ltrim($dir, $separator), $excludedDirs);
 
         FileLogger::getInstance()->info("Calculating bundles for '{$rootDir}' each {$sizeLimitInMB} MB ({$sizeLimit} bytes).");
 
-        self::packDirectory($rootDir, $sizeLimit, $refBundles);
+        self::packDirectory($rootDir, $sizeLimit, $refBundles, $excludedDirs);
         $bundleCount = count($refBundles);
         FileLogger::getInstance()->info("Calculated {$bundleCount} bundles for '{$rootDir}'.");
     }
@@ -41,15 +44,20 @@ final class FileBundleCreator
      * @param string $directory the path to the directory
      * @param int $sizeLimit the size limit for each bundle in bytes
      * @param array $fileBundles an array to store the file bundles
+     * @param array $excludedDirs an array of directories to exclude from bundling
      */
-    private static function packDirectory(string $directory, int $sizeLimit, array &$fileBundles): void
+    private static function packDirectory(string $directory, int $sizeLimit, array &$fileBundles, array $excludedDirs): void
     {
         list($files, $dirs) = self::listDirSortedByFileSize($directory);
 
         self::packFiles($files, $sizeLimit, $fileBundles);
 
         foreach ($dirs as $dir) {
-            self::packDirectory($dir, $sizeLimit, $fileBundles);
+            if (in_array($dir, $excludedDirs, true)) {
+                continue;
+            }
+
+            self::packDirectory($dir, $sizeLimit, $fileBundles, $excludedDirs);
         }
     }
 

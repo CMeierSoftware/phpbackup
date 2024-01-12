@@ -58,8 +58,32 @@ final class FileBundleCreatorTest extends TestCase
         $fileBundles = [];
         FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
 
-        self::assertNotEmpty($fileBundles);
-        self::assertCount(5, $fileBundles);
+        self::assertSame($expectedResult, $fileBundles);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\FileBundleCreator::createFileBundles()
+     */
+    public function testCreateFileBundlesExclude(): void
+    {
+        $expectedResult = [
+            ['\test_file_large.txt'],
+            [
+                '\test_file_3.txt',
+                '\test_file_2.txt',
+            ],
+            [
+                '\test_file_1.txt',
+                '\test_file_4.txt',
+                '\test_file_5.txt',
+            ],
+        ];
+
+        $sizeLimitInMB = 1;
+
+        $fileBundles = [];
+        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles, ['sub']);
+
         self::assertSame($expectedResult, $fileBundles);
     }
 
