@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Tests\Steps;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\AbstractRemoteDeleteOldFilesStep;
+use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\StepResult;
 
 /**

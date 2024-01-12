@@ -19,7 +19,7 @@ final class DirectoryBackupStep extends AbstractStep
     private array $archives;
     private readonly string $srcDir;
     private readonly string $encryptionKey;
-    private readonly string $backupFolder;
+    private readonly string $backupDirectory;
 
     /**
      * DirectoryBackupStep constructor.
@@ -72,7 +72,7 @@ final class DirectoryBackupStep extends AbstractStep
 
     protected function getRequiredStepDataKeys(): array
     {
-        return ['backupFolder', 'bundles'];
+        return ['backupDirectory', 'bundles'];
     }
 
     /**
@@ -85,7 +85,7 @@ final class DirectoryBackupStep extends AbstractStep
      */
     private function moveToBackupDirectory(string $file, string $newName): string
     {
-        $backupDirectory = rtrim($this->stepData['backupFolder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $backupDirectory = rtrim($this->stepData['backupDirectory'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $newFile = $backupDirectory . $newName;
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);

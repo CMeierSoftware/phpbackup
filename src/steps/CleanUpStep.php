@@ -14,7 +14,7 @@ final class CleanUpStep extends AbstractStep
 {
     protected function _execute(): StepResult
     {
-        FileHelper::deleteDirectory($this->stepData['backupFolder']);
+        FileHelper::deleteDirectory($this->stepData['backupDirectory']);
 
         $this->stepData = [];
 
@@ -23,6 +23,6 @@ final class CleanUpStep extends AbstractStep
 
     protected function getRequiredStepDataKeys(): array
     {
-        return ['backupFolder'];
+        return ['backupDirectory'];
     }
 }

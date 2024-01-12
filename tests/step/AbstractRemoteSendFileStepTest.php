@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Tests\Steps;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\AbstractRemoteSendFileStep;
+use CMS\PhpBackup\Step\Remote\AbstractRemoteSendFileStep;
 use CMS\PhpBackup\Step\StepResult;
 
 /**
@@ -42,7 +42,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
         ];
 
         $this->setUpAppConfig('config_full_valid');
-        $this->setStepData(['archives' => $this->archives, 'backupFolder' => self::WORK_DIR_LOCAL]);
+        $this->setStepData(['archives' => $this->archives, 'backupDirectory' => self::WORK_DIR_LOCAL]);
     }
 
     protected function tearDown(): void
@@ -98,7 +98,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
         $archives = [];
         foreach ($this->archives as $file => $content) {
             $archives[$file] = $content;
-            $this->setStepData(['archives' => $archives, 'backupFolder' => self::WORK_DIR_LOCAL]);
+            $this->setStepData(['archives' => $archives, 'backupDirectory' => self::WORK_DIR_LOCAL]);
 
             $sendRemoteStep = $this->getMockedClass();
             $result = $sendRemoteStep->execute();

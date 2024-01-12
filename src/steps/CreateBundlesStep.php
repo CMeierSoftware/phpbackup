@@ -36,11 +36,11 @@ final class CreateBundlesStep extends AbstractStep
         $this->stepData['bundles'] = [];
         FileBundleCreator::createFileBundles($this->srcDir, $this->maxArchiveSize, $this->stepData['bundles']);
 
-        $backupFolder = TEMP_DIR . 'backup_' . (new \DateTime())->format('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
-        FileHelper::makeDir($backupFolder);
-        $this->stepData['backup_folder'] = $backupFolder;
+        $backupDirectory = TEMP_DIR . 'backup_' . (new \DateTime())->format('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
+        FileHelper::makeDir($backupDirectory);
+        $this->stepData['backupDirectory'] = $backupDirectory;
 
-        return new StepResult($backupFolder, false);
+        return new StepResult($backupDirectory, false);
     }
 
     protected function getRequiredStepDataKeys(): array

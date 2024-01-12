@@ -77,7 +77,7 @@ final class DatabaseBackupStep extends AbstractStep
 
     protected function getRequiredStepDataKeys(): array
     {
-        return ['backupFolder', 'bundles'];
+        return ['backupDirectory', 'bundles'];
     }
 
     /**
@@ -89,7 +89,7 @@ final class DatabaseBackupStep extends AbstractStep
      */
     private function moveToBackupDirectory(string $file): string
     {
-        $backupDirectory = rtrim($this->stepData['backupFolder'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $backupDirectory = rtrim($this->stepData['backupDirectory'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $newFile = $backupDirectory . basename($file);
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);

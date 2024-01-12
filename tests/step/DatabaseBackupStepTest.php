@@ -21,7 +21,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
     {
         $this->setUpAppConfig('config_full_valid');
 
-        $this->setStepData(['bundles' => ['something'], 'backupFolder' => self::TEST_DIR]);
+        $this->setStepData(['bundles' => ['something'], 'backupDirectory' => self::TEST_DIR]);
 
         $this->databaseBackupStep = new DatabaseBackupStep($this->config);
     }
@@ -57,19 +57,19 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
         self::assertSame($archivesResult, $stepData['archives']);
     }
 
-    public function testExecuteMissingBackupFolder()
+    public function testExecuteMissingbackupDirectory()
     {
         $this->setStepData(['bundles' => 'some value']);
         $step = new DatabaseBackupStep($this->config);
 
         self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage('Missing required keys: backupFolder');
+        self::expectExceptionMessage('Missing required keys: backupDirectory');
         $step->execute();
     }
 
     public function testExecuteMissingBundle()
     {
-        $this->setStepData(['backupFolder' => 'some value']);
+        $this->setStepData(['backupDirectory' => 'some value']);
         $step = new DatabaseBackupStep($this->config);
 
         self::expectException(\InvalidArgumentException::class);

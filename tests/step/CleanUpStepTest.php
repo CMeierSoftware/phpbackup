@@ -19,7 +19,7 @@ final class CleanUpStepTest extends TestCaseWithAppConfig
     {
         $this->setUpAppConfig('config_full_valid');
 
-        $this->setStepData(['backupFolder' => self::TEST_DIR]);
+        $this->setStepData(['backupDirectory' => self::TEST_DIR]);
 
         FileHelper::makeDir(self::TEST_DIR);
         copy(TEST_FIXTURES_FILE_1, self::TEST_DIR . basename(TEST_FIXTURES_FILE_1));

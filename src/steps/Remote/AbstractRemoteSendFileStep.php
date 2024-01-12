@@ -43,7 +43,7 @@ abstract class AbstractRemoteSendFileStep extends AbstractStep
      */
     protected function _execute(): StepResult
     {
-        $this->backupDir = $this->stepData['backupFolder'];
+        $this->backupDir = $this->stepData['backupDirectory'];
         $this->backupDirName = basename($this->backupDir);
         $this->archives = &$this->stepData['archives'];
 
@@ -61,7 +61,7 @@ abstract class AbstractRemoteSendFileStep extends AbstractStep
 
     protected function getRequiredStepDataKeys(): array
     {
-        return ['backupFolder', 'archives'];
+        return ['backupDirectory', 'archives'];
     }
 
     /**
