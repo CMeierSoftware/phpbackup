@@ -107,16 +107,15 @@ class FileBackupCreator
      */
     private function prepareBackup(string $src): string
     {
-        $srcDir = realpath($src);
-        if (!$srcDir || !FileHelper::doesDirExists($srcDir)) {
-            throw new FileNotFoundException("Can not find '{$srcDir}'.");
+        if (!FileHelper::doesDirExists($src)) {
+            throw new FileNotFoundException("Can not find '{$src}'.");
         }
 
-        $this->archiveName = TEMP_DIR . 'backup_' . basename($srcDir) . date('_Y-m-d_H-i-s') . '.zip';
+        $this->archiveName = TEMP_DIR . 'backup_' . basename($src) . date('_Y-m-d_H-i-s') . '.zip';
 
         $ignore = [TEMP_DIR, $this->archiveName];
         $this->ignoreList = array_merge($ignore, $this->ignoreList);
 
-        return $srcDir;
+        return $src;
     }
 }

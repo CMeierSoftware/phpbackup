@@ -56,7 +56,9 @@ final class FileBackupCreatorTest extends TestCase
             self::assertStringStartsWith(TEMP_DIR . 'backup_' . basename(TEST_FIXTURES_FILE_DIR), $filename);
             self::assertStringEndsWith('.zip', $filename);
         } finally {
-            unlink($filename);
+            if ($filename) {
+                unlink($filename);
+            }
         }
     }
 
@@ -67,12 +69,14 @@ final class FileBackupCreatorTest extends TestCase
     {
         try {
             $files = ['file1.txt', 'pictures\\pics1.txt', 'pictures\\others\\others.1.txt', 'pictures\\others\\others2.txt'];
-            $filename = $this->backupCreator->backupOnly(TEST_FIXTURES_DIR . '\zip', $files);
+            $filename = $this->backupCreator->backupOnly(TEST_FIXTURES_DIR . 'files', $files);
             self::assertFileExists($filename);
-            self::assertStringStartsWith(TEMP_DIR . 'backup_zip', $filename);
+            self::assertStringStartsWith(TEMP_DIR . 'backup_files', $filename);
             self::assertStringEndsWith('.zip', $filename);
         } finally {
-            unlink($filename);
+            if ($filename) {
+                unlink($filename);
+            }
         }
     }
 }
