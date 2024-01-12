@@ -347,8 +347,47 @@ final class AppConfigTest extends TestCase
         $this->config->readTempData($type);
     }
 
-    public function testToAbsolutePathSuccess()
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::toAbsolutePath()
+     * 
+     * @dataProvider dataProviderTestToAbsolutePathOwnBase
+     */
+    public function testToAbsolutePathOwnBase(string $expect, string $relPath, string $base)
     {
-        self::assertSame(self::TEST_TEMP_DIR, $this->config->toAbsolutePath(self::TEST_TEMP_DIR));
+        self::assertSame($expect, $this->config->toAbsolutePath($relPath, $base));
+    }
+
+    public function dataProviderTestToAbsolutePathOwnBase()
+    {
+        return [
+            [self::TEST_TEMP_DIR, self::TEST_TEMP_DIR, ''],
+            [self::TEST_TEMP_DIR, self::TEST_TEMP_DIR . 'seven/..\\', ''],
+            [self::TEST_TEMP_DIR, '', self::TEST_TEMP_DIR],
+            [self::TEST_TEMP_DIR, '.', self::TEST_TEMP_DIR],
+            [self::TEST_TEMP_DIR, './six/../', self::TEST_TEMP_DIR],
+            [self::TEST_TEMP_DIR, '.\\six\\..', self::TEST_TEMP_DIR],
+        ];
+    }
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::toAbsolutePath()
+     * 
+     * @dataProvider dataProviderTestToAbsolutePathConfigBase
+     */
+    public function testToAbsolutePathConfigBase(string $expect, string $relPath)
+    {
+        self::assertSame($expect, $this->config->toAbsolutePath($relPath));
+    }
+
+    public function dataProviderTestToAbsolutePathConfigBase()
+    {
+        return [
+            [CONFIG_DIR, ''],
+            [CONFIG_DIR, '.'],
+            [CONFIG_DIR, '\\.\\'],
+            [CONFIG_DIR, '\\\\.//'],
+            [CONFIG_DIR, './six/../'],
+            [CONFIG_DIR, '.\\six\\..'],
+            [CONFIG_DIR . 't1\\', '.\\six\\../t1'],
+        ];
     }
 }

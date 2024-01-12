@@ -188,11 +188,13 @@ final class AppConfig
         return array_filter($remoteClasses, 'class_exists');
     }
 
-    public function toAbsolutePath($relativePath): string
+    public function toAbsolutePath($relativePath, $baseDir = CONFIG_DIR): string
     {
-        $parts = preg_split('/[\/\\\\]/', $relativePath);
+        $regex = "\/\\" . DIRECTORY_SEPARATOR; 
+        $parts = preg_split("/[{$regex}]/", $relativePath);
 
-        $absoluteParts = preg_split('/[\/\\\\]/', CONFIG_DIR);
+
+        $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
 
         foreach ($parts as $part) {
             if ('..' === $part) {
@@ -202,10 +204,11 @@ final class AppConfig
             }
         }
 
-        return implode(DIRECTORY_SEPARATOR, $absoluteParts);
+        $absoluteParts = array_filter($absoluteParts);
+
+        return trim(implode(DIRECTORY_SEPARATOR, $absoluteParts), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     }
 
-    // Helper function to check if an array has numeric keys
     private function hasNumericKeys(array &$array): bool
     {
         foreach (array_keys($array) as $key) {
