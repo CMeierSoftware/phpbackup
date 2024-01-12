@@ -18,7 +18,7 @@ final class StepConfig
     public function __construct(string $stepClass, int $delay = 0)
     {
         if (!class_exists($stepClass) || !is_subclass_of($stepClass, AbstractStep::class)) {
-            throw new \UnexpectedValueException('All entries in the array must be classes extended AbstractStep.');
+            throw new \UnexpectedValueException("All entries in the array must be classes extended AbstractStep. {$stepClass} is not.");
         }
 
         if ($delay < 0) {
