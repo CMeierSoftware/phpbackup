@@ -7,6 +7,9 @@ namespace CMS\PhpBackup\Tests\Core;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
+use CMS\PhpBackup\Step\Remote\BackblazeRemoteDeleteOldFilesStep;
+use CMS\PhpBackup\Step\Remote\LocalRemoteDeleteOldFilesStep;
 use Laminas\Config\Exception\RuntimeException;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;
@@ -153,10 +156,10 @@ final class AppConfigTest extends TestCase
     public function testDefinedRemoteClasses(): void
     {
         $classes = [
-            'CMS\PhpBackup\Remote\Local',
-            'CMS\PhpBackup\Remote\Backblaze',
+            LocalRemoteDeleteOldFilesStep::class,
+            BackblazeRemoteDeleteOldFilesStep::class,
         ];
-        $result = $this->config->getDefinedRemoteClasses();
+        $result = $this->config->getDefinedRemoteClasses(AbstractRemoteDeleteOldFilesStep::class);
         self::assertSame($classes, $result);
     }
 
@@ -168,7 +171,7 @@ final class AppConfigTest extends TestCase
     public function testDefinedRemoteClassesNoRemote(): void
     {
         $config = AppConfig::loadAppConfig('valid_app_no_remote');
-        self::assertEmpty($config->getDefinedRemoteClasses());
+        self::assertEmpty($config->getDefinedRemoteClasses(AbstractRemoteDeleteOldFilesStep::class));
     }
 
     /**
@@ -342,5 +345,10 @@ final class AppConfigTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->config->readTempData($type);
+    }
+
+    public function testToAbsolutePathSuccess()
+    {
+        self::assertSame(self::TEST_TEMP_DIR, $this->config->toAbsolutePath(self::TEST_TEMP_DIR));
     }
 }

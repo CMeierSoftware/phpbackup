@@ -172,7 +172,7 @@ final class AppConfig
         return isset($this->config['remote']) ? $this->config['remote'] : null;
     }
 
-    public function getDefinedRemoteClasses(): array
+    public function getDefinedRemoteClasses(string $baseClass): array
     {
         $remoteClasses = $this->getRemoteSettings();
 
@@ -180,9 +180,29 @@ final class AppConfig
             return [];
         }
         $remoteClasses = array_keys($remoteClasses);
-        $remoteClasses = array_map(static fn ($cls) => 'CMS\PhpBackup\Remote\\' . ucfirst($cls), $remoteClasses);
+        $remoteClasses = array_map(
+            static fn ($cls) => str_replace('Abstract', ucfirst($cls), $baseClass),
+            $remoteClasses
+        );
 
         return array_filter($remoteClasses, 'class_exists');
+    }
+
+    public function toAbsolutePath($relativePath): string
+    {
+        $parts = preg_split('/[\/\\\\]/', $relativePath);
+
+        $absoluteParts = preg_split('/[\/\\\\]/', CONFIG_DIR);
+
+        foreach ($parts as $part) {
+            if ('..' === $part) {
+                array_pop($absoluteParts);
+            } elseif ('.' !== $part && '' !== $part) {
+                $absoluteParts[] = $part;
+            }
+        }
+
+        return implode(DIRECTORY_SEPARATOR, $absoluteParts);
     }
 
     // Helper function to check if an array has numeric keys

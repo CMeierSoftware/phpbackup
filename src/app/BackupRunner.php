@@ -21,23 +21,23 @@ class BackupRunner extends AbstractRunner
     protected function setupSteps(): array
     {
         $steps = [];
-        $remoteHandler = array_map('ucfirst', array_keys($this->config->getRemoteSettings()));
 
         $steps[] = new StepConfig(CreateBundlesStep::class);
         $steps[] = new StepConfig(DirectoryBackupStep::class);
         $steps[] = new StepConfig(DatabaseBackupStep::class);
 
-        foreach ($remoteHandler as $handler) {
-            $class = str_replace('Abstract', $handler, AbstractRemoteSendFileStep::class);
-            $steps[] = new StepConfig($class);
-        }
-        foreach ($remoteHandler as $handler) {
-            $class = str_replace('Abstract', $handler, AbstractRemoteDeleteOldFilesStep::class);
-            $steps[] = new StepConfig($class);
-        }
+        $steps = array_merge($steps, $this->getRemoteStepsFor(AbstractRemoteSendFileStep::class));
+        $steps = array_merge($steps, $this->getRemoteStepsFor(AbstractRemoteDeleteOldFilesStep::class));
 
         $steps[] = new StepConfig(CleanUpStep::class);
 
         return $steps;
+    }
+
+    private function getRemoteStepsFor(string $baseClass): array
+    {
+        $remoteHandler = $this->config->getDefinedRemoteClasses($baseClass);
+
+        return array_map(static fn ($handler) => new StepConfig($handler), $remoteHandler);
     }
 }

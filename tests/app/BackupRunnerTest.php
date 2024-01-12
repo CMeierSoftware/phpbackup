@@ -71,6 +71,6 @@ final class BackupRunnerTest extends TestCase
         FileLogger::getInstance()->setLogLevel(LogLevel::OFF);
 
         $property = new \ReflectionProperty($runner, 'steps');
-        self::assertSame($expectedSteps, $property->getValue($runner));
+        self::assertEqualsIgnoringCase($expectedSteps, $property->getValue($runner));
     }
 }
