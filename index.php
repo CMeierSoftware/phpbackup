@@ -30,14 +30,21 @@ if (!defined('ABS_PATH')) {
 use CMS\PhpBackup\App\BackupRunner;
 use CMS\PhpBackup\Core\AppConfig;
 
-$cfg = AppConfig::loadAppConfig($_GET['app']);
+$apps = explode(',', $_GET['app']);
 
-if (!$cfg) {
-    $msg = 'Wrong App';
-    header('HTTP/1.1 404 ' . $msg, true, 404);
+foreach ($apps as $appName) {
+    $cfg = AppConfig::loadAppConfig($appName);
 
-    exit($msg);
+    if (!$cfg) {
+        $msg = "Wrong App: {$appName}";
+        header('HTTP/1.1 404 ' . $msg, true, 404);
+
+        exit($msg);
+    }
+
+    $runner = new BackupRunner($cfg);
+
+    if ($runner->run()) {
+        break;
+    }
 }
-$runner = new BackupRunner($cfg);
-
-$runner->run();
