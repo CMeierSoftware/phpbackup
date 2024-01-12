@@ -162,15 +162,32 @@ final class AppConfig
         return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : null;
     }
 
-    /**
-     * Returns the remote settings from the configuration file.
-     *
-     * @return null|array the remote settings
-     */
-    public function getRemoteSettings(): ?array
-    {
-        return isset($this->config['remote']) ? $this->config['remote'] : null;
+/**
+ * Returns the remote settings from the configuration file.
+ *
+ * @param string $type (Optional) The type of remote settings to retrieve.
+ * @param array $requiredSettings (Optional) An array of required settings to check for existence.
+ *
+ * @return array The remote settings. If $type is provided, returns settings for that type; otherwise, returns all remote settings.
+ * @throws \InvalidArgumentException If any required setting is not present in the configuration.
+ */
+public function getRemoteSettings(string $type = '', array $requiredSettings = []): array
+{
+    $remoteSettings = $this->config['remote'] ?? [];
+
+    if (!empty($type)) {
+        $remoteSettings = $remoteSettings[$type] ?? [];
+        
+        $missingSettings = array_diff_key(array_flip($requiredSettings), $remoteSettings);
+        if (!empty($missingSettings)) {
+            $missingSettingsList = implode(', ', array_keys($missingSettings));
+            throw new \InvalidArgumentException("Required setting(s) '$missingSettingsList' is/are missing in the remote configuration.");
+        }
     }
+
+    return $remoteSettings;
+}
+
 
     public function getDefinedRemoteClasses(string $baseClass): array
     {
@@ -190,9 +207,8 @@ final class AppConfig
 
     public function toAbsolutePath($relativePath, $baseDir = CONFIG_DIR): string
     {
-        $regex = "\/\\" . DIRECTORY_SEPARATOR; 
+        $regex = '\\/\\' . DIRECTORY_SEPARATOR;
         $parts = preg_split("/[{$regex}]/", $relativePath);
-
 
         $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
 

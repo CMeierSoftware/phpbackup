@@ -133,7 +133,7 @@ final class AppConfigTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
      */
-    public function testRemoteConfig(): void
+    public function testRemoteConfigAll(): void
     {
         $expectedConfig = [
             'local' => ['rootDir' => ''],
@@ -142,12 +142,65 @@ final class AppConfigTest extends TestCase
 
         $actualConfig = $this->config->getRemoteSettings();
 
-        self::assertIsArray($actualConfig);
+        self::assertSame($expectedConfig, $actualConfig);
+    }
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
+     */
+    public function testRemoteConfigSpecific(): void
+    {
+        $expectedConfig = ['rootDir' => ''];
 
-        foreach ($expectedConfig as $key => $value) {
-            self::assertArrayHasKey($key, $actualConfig);
-            self::assertSame($value, $actualConfig[$key]);
-        }
+        $actualConfig = $this->config->getRemoteSettings('local');
+
+        self::assertSame($expectedConfig, $actualConfig);
+    }
+    
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
+     */
+    public function testRemoteConfigRequired(): void
+    {
+        $expectedConfig = [
+            'accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name'
+        ];
+
+        $actualConfig = $this->config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
+
+        self::assertSame($expectedConfig, $actualConfig);
+    }
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
+     */
+    public function testRemoteConfigRequiredMissing(): void
+    {
+        self::expectException(\InvalidArgumentException::class);
+        $this->config->getRemoteSettings('local', ['rootDir', 'invalid']);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
+     */
+    public function testRemoteConfigRequiredOnAll(): void
+    {
+        $expectedConfig = [
+            'local' => ['rootDir' => ''],
+            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name'],
+        ];
+
+        $actualConfig = $this->config->getRemoteSettings('', ['something']);
+
+        self::assertSame($expectedConfig, $actualConfig);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getRemoteSettings()
+     */
+    public function testRemoteConfigInvalid(): void
+    {
+        $actualConfig = $this->config->getRemoteSettings('invalid');
+
+        self::assertSame([], $actualConfig);
     }
 
     /**
@@ -349,15 +402,15 @@ final class AppConfigTest extends TestCase
 
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::toAbsolutePath()
-     * 
-     * @dataProvider dataProviderTestToAbsolutePathOwnBase
+     *
+     * @dataProvider provideToAbsolutePathOwnBaseCases
      */
     public function testToAbsolutePathOwnBase(string $expect, string $relPath, string $base)
     {
         self::assertSame($expect, $this->config->toAbsolutePath($relPath, $base));
     }
 
-    public function dataProviderTestToAbsolutePathOwnBase()
+    public function provideToAbsolutePathOwnBaseCases(): iterable
     {
         return [
             [self::TEST_TEMP_DIR, self::TEST_TEMP_DIR, ''],
@@ -368,17 +421,18 @@ final class AppConfigTest extends TestCase
             [self::TEST_TEMP_DIR, '.\\six\\..', self::TEST_TEMP_DIR],
         ];
     }
+
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::toAbsolutePath()
-     * 
-     * @dataProvider dataProviderTestToAbsolutePathConfigBase
+     *
+     * @dataProvider provideToAbsolutePathConfigBaseCases
      */
     public function testToAbsolutePathConfigBase(string $expect, string $relPath)
     {
         self::assertSame($expect, $this->config->toAbsolutePath($relPath));
     }
 
-    public function dataProviderTestToAbsolutePathConfigBase()
+    public function provideToAbsolutePathConfigBaseCases(): iterable
     {
         return [
             [CONFIG_DIR, ''],

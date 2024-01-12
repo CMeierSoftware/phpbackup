@@ -20,10 +20,8 @@ final class BackblazeRemoteSendFileStep extends AbstractRemoteSendFileStep
      */
     public function __construct(AppConfig $config)
     {
-        $id = $config->getRemoteSettings()['backblaze']['accountId'];
-        $appKey = $config->getRemoteSettings()['backblaze']['applicationKey'];
-        $bucket = $config->getRemoteSettings()['backblaze']['bucketName'];
-        $remote = new Backblaze($id, $appKey, $bucket);
+        $cfg = $config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
+        $remote = new Backblaze($cfg['accountId'], $cfg['applicationKey'], $cfg['bucketName']);
         parent::__construct($remote, $config);
     }
 }
