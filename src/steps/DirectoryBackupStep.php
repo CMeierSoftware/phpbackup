@@ -91,6 +91,7 @@ final class DirectoryBackupStep extends AbstractStep
         $newFile = $backupDirectory . $newName;
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);
+        FileHelper::changePermission($file, 0o0400);
 
         return $newFile;
     }
