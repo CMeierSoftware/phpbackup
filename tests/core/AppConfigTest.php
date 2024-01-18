@@ -10,6 +10,7 @@ use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\Remote\BackblazeRemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\Remote\LocalRemoteDeleteOldFilesStep;
+use Laminas\Config\Config;
 use Laminas\Config\Exception\RuntimeException;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;
@@ -96,6 +97,11 @@ final class AppConfigTest extends TestCase
     {
         $expectedConfig = [
             'src' => CONFIG_DIR,
+            'exclude' => [
+                CONFIG_DIR, 
+                CONFIG_DIR . 'sub1' . DIRECTORY_SEPARATOR, 
+                CONFIG_DIR . 'sub2' . DIRECTORY_SEPARATOR, 
+            ],
         ];
 
         $actualConfig = $this->config->getBackupDirectory();
@@ -448,7 +454,13 @@ final class AppConfigTest extends TestCase
             [CONFIG_DIR, '\\\\.//'],
             [CONFIG_DIR, './six/../'],
             [CONFIG_DIR, '.\\six\\..'],
+            [CONFIG_DIR . 't1\\', '/t1'],
+            [CONFIG_DIR . 't1\\', '/t1\\'],
+            [CONFIG_DIR . 't1\\', 't1'],
             [CONFIG_DIR . 't1\\', '.\\six\\../t1'],
+            [ABS_PATH, '/..'],
+            [ABS_PATH, '\\..\\'],
+            [ABS_PATH, '..'],
         ];
     }
 }

@@ -133,9 +133,21 @@ final class AppConfig
     public function getBackupDirectory(): array
     {
         if (isset($this->config['backup']['directory'])) {
-            $this->config['backup']['directory']['src'] = $this->toAbsolutePath($this->config['backup']['directory']['src']);
+            $cfg = $this->config['backup']['directory'];
 
-            return $this->config['backup']['directory'];
+            $cfg['src'] = $this->toAbsolutePath($cfg['src']);
+
+            $cfg['exclude'] = array_map(
+                fn ($item): string => $this->toAbsolutePath($item), 
+                $cfg['exclude']
+            );
+
+            $cfg['exclude'] = array_filter(
+                $cfg['exclude'],
+                static fn($item) => str_starts_with($item, $cfg['src'])
+            );
+
+            return $cfg;
         }
 
         return [];
@@ -201,6 +213,7 @@ final class AppConfig
         $parts = preg_split("/[{$regex}]/", $relativePath);
 
         $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
+        $absoluteParts = array_filter($absoluteParts);
         $isWin = 1 === preg_match('/^[A-Za-z]:/', $absoluteParts[0]);
 
         foreach ($parts as $part) {
@@ -210,8 +223,6 @@ final class AppConfig
                 $absoluteParts[] = $part;
             }
         }
-
-        $absoluteParts = array_filter($absoluteParts);
 
         $path = trim(implode(DIRECTORY_SEPARATOR, $absoluteParts), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 

@@ -10,6 +10,10 @@
         </database>
         <directory>
             <src>.</src>
+            <exclude>.</exclude>
+            <exclude>sub1</exclude>
+            <exclude>./sub2/</exclude>
+            <exclude>..</exclude>
         </directory>
         <settings>
             <executeEveryDays>5</executeEveryDays>
