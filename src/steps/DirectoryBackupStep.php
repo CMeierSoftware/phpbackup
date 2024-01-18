@@ -18,6 +18,7 @@ final class DirectoryBackupStep extends AbstractStep
     private array $bundles;
     private array $archives;
     private readonly string $srcDir;
+    private readonly array $excludeDirs;
     private readonly string $encryptionKey;
     private readonly string $backupDirectory;
 
@@ -31,6 +32,7 @@ final class DirectoryBackupStep extends AbstractStep
         parent::__construct($config);
 
         $this->srcDir = $this->config->getBackupDirectory()['src'];
+        $this->excludeDirs = $this->config->getBackupDirectory()['exclude'];
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
     }
 
@@ -49,7 +51,7 @@ final class DirectoryBackupStep extends AbstractStep
         $archives = &$this->stepData['archives'];
 
         $idx = count($archives);
-        $f = new FileBackupCreator();
+        $f = new FileBackupCreator($this->excludeDirs);
 
         $backupFileName = $f->backupOnly($this->srcDir, $bundles[$idx]);
         $this->logger->Info("Archive files to '{$backupFileName}'");
