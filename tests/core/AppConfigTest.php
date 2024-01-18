@@ -118,6 +118,7 @@ final class AppConfigTest extends TestCase
         $config = AppConfig::loadAppConfig('valid_app_no_db');
         $expectedConfig = [
             'src' => CONFIG_DIR,
+            'exclude' => [],
         ];
 
         $actualConfig = $config->getBackupDirectory();

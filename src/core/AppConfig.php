@@ -152,6 +152,8 @@ final class AppConfig
                 $cfg['exclude'],
                 static fn ($item): bool => str_starts_with($item, $cfg['src']) && is_dir($item)
             );
+        } else {
+            $cfg['exclude'] = [];
         }
 
         return $cfg;
