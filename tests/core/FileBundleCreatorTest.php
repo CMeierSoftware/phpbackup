@@ -97,12 +97,14 @@ final class FileBundleCreatorTest extends TestCase
                 '\test_file_1.txt',
                 '\test_file_4.txt',
                 '\test_file_5.txt',
+                '\sub\test_file_4.txt',
+            ],
+            [
                 '\sub\test_file_3.txt',
                 '\sub\test_file_2.txt',
             ],
             [
                 '\sub\test_file_1.txt',
-                '\sub\test_file_4.txt',
                 '\sub\test_file_5.txt',
             ],
         ];
