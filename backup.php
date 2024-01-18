@@ -48,3 +48,5 @@ foreach ($apps as $appName) {
         break;
     }
 }
+
+echo "<h2>Step Execution completed.</h2>";
