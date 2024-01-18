@@ -67,7 +67,7 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("Can not create directory for '{$remotePath}' in remote storage.");
         }
 
-        FileLogger::getInstance()->info("Upload local file '{$localPath}' to remote storage '{$remotePath}'");
+        FileLogger::getInstance()->debug("Upload local file '{$localPath}' to remote storage '{$remotePath}'");
         $this->fileExistsCache[$remotePath] = $this->_fileUpload($localPath, $remotePath);
 
         return $this->fileExistsCache[$remotePath];
@@ -97,7 +97,7 @@ abstract class AbstractRemoteHandler
 
         FileHelper::makeDir(dirname($localPath));
 
-        FileLogger::getInstance()->info("Download remote file '{$remotePath}' to local storage '{$localPath}'");
+        FileLogger::getInstance()->debug("Download remote file '{$remotePath}' to local storage '{$localPath}'");
 
         return $this->_fileDownload($localPath, $remotePath);
     }
@@ -119,7 +119,7 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("The file '{$remotePath}' was not found in remote storage.");
         }
 
-        FileLogger::getInstance()->info("Delete remote file '{$remotePath}'");
+        FileLogger::getInstance()->debug("Delete remote file '{$remotePath}'");
 
         $result = $this->_fileDelete($remotePath);
         if ($result) {
@@ -148,14 +148,14 @@ abstract class AbstractRemoteHandler
             $result = $this->_fileExists($remotePath);
             $this->fileExistsCache[$remotePath] = $result;
             if ($this->fileExistsCache[$remotePath]) {
-                FileLogger::getInstance()->info("Remote file '{$remotePath}' does exist (request).");
+                FileLogger::getInstance()->debug("Remote file '{$remotePath}' does exist (request).");
             } else {
-                FileLogger::getInstance()->info("Remote file '{$remotePath}' doesn't exist (request).");
+                FileLogger::getInstance()->debug("Remote file '{$remotePath}' doesn't exist (request).");
             }
         } elseif ($this->fileExistsCache[$remotePath]) {
-            FileLogger::getInstance()->info("Remote file '{$remotePath}' does exist (cache).");
+            FileLogger::getInstance()->debug("Remote file '{$remotePath}' does exist (cache).");
         } else {
-            FileLogger::getInstance()->info("Remote file '{$remotePath}' doesn't exist (cache).");
+            FileLogger::getInstance()->debug("Remote file '{$remotePath}' doesn't exist (cache).");
         }
 
         return $this->fileExistsCache[$remotePath];
@@ -178,7 +178,7 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("The directory '{$remotePath}' was not found in remote storage.");
         }
 
-        FileLogger::getInstance()->info("List remote directory '{$remotePath}'.");
+        FileLogger::getInstance()->debug("List remote directory '{$remotePath}'.");
 
         $result = $this->_dirList($remotePath);
         $result = array_values(array_diff($result, ['..', '.']));
@@ -215,7 +215,7 @@ abstract class AbstractRemoteHandler
         $this->sanitizeDirCheck($remotePath);
 
         if (!$this->fileExists($remotePath)) {
-            FileLogger::getInstance()->info("Create remote directory '{$remotePath}'.");
+            FileLogger::getInstance()->debug("Create remote directory '{$remotePath}'.");
 
             $this->fileExistsCache[$remotePath] = $this->_dirCreate($remotePath);
         }
@@ -237,7 +237,7 @@ abstract class AbstractRemoteHandler
         $success = false;
 
         if ($this->fileExists($remotePath)) {
-            FileLogger::getInstance()->info("Delete remote directory recursively '{$remotePath}'.");
+            FileLogger::getInstance()->debug("Delete remote directory recursively '{$remotePath}'.");
 
             $success = $this->_dirDelete($remotePath);
             $this->fileExistsCache[$remotePath] = !$success;
