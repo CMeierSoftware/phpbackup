@@ -64,6 +64,26 @@ final class FileBundleCreatorTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Core\FileBundleCreator::createFileBundles()
      */
+    public function testCreateFileBundlesOnEmptyDir(): void
+    {
+        FileHelper::deleteDirectory(self::TEST_DIR);
+        self::assertDirectoryDoesNotExist(self::TEST_DIR);
+        FileHelper::makeDir(self::TEST_DIR);
+        self::assertDirectoryExists(self::TEST_DIR);
+        
+        $expectedResult = [];
+
+        $sizeLimitInMB = 1;
+
+        $fileBundles = [];
+        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
+
+        self::assertSame($expectedResult, $fileBundles);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\FileBundleCreator::createFileBundles()
+     */
     public function testCreateFileBundlesExclude(): void
     {
         $expectedResult = [
@@ -72,19 +92,56 @@ final class FileBundleCreatorTest extends TestCase
                 '\test_file_3.txt',
                 '\test_file_2.txt',
             ],
+            ['\sub\test_file_large.txt'],
             [
                 '\test_file_1.txt',
                 '\test_file_4.txt',
                 '\test_file_5.txt',
+                '\sub\test_file_3.txt',
+                '\sub\test_file_2.txt',
+            ],
+            [
+                '\sub\test_file_1.txt',
+                '\sub\test_file_4.txt',
+                '\sub\test_file_5.txt',
             ],
         ];
+
+        $this->createTestFiles(self::TEST_DIR . 'sub' . DIRECTORY_SEPARATOR);
 
         $sizeLimitInMB = 1;
 
         $fileBundles = [];
-        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles, ['sub']);
+        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles, ['sub\\sub']);
 
         self::assertSame($expectedResult, $fileBundles);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\FileBundleCreator::createFileBundles()
+     * 
+     */
+    public function testMeasureTiming(): void
+    {
+        $this->markTestSkipped('Run only manually.');
+        FileHelper::makeDir(self::TEST_DIR . "sub");
+        FileHelper::makeDir(self::TEST_DIR . "sub\\sub");
+
+        for ($i=0; $i < 100; $i++) { 
+            $this->createTestFile(self::TEST_DIR . "{$i}.txt", 10);
+            $this->createTestFile(self::TEST_DIR . "sub\\{$i}.txt", 10);
+            $this->createTestFile(self::TEST_DIR . "sub\\sub\\{$i}.txt", 10);
+        }
+
+        $sizeLimitInMB = 1;
+        $fileBundles = [];
+
+        $start = microtime(true);
+        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
+        $end = microtime(true);
+        
+        $executionTime = $end - $start;
+        self::fail("Execution took {$executionTime} ms.");
     }
 
     private function createTestFiles(string $directory): void
