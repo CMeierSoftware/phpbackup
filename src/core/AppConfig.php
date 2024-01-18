@@ -141,17 +141,19 @@ final class AppConfig
         $cfg['src'] = $this->toAbsolutePath($cfg['src']);
 
         if (isset($cfg['exclude'])) {
+            $cfg['exclude'] = is_array($cfg['exclude']) ? $cfg['exclude'] : [$cfg['exclude']];
+
             $cfg['exclude'] = array_map(
-                fn ($item): string => $this->toAbsolutePath($item), 
+                fn ($item): string => $this->toAbsolutePath($item),
                 $cfg['exclude']
             );
-            
+
             $cfg['exclude'] = array_filter(
                 $cfg['exclude'],
-                static fn($item): bool => str_starts_with($item, $cfg['src']) && is_dir($item)
+                static fn ($item): bool => str_starts_with($item, $cfg['src']) && is_dir($item)
             );
         }
-            
+
         return $cfg;
     }
 
@@ -216,7 +218,7 @@ final class AppConfig
 
         $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
         $absoluteParts = array_filter($absoluteParts);
-        $isWin = 1 === preg_match('/^[A-Za-z]:/', $absoluteParts[0]);
+        $isWin = 1 === preg_match('/^[A-Za-z]:/', reset($absoluteParts));
 
         foreach ($parts as $part) {
             if ('..' === $part) {

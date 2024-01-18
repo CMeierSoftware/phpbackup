@@ -97,11 +97,11 @@ final class AppConfigTest extends TestCase
     {
         FileHelper::makeDir(self::TEST_TEMP_DIR);
         self::assertDirectoryExists(self::TEST_TEMP_DIR);
-        
+
         $expectedConfig = [
             'src' => CONFIG_DIR,
             'exclude' => [
-                CONFIG_DIR, 
+                CONFIG_DIR,
                 self::TEST_TEMP_DIR,
             ],
         ];
@@ -109,7 +109,6 @@ final class AppConfigTest extends TestCase
         $actualConfig = $this->config->getBackupDirectory();
         self::assertSame($expectedConfig, $actualConfig);
     }
-
 
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getBackupDirectory()
@@ -124,6 +123,7 @@ final class AppConfigTest extends TestCase
         $actualConfig = $config->getBackupDirectory();
         self::assertSame($expectedConfig, $actualConfig);
     }
+
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getBackupSettings()
      */
