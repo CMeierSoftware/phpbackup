@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class AppConfigTest extends TestCase
 {
-    private const TEST_TEMP_TEST_RESULT = TEST_FIXTURES_CONFIG_DIR . 'test_temp_data.xml';
+    private const TEST_TEMP_TEST_RESULT = TEST_FIXTURES_CONFIG_DIR . 'test_temp_data.json';
     private const TEST_TEMP_DIR = CONFIG_DIR . 'temp_valid_app' . DIRECTORY_SEPARATOR;
     private const APPS = [
         'valid_app' => TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml',
@@ -282,29 +282,49 @@ final class AppConfigTest extends TestCase
 
         $this->config->saveTempData($type, $data);
 
-        $filePath = self::TEST_TEMP_DIR . $type . '.xml';
+        $filePath = self::TEST_TEMP_DIR . $type . '.json';
         self::assertFileExists($filePath);
-        self::assertXmlFileEqualsXmlFile(self::TEST_TEMP_TEST_RESULT, $filePath);
+        self::assertJsonFileEqualsJsonFile(self::TEST_TEMP_TEST_RESULT, $filePath);
     }
 
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
      */
-    public function testSaveTempDataDirSepInTypeName()
+    public function testSaveAndReadTempDataDirSepInTypeName()
     {
         $type = 'test\\test';
         $data = ['key' => 'value'];
 
         $this->config->saveTempData($type, $data);
 
-        $filePath = self::TEST_TEMP_DIR . 'test_test.xml';
+        $filePath = self::TEST_TEMP_DIR . 'test_test.json';
         self::assertFileExists($filePath);
+
+        $readData = $this->config->readTempData($type);
+        self::assertSame($data, $readData);
     }
 
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
      */
     public function testSaveTempDataThrowsTypeErrorOnInvalidData()
+    {
+        $type = 'test';
+        $data = [
+            'key1' => 'val1',
+            'key2' => ['v1']
+        ];
+
+        $this->config->saveTempData($type, $data);
+
+        $readData = $this->config->readTempData($type);
+        self::assertSame($data, $readData);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::saveTempData()
+     */
+    public function testSaveTempDataOnEmptyData()
     {
         $type = 'invalid';
 
@@ -322,20 +342,20 @@ final class AppConfigTest extends TestCase
     {
         $type = 'test';
         $data = [
-            'key' => 'value',
-            'bundles' => [
-                'a' => ['item1', 'item2'],
-                'b' => ['item3', 'item4'],
-                'c' => ['c1' => ['item5', 'item6'], 'c2' => ['item7', 'item8']],
-            ],
             'archives' => [
                 ['item1', 'item2'],
                 ['item3', 'item4'],
                 [['item5', 'item6'], ['item7', 'item8']],
             ],
+            'bundles' => [
+                'a' => ['item1', 'item2'],
+                'b' => ['item3', 'item4'],
+                'c' => ['c1' => ['item5', 'item6'], 'c2' => ['item7', 'item8']],
+            ],
+            'key' => 'value',
         ];
 
-        $filePath = $this->config->getTempDir() . $type . '.xml';
+        $filePath = $this->config->getTempDir() . $type . '.json';
         copy(self::TEST_TEMP_TEST_RESULT, $filePath);
         self::assertFileExists($filePath);
 
@@ -381,7 +401,7 @@ final class AppConfigTest extends TestCase
         $type = 'invalid';
 
         // Save invalid data to file for testing
-        file_put_contents($this->config->getTempDir() . $type . '.xml', 'invalid_xml_data');
+        file_put_contents($this->config->getTempDir() . $type . '.json', 'invalid_json_data');
 
         $this->expectException(RuntimeException::class);
         $this->config->readTempData($type);

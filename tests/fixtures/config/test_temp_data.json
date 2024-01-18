@@ -1,0 +1,43 @@
+{
+  "archives": [
+      [
+          "item1",
+          "item2"
+      ],
+      [
+          "item3",
+          "item4"
+      ],
+      [
+          [
+              "item5",
+              "item6"
+          ],
+          [
+              "item7",
+              "item8"
+          ]
+      ]
+  ],
+  "bundles": {
+      "a": [
+          "item1",
+          "item2"
+      ],
+      "b": [
+          "item3",
+          "item4"
+      ],
+      "c": {
+          "c1": [
+              "item5",
+              "item6"
+          ],
+          "c2": [
+              "item7",
+              "item8"
+          ]
+      }
+  },
+  "key": "value"
+}
