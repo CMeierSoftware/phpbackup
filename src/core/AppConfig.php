@@ -9,10 +9,8 @@ use CMS\PhpBackup\Helper\FileHelper;
 use Laminas\Config\Config;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use Laminas\Config\Factory as LaminasConfigFactory;
-use Laminas\Config\Reader\Xml as XmlReader;
-use Laminas\Config\Writer\Json as JsonWriter;
 use Laminas\Config\Reader\Json as JsonReader;
-use Laminas\Config\Writer\Xml as XmlWriter;
+use Laminas\Config\Writer\Json as JsonWriter;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -83,8 +81,6 @@ final class AppConfig
      */
     public function saveTempData(string $type, array &$data): void
     {
-        $this->processDataForSave($data);
-
         $filePath = $this->getTempDataFilePath($type);
 
         $config = new Config($data, false);
@@ -116,15 +112,7 @@ final class AppConfig
 
         $data = is_array($result = $reader->fromFile($filePath)) ? $result : [];
 
-        $this->processDataForRead($data);
-
         return $data;
-    }
-
-    private function getTempDataFilePath(string $type): string 
-    {
-        $sanitizedType = str_replace([DIRECTORY_SEPARATOR, '\\', '/'], '_', $type);
-        return $this->getTempDir() . $sanitizedType . '.json';
     }
 
     /**
@@ -235,6 +223,13 @@ final class AppConfig
         return pathinfo($this->configFile, PATHINFO_FILENAME);
     }
 
+    private function getTempDataFilePath(string $type): string
+    {
+        $sanitizedType = str_replace([DIRECTORY_SEPARATOR, '\\', '/'], '_', $type);
+
+        return $this->getTempDir() . $sanitizedType . '.json';
+    }
+
     private function hasNumericKeys(array &$array): bool
     {
         foreach (array_keys($array) as $key) {
@@ -244,46 +239,6 @@ final class AppConfig
         }
 
         return false;
-    }
-
-    // Recursive function for saving data
-    private function processDataForSave(array &$data): void
-    {
-        // foreach (array_keys($data) as $key) {
-        //     $node = &$data[$key];
-        //     if (!is_array($node) || empty($node)) {
-        //         continue;
-        //     }
-        //     // only change keys when values are also arrays
-        //     if (is_array($node[array_key_first($node)]) && $this->hasNumericKeys($node)) {
-        //         $node = array_combine(
-        //             array_map(static fn ($k) => $key . self::TEMP_DATA_KEY_SEP . $k, array_keys($node)),
-        //             $node
-        //         );
-        //     }
-        //     $this->processDataForSave($node);
-        // }
-    }
-
-    // Recursive function for reading data
-    private function processDataForRead(array &$data): void
-    {
-        // foreach (array_keys($data) as $key) {
-        //     $node = &$data[$key];
-        //     if (!is_array($node) || empty($node)) {
-        //         continue;
-        //     }
-
-        //     $this->processDataForRead($data[$key]);
-
-        //     $childKeys = array_keys($node);
-        //     if (is_string($childKeys[0]) && 0 === strpos($childKeys[0], $key . self::TEMP_DATA_KEY_SEP)) {
-        //         $node = array_combine(
-        //             array_map(static fn ($k) => (int) str_replace($key . self::TEMP_DATA_KEY_SEP, '', $k), array_keys($node)),
-        //             $node
-        //         );
-        //     }
-        // }
     }
 
     /**

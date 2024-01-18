@@ -312,7 +312,7 @@ final class AppConfigTest extends TestCase
         $type = 'test';
         $data = [
             'key1' => 'val1',
-            'key2' => ['v1']
+            'key2' => ['v1'],
         ];
 
         $this->config->saveTempData($type, $data);

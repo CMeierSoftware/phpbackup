@@ -70,7 +70,7 @@ final class FileBundleCreatorTest extends TestCase
         self::assertDirectoryDoesNotExist(self::TEST_DIR);
         FileHelper::makeDir(self::TEST_DIR);
         self::assertDirectoryExists(self::TEST_DIR);
-        
+
         $expectedResult = [];
 
         $sizeLimitInMB = 1;
@@ -119,15 +119,14 @@ final class FileBundleCreatorTest extends TestCase
 
     /**
      * @covers \CMS\PhpBackup\Core\FileBundleCreator::createFileBundles()
-     * 
      */
     public function testMeasureTiming(): void
     {
-        $this->markTestSkipped('Run only manually.');
-        FileHelper::makeDir(self::TEST_DIR . "sub");
-        FileHelper::makeDir(self::TEST_DIR . "sub\\sub");
+        self::markTestSkipped('Run only manually.');
+        FileHelper::makeDir(self::TEST_DIR . 'sub');
+        FileHelper::makeDir(self::TEST_DIR . 'sub\\sub');
 
-        for ($i=0; $i < 100; $i++) { 
+        for ($i = 0; $i < 100; ++$i) {
             $this->createTestFile(self::TEST_DIR . "{$i}.txt", 10);
             $this->createTestFile(self::TEST_DIR . "sub\\{$i}.txt", 10);
             $this->createTestFile(self::TEST_DIR . "sub\\sub\\{$i}.txt", 10);
@@ -139,7 +138,7 @@ final class FileBundleCreatorTest extends TestCase
         $start = microtime(true);
         FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles);
         $end = microtime(true);
-        
+
         $executionTime = $end - $start;
         self::fail("Execution took {$executionTime} ms.");
     }

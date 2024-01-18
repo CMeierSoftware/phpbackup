@@ -88,11 +88,10 @@ final class StepManager
 
         // Check if the delay for the current step has passed
         $nextExecution = ($prevStepInfo['timestamp'] + $this->steps[$this->currentStepIdx]->delay);
-        if (microtime(true) -$nextExecution >= 0) {
+        if (microtime(true) - $nextExecution >= 0) {
             return $this->steps[$this->currentStepIdx];
-        } else {
-            $logger->info('Next execution at: ' . date("Y-m-d H:i:s", $nextExecution));
         }
+        $logger->info('Next execution at: ' . date('Y-m-d H:i:s', $nextExecution));
 
         return null;
     }

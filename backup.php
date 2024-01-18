@@ -49,4 +49,4 @@ foreach ($apps as $appName) {
     }
 }
 
-echo "<h2>Step Execution completed.</h2>";
+echo '<h2>Step Execution completed.</h2>';
