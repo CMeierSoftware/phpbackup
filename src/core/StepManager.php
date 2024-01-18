@@ -71,12 +71,14 @@ final class StepManager
     private function getNextStep(): ?StepConfig
     {
         $prevStepInfo = false;
+        $logger = FileLogger::getInstance();
         if (file_exists($this->stepFile) && 0 !== filesize($this->stepFile)) {
             $prevStepInfo = unserialize(file_get_contents($this->stepFile));
         }
 
         // Check if there is no previous step information or if steps have changed
         if (!$prevStepInfo || $prevStepInfo['step_hash'] !== md5(serialize($this->steps))) {
+            $logger->info('Steps changed, start at index 0.');
             $this->currentStepIdx = 0;
 
             return $this->steps[0];
@@ -85,9 +87,11 @@ final class StepManager
         $this->currentStepIdx = ((int) $prevStepInfo['last_step_index'] + 1) % count($this->steps);
 
         // Check if the delay for the current step has passed
-        $delay = microtime(true) - ($prevStepInfo['timestamp'] + $this->steps[$this->currentStepIdx]->delay);
-        if ($delay >= 0) {
+        $nextExecution = ($prevStepInfo['timestamp'] + $this->steps[$this->currentStepIdx]->delay);
+        if (microtime(true) -$nextExecution >= 0) {
             return $this->steps[$this->currentStepIdx];
+        } else {
+            $logger->info('Next execution at: ' . date("Y-m-d H:i:s", $nextExecution));
         }
 
         return null;
