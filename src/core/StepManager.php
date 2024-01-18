@@ -78,7 +78,7 @@ final class StepManager
 
         // Check if there is no previous step information or if steps have changed
         if (!$prevStepInfo || $prevStepInfo['step_hash'] !== md5(serialize($this->steps))) {
-            $logger->info('Steps changed, start at index 0.');
+            $logger->debug('Steps changed, start at index 0.');
             $this->currentStepIdx = 0;
 
             return $this->steps[0];

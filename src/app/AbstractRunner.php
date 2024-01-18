@@ -86,13 +86,13 @@ abstract class AbstractRunner
 
             $stepExecuted = (null !== $result);
 
-            $this->logger->Info($stepExecuted ? (string) $result : 'No next step.');
+            $this->logger->info($stepExecuted ? (string) $result : 'No next step.');
         } catch (\Exception $e) {
-            $this->logger->Error($e->getMessage());
+            $this->logger->error($e->getMessage());
 
             throw $e;
         } finally {
-            $this->logger->Info('Step done.');
+            $this->logger->debug('Step done.');
         }
 
         return $stepExecuted;

@@ -41,12 +41,12 @@ final class FileBundleCreator
     {
         $fbc = new self($rootDir, $sizeLimitInMB, $refBundles, $excludedDirs);
 
-        FileLogger::getInstance()->info("Calculating bundles for '{$rootDir}' each {$sizeLimitInMB} MB.");
+        FileLogger::getInstance()->debug("Start calculating bundles for '{$rootDir}' each {$sizeLimitInMB} MB.");
 
         $fbc->packDirectory();
 
         $bundleCount = count($refBundles);
-        FileLogger::getInstance()->info("Calculated {$bundleCount} bundles for '{$rootDir}'.");
+        FileLogger::getInstance()->info("Calculated {$bundleCount} bundles for '{$rootDir}' each {$sizeLimitInMB} MB.");
     }
 
     /**

@@ -15,6 +15,7 @@ if (!defined('ABS_PATH')) {
 final class CreateBundlesStep extends AbstractStep
 {
     private readonly string $srcDir;
+    private readonly array $excludeDirs;
     private readonly int $maxArchiveSize;
     private array $bundles;
 
@@ -27,14 +28,21 @@ final class CreateBundlesStep extends AbstractStep
     {
         parent::__construct($config);
 
-        $this->srcDir = $this->config->getBackupDirectory()['src'];
+        $this->srcDir = $this->config->getBackupDirectory()['src'];       
+        $this->excludeDirs = $this->config->getBackupDirectory()['exclude'];
+
         $this->maxArchiveSize = (int) $this->config->getBackupSettings()['maxArchiveSize'];
     }
 
     protected function _execute(): StepResult
     {
         $this->stepData['bundles'] = [];
-        FileBundleCreator::createFileBundles($this->srcDir, $this->maxArchiveSize, $this->stepData['bundles']);
+        FileBundleCreator::createFileBundles(
+            $this->srcDir, 
+            $this->maxArchiveSize, 
+            $this->stepData['bundles'],
+            $this->excludeDirs
+        );
 
         $backupDirectory = TEMP_DIR . 'backup_' . (new \DateTime())->format('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
         FileHelper::makeDir($backupDirectory);

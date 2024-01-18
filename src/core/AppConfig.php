@@ -32,6 +32,8 @@ final class AppConfig
     private function __construct(string $configFile, string $tempDir)
     {
         $this->configFile = $configFile;
+        FileLogger::getInstance()->debug("Load config file from {$configFile}");
+
         $cfg = LaminasConfigFactory::fromFile($configFile);
         if (empty($cfg) || !is_array($cfg)) {
             throw new UnprocessableConfigException("The config {$configFile} is not formatted correctly. Its empty or not containing elements.");
@@ -51,14 +53,14 @@ final class AppConfig
      */
     public static function loadAppConfig(string $app): self
     {
-        $config_file = CONFIG_DIR . $app . '.xml';
+        $configFile = CONFIG_DIR . $app . '.xml';
         $tempDir = CONFIG_DIR . self::TMP_DIR . $app;
 
-        if (!file_exists($config_file)) {
-            throw new FileNotFoundException("Configuration file does not exist: {$config_file}");
+        if (!file_exists($configFile)) {
+            throw new FileNotFoundException("Configuration file does not exist: {$configFile}");
         }
 
-        return new self($config_file, $tempDir);
+        return new self($configFile, $tempDir);
     }
 
     /**
@@ -68,7 +70,7 @@ final class AppConfig
      */
     public function getTempDir(): string
     {
-        $this->createTempDir();
+        FileHelper::makeDir($this->tempDir);
 
         return $this->tempDir . DIRECTORY_SEPARATOR;
     }
@@ -87,7 +89,7 @@ final class AppConfig
         $writer = new JsonWriter();
         $writer->toFile($filePath, $config);
 
-        FileLogger::getInstance()->info("Wrote tempData to '{$filePath}'.");
+        FileLogger::getInstance()->debug("Wrote tempData to '{$filePath}'.");
     }
 
     /**
@@ -108,7 +110,7 @@ final class AppConfig
         }
         $reader = new JsonReader();
 
-        FileLogger::getInstance()->info("Read tempData from '{$filePath}'.");
+        FileLogger::getInstance()->debug("Read tempData from '{$filePath}'.");
 
         $data = is_array($result = $reader->fromFile($filePath)) ? $result : [];
 
@@ -204,10 +206,10 @@ final class AppConfig
         if (null === $remoteClasses) {
             return [];
         }
-        $remoteClasses = array_keys($remoteClasses);
+
         $remoteClasses = array_map(
-            static fn ($cls) => str_replace('Abstract', ucfirst($cls), $baseClass),
-            $remoteClasses
+            static fn ($cls): string => str_replace('Abstract', ucfirst($cls), $baseClass),
+            array_keys($remoteClasses)
         );
 
         return array_filter($remoteClasses, 'class_exists');
@@ -220,8 +222,7 @@ final class AppConfig
 
         $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
         $absoluteParts = array_filter($absoluteParts);
-        $isWin = 1 === preg_match('/^[A-Za-z]:/', reset($absoluteParts));
-
+        
         foreach ($parts as $part) {
             if ('..' === $part) {
                 array_pop($absoluteParts);
@@ -232,6 +233,7 @@ final class AppConfig
 
         $path = trim(implode(DIRECTORY_SEPARATOR, $absoluteParts), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
+        $isWin = 1 === preg_match('/^[A-Za-z]:/', reset($absoluteParts));
         return $isWin ? $path : DIRECTORY_SEPARATOR . $path;
     }
 
@@ -245,26 +247,5 @@ final class AppConfig
         $sanitizedType = str_replace([DIRECTORY_SEPARATOR, '\\', '/'], '_', $type);
 
         return $this->getTempDir() . $sanitizedType . '.json';
-    }
-
-    private function hasNumericKeys(array &$array): bool
-    {
-        foreach (array_keys($array) as $key) {
-            if (is_numeric($key)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Creates the temporary directory if it does not exist.
-     */
-    private function createTempDir(): void
-    {
-        if (!file_exists($this->tempDir)) {
-            FileHelper::makeDir($this->tempDir);
-        }
     }
 }

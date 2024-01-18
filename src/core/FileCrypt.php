@@ -10,6 +10,7 @@ if (!defined('ABS_PATH')) {
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use Defuse\Crypto\File;
+use CMS\PhpBackup\Core\FileLogger;
 
 /**
  * Class FileCrypt.
@@ -70,7 +71,7 @@ final class FileCrypt
         $tempFile = $inputFile . uniqid();
         $action = $isEncrypt ? 'Encrypt' : 'Decrypt';
 
-        FileLogger::getInstance()->info("{$action} '{$inputFile}' into temp file '{$tempFile}'.");
+        FileLogger::getInstance()->debug("{$action} '{$inputFile}' into temp file '{$tempFile}'.");
 
         try {
             $method = strtolower($action) . 'FileWithPassword';
@@ -89,6 +90,7 @@ final class FileCrypt
             throw new \Exception("Failed to rename the temporary file after {$action}.");
         }
 
-        FileLogger::getInstance()->info('Renamed tempFile back to inputFile.');
+        FileLogger::getInstance()->debug('Renamed tempFile back to inputFile.');
+        FileLogger::getInstance()->info("{$action} {$inputFile} successful completed.");
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\App;
 
+use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
@@ -22,8 +23,11 @@ class BackupRunner extends AbstractRunner
     {
         $steps = [];
         $repeatDelay = (int) $this->config->getBackupSettings()['executeEveryDays'];
+        $repeatDelaySecs = $repeatDelay * 24 * 60 * 60;
 
-        $steps[] = new StepConfig(CreateBundlesStep::class, $repeatDelay * 24 * 60 * 60);
+        FileLogger::getInstance()->debug("Repeat delay {$repeatDelay} day(s) or {$repeatDelaySecs} seconds.");
+
+        $steps[] = new StepConfig(CreateBundlesStep::class, $repeatDelaySecs);
         $steps[] = new StepConfig(DirectoryBackupStep::class);
         $steps[] = new StepConfig(DatabaseBackupStep::class);
 
@@ -39,6 +43,6 @@ class BackupRunner extends AbstractRunner
     {
         $remoteHandler = $this->config->getDefinedRemoteClasses($baseClass);
 
-        return array_map(static fn ($handler) => new StepConfig($handler), $remoteHandler);
+        return array_map(static fn ($handler): StepConfig => new StepConfig($handler), $remoteHandler);
     }
 }
