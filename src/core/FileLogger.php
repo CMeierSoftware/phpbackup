@@ -16,6 +16,7 @@ enum LogLevel: int
     case ERROR = 1;
     case WARNING = 2;
     case INFO = 3;
+    case DEBUG = 4;
 }
 
 final class FileLogger
@@ -109,6 +110,16 @@ final class FileLogger
     public function info(string $message): void
     {
         $this->writeEntry(LogLevel::INFO, $message);
+    }
+
+    /**
+     * Writes a message of the level 'Info'.
+     *
+     * @param string $message The message to be logged
+     */
+    public function debug(string $message): void
+    {
+        $this->writeEntry(LogLevel::DEBUG, $message);
     }
 
     /**

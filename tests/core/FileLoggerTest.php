@@ -32,7 +32,7 @@ final class FileLoggerTest extends TestCase
 
         $this->logger = FileLogger::getInstance();
         $this->logger->setLogFile(self::LOG_FILE_PATH);
-        $this->logger->setLogLevel(LogLevel::INFO);
+        $this->logger->setLogLevel(LogLevel::DEBUG);
     }
 
     protected function tearDown(): void
@@ -189,6 +189,24 @@ final class FileLoggerTest extends TestCase
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringStartsWith(LogLevel::INFO->name, $log_file_content);
+        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\FileLogger::debug()
+     *
+     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Core\LogLevel::toString()
+     */
+    public function testDebugLogEntry()
+    {
+        $errorMessage = 'This is an error message';
+        $this->logger->debug($errorMessage);
+
+        // Assert that the log entry is written to the file
+        self::assertFileExists(self::LOG_FILE_PATH);
+        $log_file_content = file_get_contents(self::LOG_FILE_PATH);
+        self::assertStringStartsWith(LogLevel::DEBUG->name, $log_file_content);
         self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
     }
 }
