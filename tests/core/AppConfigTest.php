@@ -48,9 +48,9 @@ final class AppConfigTest extends TestCase
 
     protected function tearDown(): void
     {
-        FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
-        FileHelper::deleteDirectory(TEMP_DIR);
-        FileHelper::deleteDirectory(CONFIG_DIR);
+        // FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        // FileHelper::deleteDirectory(TEMP_DIR);
+        // FileHelper::deleteDirectory(CONFIG_DIR);
     }
 
     /**
@@ -95,12 +95,14 @@ final class AppConfigTest extends TestCase
      */
     public function testDirectoryConfig(): void
     {
+        FileHelper::makeDir(self::TEST_TEMP_DIR);
+        self::assertDirectoryExists(self::TEST_TEMP_DIR);
+        
         $expectedConfig = [
             'src' => CONFIG_DIR,
             'exclude' => [
                 CONFIG_DIR, 
-                CONFIG_DIR . 'sub1' . DIRECTORY_SEPARATOR, 
-                CONFIG_DIR . 'sub2' . DIRECTORY_SEPARATOR, 
+                self::TEST_TEMP_DIR,
             ],
         ];
 
@@ -108,6 +110,20 @@ final class AppConfigTest extends TestCase
         self::assertSame($expectedConfig, $actualConfig);
     }
 
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::getBackupDirectory()
+     */
+    public function testDirectoryConfigNoExclude(): void
+    {
+        $config = AppConfig::loadAppConfig('valid_app_no_db');
+        $expectedConfig = [
+            'src' => CONFIG_DIR,
+        ];
+
+        $actualConfig = $config->getBackupDirectory();
+        self::assertSame($expectedConfig, $actualConfig);
+    }
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::getBackupSettings()
      */

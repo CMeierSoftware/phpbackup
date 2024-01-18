@@ -11,8 +11,8 @@
         <directory>
             <src>.</src>
             <exclude>.</exclude>
-            <exclude>sub1</exclude>
-            <exclude>./sub2/</exclude>
+            <exclude>temp_valid_app</exclude>
+            <exclude>not_existent</exclude>
             <exclude>..</exclude>
         </directory>
         <settings>

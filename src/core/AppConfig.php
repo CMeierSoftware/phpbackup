@@ -132,25 +132,27 @@ final class AppConfig
      */
     public function getBackupDirectory(): array
     {
-        if (isset($this->config['backup']['directory'])) {
-            $cfg = $this->config['backup']['directory'];
+        if (!isset($this->config['backup']['directory'])) {
+            return [];
+        }
 
-            $cfg['src'] = $this->toAbsolutePath($cfg['src']);
+        $cfg = $this->config['backup']['directory'];
 
+        $cfg['src'] = $this->toAbsolutePath($cfg['src']);
+
+        if (isset($cfg['exclude'])) {
             $cfg['exclude'] = array_map(
                 fn ($item): string => $this->toAbsolutePath($item), 
                 $cfg['exclude']
             );
-
+            
             $cfg['exclude'] = array_filter(
                 $cfg['exclude'],
-                static fn($item) => str_starts_with($item, $cfg['src'])
+                static fn($item): bool => str_starts_with($item, $cfg['src']) && is_dir($item)
             );
-
-            return $cfg;
         }
-
-        return [];
+            
+        return $cfg;
     }
 
     /**
