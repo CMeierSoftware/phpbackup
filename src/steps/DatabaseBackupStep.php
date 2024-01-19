@@ -68,15 +68,15 @@ final class DatabaseBackupStep extends AbstractStep
             return new StepResult('Database dump could not be created.', false);
         }
 
-        $this->logger->info("Database dump created at '{$backupFileName}'");
-
         if (!empty($this->encryptionKey)) {
             FileCrypt::encryptFile($backupFileName, $this->encryptionKey);
         }
 
         $backupFileName = $this->moveToBackupDirectory($backupFileName);
         $archives[basename($backupFileName)] = 'Database backup.';
-
+        
+        $this->logger->info("Database dump created and encrypted.");
+        
         return new StepResult($backupFileName, false);
     }
 
@@ -98,7 +98,7 @@ final class DatabaseBackupStep extends AbstractStep
         $newFile = $backupDirectory . basename($file);
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);
-        FileHelper::changePermission($file, 0o0400);
+        FileHelper::changePermission($newFile, 0o0400);
 
         return $newFile;
     }

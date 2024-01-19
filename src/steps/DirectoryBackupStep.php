@@ -54,7 +54,7 @@ final class DirectoryBackupStep extends AbstractStep
         $f = new FileBackupCreator($this->excludeDirs);
 
         $backupFileName = $f->backupOnly($this->srcDir, $bundles[$idx]);
-        $this->logger->Info("Archive files to '{$backupFileName}'");
+        $this->logger->debug("Archive files to '{$backupFileName}'");
 
         if (!empty($this->encryptionKey)) {
             FileCrypt::encryptFile($backupFileName, $this->encryptionKey);
@@ -67,7 +67,7 @@ final class DirectoryBackupStep extends AbstractStep
         $cntBundles = count($bundles);
         $cntArchives = count($archives);
 
-        $this->logger->Info("Archived {$cntArchives} of {$cntBundles} bundles.");
+        $this->logger->info("Archived and encrypted bundle {$cntArchives} of {$cntBundles} bundles.");
 
         return new StepResult($backupFileName, $cntArchives < $cntBundles);
     }
@@ -91,7 +91,7 @@ final class DirectoryBackupStep extends AbstractStep
         $newFile = $backupDirectory . $newName;
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);
-        FileHelper::changePermission($file, 0o0400);
+        FileHelper::changePermission($newFile, 0o0400);
 
         return $newFile;
     }
