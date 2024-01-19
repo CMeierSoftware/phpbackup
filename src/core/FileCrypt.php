@@ -10,7 +10,6 @@ if (!defined('ABS_PATH')) {
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use Defuse\Crypto\File;
-use CMS\PhpBackup\Core\FileLogger;
 
 /**
  * Class FileCrypt.

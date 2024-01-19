@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Api;
 
+if (!defined('ABS_PATH')) {
+    return;
+}
+
 /**
  * JsonResponse class provides static methods for sending JSON-formatted responses.
  *
@@ -62,10 +66,10 @@ class JsonResponse
         $statusMessages = [
             200 => 'OK',
             201 => 'Created',
-            // ... add more as needed
             400 => 'Bad Request',
             403 => 'Forbidden',
             404 => 'Not Found',
+            405 => 'Method Not Allowed',
             500 => 'Internal Server Error',
         ];
 

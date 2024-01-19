@@ -222,7 +222,7 @@ final class AppConfig
 
         $absoluteParts = preg_split("/[{$regex}]/", $baseDir);
         $absoluteParts = array_filter($absoluteParts);
-        
+
         foreach ($parts as $part) {
             if ('..' === $part) {
                 array_pop($absoluteParts);
@@ -234,6 +234,7 @@ final class AppConfig
         $path = trim(implode(DIRECTORY_SEPARATOR, $absoluteParts), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
         $isWin = 1 === preg_match('/^[A-Za-z]:/', reset($absoluteParts));
+
         return $isWin ? $path : DIRECTORY_SEPARATOR . $path;
     }
 
