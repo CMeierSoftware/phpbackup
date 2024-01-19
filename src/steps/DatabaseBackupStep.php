@@ -74,9 +74,9 @@ final class DatabaseBackupStep extends AbstractStep
 
         $backupFileName = $this->moveToBackupDirectory($backupFileName);
         $archives[basename($backupFileName)] = 'Database backup.';
-        
-        $this->logger->info("Database dump created and encrypted.");
-        
+
+        $this->logger->info('Database dump created and encrypted.');
+
         return new StepResult($backupFileName, false);
     }
 

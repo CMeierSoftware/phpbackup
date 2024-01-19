@@ -28,7 +28,7 @@ final class CreateBundlesStep extends AbstractStep
     {
         parent::__construct($config);
 
-        $this->srcDir = $this->config->getBackupDirectory()['src'];       
+        $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->excludeDirs = $this->config->getBackupDirectory()['exclude'];
 
         $this->maxArchiveSize = (int) $this->config->getBackupSettings()['maxArchiveSize'];
@@ -38,8 +38,8 @@ final class CreateBundlesStep extends AbstractStep
     {
         $this->stepData['bundles'] = [];
         FileBundleCreator::createFileBundles(
-            $this->srcDir, 
-            $this->maxArchiveSize, 
+            $this->srcDir,
+            $this->maxArchiveSize,
             $this->stepData['bundles'],
             $this->excludeDirs
         );
