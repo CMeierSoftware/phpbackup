@@ -42,7 +42,7 @@ final class BackblazeTest extends TestCase
     protected function tearDown(): void
     {
         FileHelper::deleteDirectory(self::WORK_DIR_LOCAL);
-        $this->remote->fileDelete($this->remoteWorkDir);
+        $this->remote->dirDelete($this->remoteWorkDir);
     }
 
     /**
@@ -96,6 +96,31 @@ final class BackblazeTest extends TestCase
     }
 
     /**
+     * @covers \CMS\PhpBackup\Remote\Backblaze::dirList()
+     */
+    public function testDirectoryListSuccess()
+    {
+        $result = $this->remote->dirList($this->remoteWorkDir);
+
+        self::assertSame([$this->remoteWorkDir . '.bzEmpty'], $result);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Remote\Backblaze::dirDelete()
+     */
+    public function testDirectoryDeleteSuccess()
+    {
+        $file = $this->remoteWorkDir . 'f1.txt';
+        $this->remote->fileUpload(TEST_FIXTURES_FILE_1, $file);
+        self::assertRemoteFileExists($file);
+
+        self::assertTrue($this->remote->dirDelete($this->remoteWorkDir));
+
+        self::assertRemoteFileDoesNotExist($file);
+        self::assertRemoteFileDoesNotExist($this->remoteWorkDir . '.bzEmpty');
+    }
+
+    /**
      * @covers \CMS\PhpBackup\Remote\Backblaze::fileDownload()
      */
     public function testFileDownloadSuccess()
@@ -121,11 +146,13 @@ final class BackblazeTest extends TestCase
 
     public function assertRemoteFileExists(string $file)
     {
+        $this->remote->clearCache();
         self::assertTrue($this->remote->fileExists($file), "{$file} does not exist on remote storage.");
     }
 
     public function assertRemoteFileDoesNotExist(string $file)
     {
+        $this->remote->clearCache();
         self::assertFalse($this->remote->fileExists($file), "{$file} exists on remote storage.");
     }
 }

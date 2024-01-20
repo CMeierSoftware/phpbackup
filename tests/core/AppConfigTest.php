@@ -10,7 +10,6 @@ use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\Remote\BackblazeRemoteDeleteOldFilesStep;
 use CMS\PhpBackup\Step\Remote\LocalRemoteDeleteOldFilesStep;
-use Laminas\Config\Config;
 use Laminas\Config\Exception\RuntimeException;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;
@@ -48,9 +47,9 @@ final class AppConfigTest extends TestCase
 
     protected function tearDown(): void
     {
-        // FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
-        // FileHelper::deleteDirectory(TEMP_DIR);
-        // FileHelper::deleteDirectory(CONFIG_DIR);
+        FileHelper::deleteDirectory(self::TEST_TEMP_DIR);
+        FileHelper::deleteDirectory(TEMP_DIR);
+        FileHelper::deleteDirectory(CONFIG_DIR);
     }
 
     /**
@@ -440,7 +439,7 @@ final class AppConfigTest extends TestCase
         self::assertSame($expect, $this->config->toAbsolutePath($relPath, $base));
     }
 
-    public function provideToAbsolutePathOwnBaseCases(): iterable
+    public static function provideToAbsolutePathOwnBaseCases(): iterable
     {
         return [
             [self::TEST_TEMP_DIR, self::TEST_TEMP_DIR, ''],
@@ -462,7 +461,7 @@ final class AppConfigTest extends TestCase
         self::assertSame($expect, $this->config->toAbsolutePath($relPath));
     }
 
-    public function provideToAbsolutePathConfigBaseCases(): iterable
+    public static function provideToAbsolutePathConfigBaseCases(): iterable
     {
         return [
             [CONFIG_DIR, ''],

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Remote;
 
 use obregonco\B2\Client;
+use obregonco\B2\File;
 
 class Backblaze extends AbstractRemoteHandler
 {
@@ -117,6 +118,48 @@ class Backblaze extends AbstractRemoteHandler
         }
 
         return false;
+    }
+
+    protected function _dirDelete(string $remotePath): bool
+    {
+        $result = true;
+        $files = $this->_dirList($remotePath, true);
+        foreach ($files as $fileId => $fileName) {
+            $options = [
+                'BucketName' => $this->bucketName,
+                'BucketId' => $this->bucketId,
+                'FileId' => $fileId,
+                'FileName' => $fileName,
+            ];
+
+            $result = $result && $this->connection->deleteFile($options);
+        }
+
+        return $result;
+    }
+
+    protected function _dirList(string $remotePath, bool $includeFileId = false): array
+    {
+        $options = [
+            'BucketName' => $this->bucketName,
+            'BucketId' => $this->bucketId,
+        ];
+
+        $fileList = $this->connection->listFiles($options);
+        $fileList = array_map(
+            static fn (File $file): array => [
+                'name' => $file->getFileName(),
+                'id' => $file->getFileId(),
+            ],
+            $fileList
+        );
+
+        $fileList = array_filter(
+            $fileList,
+            static fn (array $file): bool => str_starts_with($file['name'], $remotePath)
+        );
+
+        return array_column($fileList, 'name', $includeFileId ? 'id' : null);
     }
 
     private function isFilePath($path): bool
