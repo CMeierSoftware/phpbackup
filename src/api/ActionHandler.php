@@ -114,7 +114,7 @@ class ActionHandler
      *
      * @return string the generated nonce
      */
-    public function generateNonce(string $actionName): string
+    public static function generateNonce(string $actionName): string
     {
         return md5($actionName . self::class);
     }

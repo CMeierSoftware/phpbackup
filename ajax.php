@@ -12,8 +12,7 @@ use CMS\PhpBackup\Api\AjaxController;
 
 session_start();
 
-$session = &$_SESSION;
-$ajaxController = new AjaxController($session);
+$ajaxController = new AjaxController();
 
 // Handle the request
 $ajaxController->handleRequest();

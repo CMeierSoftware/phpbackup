@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace CMS\PhpBackup\Api;
@@ -9,7 +10,6 @@ if (!defined('ABS_PATH')) {
 
 /**
  * JsonResponse class provides static methods for sending JSON-formatted responses.
- *
  */
 class JsonResponse
 {
@@ -17,10 +17,8 @@ class JsonResponse
      * Sends a JSON error response with the specified message and HTTP status code.
      * Exits the script after sending the response.
      *
-     * @param string $message The error message.
-     * @param int $code The HTTP status code for the response.
-     *
-     * @return void
+     * @param string $message the error message
+     * @param int $code the HTTP status code for the response
      */
     public static function sendError(string $message, int $code)
     {
@@ -31,10 +29,8 @@ class JsonResponse
      * Sends a JSON success response with the specified data and optional HTTP status code.
      * Exits the script after sending the response.
      *
-     * @param array $data The data to include in the success response.
-     * @param int $code The optional HTTP status code for the response (default is 200).
-     *
-     * @return void
+     * @param array $data the data to include in the success response
+     * @param int $code the optional HTTP status code for the response (default is 200)
      */
     public static function sendSuccess(array $data, int $code = 200)
     {
@@ -53,12 +49,13 @@ class JsonResponse
 
         $jsonData = json_encode($responseData, JSON_UNESCAPED_UNICODE);
 
-        if ($jsonData === false) {
+        if (false === $jsonData) {
             self::sendError('JSON encoding error', 500);
         }
 
         echo $jsonData;
-        exit();
+
+        exit;
     }
 
     private static function getStatusMessage(int $code): string
