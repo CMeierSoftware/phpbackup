@@ -112,9 +112,9 @@ final class AppConfig
 
         FileLogger::getInstance()->debug("Read tempData from '{$filePath}'.");
 
-        $data = is_array($result = $reader->fromFile($filePath)) ? $result : [];
+        $data = $reader->fromFile($filePath);
 
-        return $data;
+        return is_array($data) ? $data : [];
     }
 
     /**
@@ -124,7 +124,7 @@ final class AppConfig
      */
     public function getBackupDatabase(): array
     {
-        return isset($this->config['backup']['database']) ? $this->config['backup']['database'] : [];
+        return $this->config['backup']['database'] ?? [];
     }
 
     /**
@@ -134,31 +134,21 @@ final class AppConfig
      */
     public function getBackupDirectory(): array
     {
-        if (!isset($this->config['backup']['directory'])) {
-            return [];
-        }
+        $backupConfig = $this->config['backup']['directory'] ?? [];
+        $backupConfig['src'] = $this->toAbsolutePath($backupConfig['src'] ?? '');
+        $backupConfig['exclude'] = (array) ($backupConfig['exclude'] ?? []);
 
-        $cfg = $this->config['backup']['directory'];
+        $backupConfig['exclude'] = array_map(
+            fn (string $item): string => $this->toAbsolutePath($item),
+            $backupConfig['exclude']
+        );
 
-        $cfg['src'] = $this->toAbsolutePath($cfg['src']);
+        $backupConfig['exclude'] = array_filter(
+            $backupConfig['exclude'],
+            static fn (string $item): bool => str_starts_with($item, $backupConfig['src']) && is_dir($item)
+        );
 
-        if (isset($cfg['exclude'])) {
-            $cfg['exclude'] = is_array($cfg['exclude']) ? $cfg['exclude'] : [$cfg['exclude']];
-
-            $cfg['exclude'] = array_map(
-                fn ($item): string => $this->toAbsolutePath($item),
-                $cfg['exclude']
-            );
-
-            $cfg['exclude'] = array_filter(
-                $cfg['exclude'],
-                static fn ($item): bool => str_starts_with($item, $cfg['src']) && is_dir($item)
-            );
-        } else {
-            $cfg['exclude'] = [];
-        }
-
-        return $cfg;
+        return $backupConfig;
     }
 
     /**
@@ -168,7 +158,7 @@ final class AppConfig
      */
     public function getBackupSettings(): array
     {
-        return isset($this->config['backup']['settings']) ? $this->config['backup']['settings'] : [];
+        return $this->config['backup']['settings'] ?? [];
     }
 
     /**
@@ -201,14 +191,10 @@ final class AppConfig
 
     public function getDefinedRemoteClasses(string $baseClass): array
     {
-        $remoteClasses = $this->getRemoteSettings();
-
-        if (null === $remoteClasses) {
-            return [];
-        }
+        $remoteClasses = $this->getRemoteSettings() ?? [];
 
         $remoteClasses = array_map(
-            static fn ($cls): string => str_replace('Abstract', ucfirst($cls), $baseClass),
+            static fn (string $cls): string => str_replace('Abstract', ucfirst($cls), $baseClass),
             array_keys($remoteClasses)
         );
 

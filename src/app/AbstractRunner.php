@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\App;
 
+use CMS\PhpBackup\Step\StepConfig;
+
 if (!defined('ABS_PATH')) {
     return;
 }
@@ -125,6 +127,16 @@ abstract class AbstractRunner
         $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
         $this->logger->setLogLevel(LogLevel::INFO);
         $this->logger->activateEchoLogs();
+    }
+
+    protected function getRemoteStepsFor(string $baseClass): array
+    {
+        $remoteHandler = $this->config->getDefinedRemoteClasses($baseClass);
+
+        return array_map(
+            static fn (string $handler): StepConfig => new StepConfig($handler),
+            $remoteHandler
+        );
     }
 
     /**

@@ -30,11 +30,9 @@ class FileBackupCreator
      *
      * @param null|array $ignoreList A list of file or directory names to ignore
      */
-    public function __construct(array $ignoreList = null)
+    public function __construct(array $ignoreList = [])
     {
-        if (null !== $ignoreList) {
-            $this->ignoreList = $ignoreList;
-        }
+        $this->ignoreList = $ignoreList;
         $this->archive = new ZipFile();
     }
 
@@ -49,10 +47,8 @@ class FileBackupCreator
     {
         $srcDir = $this->prepareBackup($src);
 
-        $directoryIterator = new \RecursiveDirectoryIterator($srcDir);
-
         $ignoreIterator = new IgnoreFilesRecursiveFilterIterator(
-            $directoryIterator,
+            new \RecursiveDirectoryIterator($srcDir),
             $this->ignoreList
         );
 
@@ -79,13 +75,27 @@ class FileBackupCreator
     {
         $srcDir = $this->prepareBackup($src);
 
+        $files = array_map(
+            static fn (string $file): string => rtrim($srcDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file,
+            $files
+        );
+
+        $files = array_filter(
+            $files,
+            function (string $file): bool {
+                foreach ($this->ignoreList as $ignorePath) {
+                    if (str_starts_with($file, $ignorePath)) {
+                        return false;
+                    }
+                }
+
+                return file_exists($file);
+            }
+        );
+
         try {
             foreach ($files as $file) {
-                $srcFilePath = rtrim($srcDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
-
-                if (file_exists($srcFilePath)) {
-                    $this->archive->addFile($srcFilePath, $file);
-                }
+                $this->archive->addFile($file, basename($file));
             }
             $this->archive->saveAsFile($this->archiveName);
             FileLogger::getInstance()->info("Backup created for '{$src}' with specific files at '{$this->archiveName}'.");

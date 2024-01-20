@@ -16,8 +16,9 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 final class AbstractStepTest extends TestCaseWithAppConfig
 {
-    private const WATCHDOG_FILE = self::CONFIG_TEMP_DIR . 'send_remote_watchdog.xml';
-    private const CONFIG_STEP_RESULT_FILE = self::CONFIG_TEMP_DIR . 'StepData.xml';
+    private const WATCHDOG_FILE = self::CONFIG_TEMP_DIR . 'send_remote_watchdog.json';
+    private const CONFIG_STEP_RESULT_FILE = self::CONFIG_TEMP_DIR . 'StepData.json';
+    private const CONFIG_STEP_EXPECTED_FILE = TEST_FIXTURES_STEPS_DIR . 'StepData.json';
 
     protected function setUp(): void
     {
@@ -66,7 +67,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $result = $step->execute();
 
         self::assertSame($stepResult, $result);
-        self::assertStepResultFile(TEST_FIXTURES_STEPS_DIR . 'StepData.xml');
+        self::assertStepResultFile(self::CONFIG_STEP_EXPECTED_FILE);
     }
 
     /**
@@ -75,7 +76,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     public function testExecuteExistingStepData()
     {
         FileHelper::makeDir(self::CONFIG_TEMP_DIR);
-        copy(TEST_FIXTURES_STEPS_DIR . 'StepData.xml', self::CONFIG_STEP_RESULT_FILE);
+        copy(self::CONFIG_STEP_EXPECTED_FILE, self::CONFIG_STEP_RESULT_FILE);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
 
         $stepResult = new StepResult('Result', false);
@@ -86,7 +87,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $result = $step->execute();
 
         self::assertSame($stepResult, $result);
-        self::assertStepResultFile(TEST_FIXTURES_STEPS_DIR . 'StepData.xml');
+        self::assertStepResultFile(self::CONFIG_STEP_EXPECTED_FILE);
     }
 
     /**
@@ -95,7 +96,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     public function testValidateStepDataKeySuccess()
     {
         FileHelper::makeDir(self::CONFIG_TEMP_DIR);
-        copy(TEST_FIXTURES_STEPS_DIR . 'StepData.xml', self::CONFIG_STEP_RESULT_FILE);
+        copy(self::CONFIG_STEP_EXPECTED_FILE, self::CONFIG_STEP_RESULT_FILE);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
 
         $stepResult = new StepResult('Result', false);
@@ -106,7 +107,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $result = $step->execute();
 
         self::assertSame($stepResult, $result);
-        self::assertStepResultFile(TEST_FIXTURES_STEPS_DIR . 'StepData.xml');
+        self::assertStepResultFile(self::CONFIG_STEP_EXPECTED_FILE);
     }
 
     /**
@@ -115,7 +116,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     public function testValidateStepDataKeyMissing()
     {
         FileHelper::makeDir(self::CONFIG_TEMP_DIR);
-        copy(TEST_FIXTURES_STEPS_DIR . 'StepData.xml', self::CONFIG_STEP_RESULT_FILE);
+        copy(self::CONFIG_STEP_EXPECTED_FILE, self::CONFIG_STEP_RESULT_FILE);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
 
         $stepResult = new StepResult('Result', false);
@@ -162,7 +163,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         }
 
         self::assertFileExists(self::WATCHDOG_FILE);
-        self::assertStringContainsString("<attempts>{$count}</attempts>", file_get_contents(self::WATCHDOG_FILE));
+        self::assertStringContainsString("\"attempts\": {$count}", file_get_contents(self::WATCHDOG_FILE));
     }
 
     /**
@@ -183,9 +184,9 @@ final class AbstractStepTest extends TestCaseWithAppConfig
 
         $methodIncrementAttemptsCount->invoke($step);
 
-        self::assertStringContainsString('<attempts>1</attempts>', file_get_contents(self::WATCHDOG_FILE));
+        self::assertStringContainsString('"attempts": 1', file_get_contents(self::WATCHDOG_FILE));
         $methodResetAttemptsCount->invoke($step);
-        self::assertStringContainsString('<attempts>0</attempts>', file_get_contents(self::WATCHDOG_FILE));
+        self::assertStringContainsString('"attempts": 0', file_get_contents(self::WATCHDOG_FILE));
     }
 
     private function getMockedHandler(): MockObject
@@ -202,6 +203,6 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         self::assertDirectoryExists(self::CONFIG_TEMP_DIR);
         self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
 
-        self::assertXmlFileEqualsXmlFile($expected, self::CONFIG_STEP_RESULT_FILE);
+        self::assertJsonFileEqualsJsonFile($expected, self::CONFIG_STEP_RESULT_FILE);
     }
 }

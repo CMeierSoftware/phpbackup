@@ -426,7 +426,7 @@ final class AbstractRemoteHandlerTest extends TestCase
         $this->mockedHandler->expects(self::exactly(count($expiredDirs)))
             ->method('_dirDelete')
             ->willReturnCallback(
-                static fn ($remotePath) => in_array(ltrim($remotePath, '/'), $expiredDirs, true) ? true : self::fail("Function wants to delete validDir {$remotePath} " . json_encode($expiredDirs))
+                static fn (string $remotePath): bool => in_array(ltrim($remotePath, '/'), $expiredDirs, true) ? true : self::fail("Function wants to delete validDir {$remotePath} " . json_encode($expiredDirs))
             )
         ;
 
@@ -460,7 +460,7 @@ final class AbstractRemoteHandlerTest extends TestCase
         $this->mockedHandler->expects(self::exactly(count($allDirs) - $countToKeep))
             ->method('_dirDelete')
             ->willReturnCallback(
-                static fn ($remotePath) => in_array(ltrim($remotePath, '/'), $expiredDirs, true) ? true : self::fail("Function wants to delete validDir {$remotePath} " . json_encode($expiredDirs))
+                static fn (string $remotePath): bool => in_array(ltrim($remotePath, '/'), $expiredDirs, true) ? true : self::fail("Function wants to delete validDir {$remotePath} " . json_encode($expiredDirs))
             )
         ;
 

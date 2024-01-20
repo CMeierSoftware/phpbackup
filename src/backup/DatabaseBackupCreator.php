@@ -36,7 +36,7 @@ class DatabaseBackupCreator
         $this->username = $username;
         $this->password = $password;
         $this->database = $database;
-        $this->mysqldumpExe = !empty(getenv('MYSQLDUMP_EXE')) ? getenv('MYSQLDUMP_EXE') : 'mysqldump';
+        $this->mysqldumpExe = getenv('MYSQLDUMP_EXE') ?? 'mysqldump';
     }
 
     /**

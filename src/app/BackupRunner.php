@@ -38,11 +38,4 @@ class BackupRunner extends AbstractRunner
 
         return $steps;
     }
-
-    private function getRemoteStepsFor(string $baseClass): array
-    {
-        $remoteHandler = $this->config->getDefinedRemoteClasses($baseClass);
-
-        return array_map(static fn ($handler): StepConfig => new StepConfig($handler), $remoteHandler);
-    }
 }

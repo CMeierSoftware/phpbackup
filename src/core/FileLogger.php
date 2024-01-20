@@ -148,12 +148,7 @@ final class FileLogger
     {
         $timestamp = date('d.m.Y H:i:s');
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4)[3];
-        $class = '';
-        if (isset($trace['class'])) {
-            $class = $trace['class'];
-        } else {
-            $class = basename($trace['file']);
-        }
+        $class = $trace['class'] ?? basename($trace['file']);
 
         return $level->name . "\t" . $timestamp . "\t" . $class . ": \t" . $message . "\n";
     }

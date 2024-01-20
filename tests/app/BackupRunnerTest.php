@@ -56,7 +56,7 @@ final class BackupRunnerTest extends TestCase
     public function testSteps()
     {
         $expectedSteps = [
-            new StepConfig(CreateBundlesStep::class),
+            new StepConfig(CreateBundlesStep::class, 5 * 24 * 60 * 60),
             new StepConfig(DirectoryBackupStep::class),
             new StepConfig(DatabaseBackupStep::class),
             new StepConfig(LocalRemoteSendFileStep::class),

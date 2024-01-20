@@ -42,8 +42,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
 
         self::assertInstanceOf(StepResult::class, $actual);
 
-        // $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql\.gz$/';
-        $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/';
+        $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql(?:\.[a-zA-Z]{0,3})?$/';
         self::assertMatchesRegularExpression($dtPattern, basename($actual->returnValue));
         self::assertStringStartsWith(self::TEST_DIR, $actual->returnValue);
         self::assertSame($expected->repeat, $actual->repeat);

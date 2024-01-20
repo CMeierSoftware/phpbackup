@@ -184,7 +184,7 @@ abstract class AbstractRemoteHandler
         $result = array_values(array_diff($result, ['..', '.']));
 
         $resultCache = array_map(
-            static fn ($path) => rtrim($remotePath, '\\/') . DIRECTORY_SEPARATOR . $path,
+            static fn (string $path): string => rtrim($remotePath, '\\/') . DIRECTORY_SEPARATOR . $path,
             $result
         );
         $this->fileExistsCache += array_fill_keys($resultCache, true);
@@ -374,7 +374,7 @@ abstract class AbstractRemoteHandler
             throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
         }
         if ($checkFilePath && !$this->isFilePath($remotePath)) {
-            throw new \InvalidArgumentException('The provided path belongs to a file, not a directory.');
+            throw new \InvalidArgumentException("{$remotePath} belongs to a file, not a directory.");
         }
     }
 
