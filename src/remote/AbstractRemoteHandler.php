@@ -17,7 +17,6 @@ abstract class AbstractRemoteHandler
 {
     public array $fileExistsCache = [];
     protected mixed $connection = null;
-
     protected FileLogger $logger;
 
     public function __construct()
@@ -410,7 +409,7 @@ abstract class AbstractRemoteHandler
      */
     private function isFilePath(string $path): bool
     {
-        $isFilePath = !empty($pathInfo['extension']);
+        $isFilePath = !empty(pathinfo($path)['extension']);
 
         $this->logger->debug("The path '{$path}' is " . ($isFilePath ? '' : 'not') . ' a file.');
 

@@ -393,7 +393,7 @@ final class AbstractRemoteHandlerTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($this->mockedHandler, $dirs);
 
-        self::assertFalse($this->mockedHandler->dirDelete(self::WORK_DIR_LOCAL . 'test'));
+        self::assertTrue($this->mockedHandler->dirDelete(self::WORK_DIR_LOCAL . 'test'));
 
         self::assertMockedCache([
             self::WORK_DIR_LOCAL . 'test\foo.txt' => false,
