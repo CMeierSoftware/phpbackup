@@ -23,21 +23,23 @@ abstract class TestCaseWithAppConfig extends TestCase
 
     protected function tearDown(): void
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(self::TEST_DIR, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-    
-        foreach ($iterator as $item) {
-            $path = $item->getPathname();
-            if ($item->isFile()) {
-                FileHelper::changePermission($path, 0o644);
+        if (FileHelper::doesDirExists(self::TEST_DIR)) {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator(self::TEST_DIR, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+        
+            foreach ($iterator as $item) {
+                $path = $item->getPathname();
+                if ($item->isFile()) {
+                    FileHelper::changePermission($path, 0o644);
+                }
             }
         }
         FileHelper::deleteDirectory(self::TEST_DIR);
         FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
 
-        FileHelper::deleteFile(self::CONFIG_FILE);
+        unlink(self::CONFIG_FILE);
         parent::tearDown();
     }
 
