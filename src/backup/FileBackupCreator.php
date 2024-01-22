@@ -117,7 +117,7 @@ class FileBackupCreator
      */
     private function prepareBackup(string $src): string
     {
-        if (!FileHelper::doesDirExists($src)) {
+        if (!FileHelper::directoryExists($src)) {
             throw new FileNotFoundException("Can not find '{$src}'.");
         }
 

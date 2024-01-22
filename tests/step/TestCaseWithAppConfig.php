@@ -23,7 +23,7 @@ abstract class TestCaseWithAppConfig extends TestCase
 
     protected function tearDown(): void
     {
-        if (FileHelper::doesDirExists(self::TEST_DIR)) {
+        if (FileHelper::directoryExists(self::TEST_DIR)) {
             $iterator = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(self::TEST_DIR, \RecursiveDirectoryIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::SELF_FIRST
@@ -32,7 +32,7 @@ abstract class TestCaseWithAppConfig extends TestCase
             foreach ($iterator as $item) {
                 $path = $item->getPathname();
                 if ($item->isFile()) {
-                    FileHelper::changePermission($path, 0o644);
+                    FileHelper::changeFilePermission($path, 0o644);
                 }
             }
         }

@@ -30,7 +30,8 @@ final class FileHelperTest extends TestCase
 
     protected function tearDown(): void
     {
-        // FileHelper::deleteDirectory(self::TEST_DIR);
+        chmod(self::TEST_FILE, 0o644);
+        FileHelper::deleteDirectory(self::TEST_DIR);
     }
 
     /**
@@ -87,7 +88,6 @@ final class FileHelperTest extends TestCase
     {
         chmod(self::TEST_FILE, 0o400);
 
-        // Test FileNotWriteableException
         $this->expectException(FileNotWriteableException::class);
         $this->expectExceptionMessage('File is not writable: \'' . self::TEST_FILE . '\'.');
         FileHelper::deleteFile(self::TEST_FILE);
@@ -163,10 +163,10 @@ final class FileHelperTest extends TestCase
      */
     public function testDoesDirExists()
     {
-        self::assertTrue(FileHelper::doesDirExists(self::TEST_DIR));
+        self::assertTrue(FileHelper::directoryExists(self::TEST_DIR));
 
         $nonExistingDir = self::TEST_DIR . 'nonexistent_directory';
-        self::assertFalse(FileHelper::doesDirExists($nonExistingDir));
+        self::assertFalse(FileHelper::directoryExists($nonExistingDir));
     }
 
     /**
@@ -178,7 +178,7 @@ final class FileHelperTest extends TestCase
         touch($filePath);
         self::assertFileExists($filePath);
 
-        FileHelper::changePermission($filePath, 0o755);
+        FileHelper::changeFilePermission($filePath, 0o755);
 
         $this->assertFileMode($filePath, 0o777);
     }
@@ -191,7 +191,7 @@ final class FileHelperTest extends TestCase
         $nonExistentFile = self::TEST_DIR . 'nonexistent_file.txt';
 
         $this->expectException(\Exception::class);
-        FileHelper::changePermission($nonExistentFile, 0o777);
+        FileHelper::changeFilePermission($nonExistentFile, 0o777);
     }
 
     private function assertFileMode(string $filePath, int $expectedMode)

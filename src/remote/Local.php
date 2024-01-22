@@ -62,7 +62,7 @@ class Local extends AbstractRemoteHandler
             $absolutePath = pathinfo($absolutePath, PATHINFO_DIRNAME);
         }
 
-        if (!FileHelper::doesDirExists($absolutePath)) {
+        if (!FileHelper::directoryExists($absolutePath)) {
             FileHelper::makeDir($absolutePath);
         }
 

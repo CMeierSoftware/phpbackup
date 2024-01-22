@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Helper;
 
 use CMS\PhpBackup\Core\FileLogger;
+use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Exceptions\FileNotReadableException;
 use CMS\PhpBackup\Exceptions\FileNotWriteableException;
 use Exception;
 
@@ -21,6 +23,16 @@ abstract class FileHelper
      */
     public static function moveFile(string $src, string $dest): void
     {
+        if (!self::fileExists($src)) {
+            throw new FileNotFoundException("Source file not found '{$src}'.");
+        }
+        if (self::fileExists($dest)) {
+            throw new FileAlreadyExistsException("Destination file already exists '{$dest}'.");
+        }
+        if (!is_readable($src)) {
+            throw new FileNotReadableException("Source file is not readable '{$src}'.");
+        }
+
         FileLogger::getInstance()->debug("Move '{$src}' to '{$dest}'.");
 
         if (!rename($src, $dest)) {
@@ -64,6 +76,8 @@ abstract class FileHelper
     public static function makeDir(string $path, int $mode = 0o755): void
     {
         if ('.' === $path || is_dir($path)) {
+            FileLogger::getInstance()->debug("Directory already exists {$path}.");
+
             return;
         }
         FileLogger::getInstance()->debug("Create directory {$path}.");
@@ -80,7 +94,7 @@ abstract class FileHelper
      */
     public static function deleteDirectory(string $dirname): void
     {
-        if (!self::doesDirExists($dirname)) {
+        if (!self::directoryExists($dirname)) {
             return;
         }
 
@@ -103,29 +117,45 @@ abstract class FileHelper
     }
 
     /**
+     * Checks if a file exists.
+     *
+     * @param string $path the path of the file to check
+     *
+     * @return bool TRUE if the file exists, FALSE otherwise
+     */
+    public static function fileExists(string $path): bool
+    {
+        return file_exists($path) && is_file($path);
+    }
+
+    /**
      * Checks if a directory exists.
      *
-     * @param string $dir the path of the directory to check
+     * @param string $path the path of the directory to check
      *
      * @return bool TRUE if the directory exists, FALSE otherwise
      */
-    public static function doesDirExists(string $dir): bool
+    public static function directoryExists(string $path): bool
     {
-        return file_exists($dir) && is_dir($dir);
+        return file_exists($path) && is_dir($path);
     }
 
     /**
      * Changes the permissions of a file.
      *
-     * @param string $file the path of the file to change permissions on
+     * @param string $filePath the path of the file to change permissions on
      * @param int $chmod the new permissions to set on the file
      *
      * @throws \Exception if there is a problem changing the file permissions
      */
-    public static function changePermission(string $file, int $chmod): void
+    public static function changeFilePermission(string $filePath, int $chmod): void
     {
-        if (!chmod($file, $chmod)) {
-            throw new \Exception("Failed to set permissions on file {$file}");
+        if (!self::fileExists($filePath)) {
+            throw new FileNotFoundException("File not found '{$filePath}'.");
+        }
+
+        if (!chmod($filePath, $chmod)) {
+            throw new \Exception("Failed to set permissions on file {$filePath}");
         }
     }
 }

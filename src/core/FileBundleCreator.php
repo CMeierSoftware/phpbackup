@@ -167,7 +167,7 @@ final class FileBundleCreator
         $files = [];
         $folders = [];
 
-        if (!FileHelper::doesDirExists($dir)) {
+        if (!FileHelper::directoryExists($dir)) {
             throw new FileNotFoundException("Can not scandir on not existing directory '{$dir}'");
         }
 
