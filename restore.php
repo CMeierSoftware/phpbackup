@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+namespace CMS\PhpBackup;
+
 if (!isset($_GET['app']) || empty($_GET['app'])) {
     $msg = 'Forbidden';
     header('HTTP/1.1 403 ' . $msg, true, 403);
@@ -17,50 +19,48 @@ if (!defined('ABS_PATH')) {
     exit($msg);
 }
 
-use CMS\PhpBackup\Api\AjaxController;
 use CMS\PhpBackup\Api\ActionHandler;
+use CMS\PhpBackup\Api\AjaxController;
+use CMS\PhpBackup\App\RestoreRunner;
+use CMS\PhpBackup\Core\AppConfig;
+
 session_start();
+
+$config = AppConfig::loadAppConfig($_GET['app']);
+(new RestoreRunner($config))->registerActions();
+
 ?>
 <head>
+    <title>Step-by-Step Backup Restore</title>
     <?php AjaxController::printCsrfToken(); ?>
     <script src="assets/js/lib/jquery/jquery-3.7.1.min.js"></script>
+    <script src="assets/js/restore.js"></script>
+    <link rel="stylesheet" href="assets/css/step-container.css">
 </head>
 <main>
-    <h1>Restore Backup</h1>
-    <button>Send</button>
+    <h1>Step-by-Step Backup Restore</h1>
+    <div id="step-list-backups" action="list-backups" class="step-container active-step">
+        <h2>Step 1: Select Remote Storage</h2>
+        <div>
+            <?php
+            // Example array of storage labels
+            $storageLabels = ['Local', 'pCloud'];
+
+// Loop through the array to create radio buttons
+foreach ($storageLabels as $index => $label) {
+    $id = 'storage' . $index; // Unique ID for each radio button
+    echo '<input type="radio" id="' . $id . '" name="remoteStorage" value="' . $label . '">';
+    echo '<label for="' . $id . '">' . $label . '</label><br>';
+}
+?>
+        </div>
+        <div class="btn-container">
+            <button id="btn-step-list-backups"
+                    data-nonce='<?php echo ActionHandler::generateNonce('list-backups'); ?>'
+                    data-action='list-backups'>Next</button>
+        </div>
+    </div>
 </main>
 <footer>
-    <script>
-        $(document).ready(function() {
-            $("button").click(function(){
-                const data = {
-                    nonce: '<?php echo ActionHandler::generateNonce('test'); ?>a',
-                    action: 'test',
-                    data: ['...', '...']
-                };
-                $.ajax({
-                    async: true,
-                    url: 'ajax.php',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json',
-                    headers: {
-                        'X-CSRF-Token': $('meta[name="HTTP_X_CSRF_TOKEN"]').attr('content')
-                    },
-                    success: function(response) {    
-                        alert(response);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        // Error handler
-                        console.error("AJAX Error: " + textStatus, errorThrown); 
-                        alert(jqXHR.responseJSON.error);
-                    },
-                    complete: function() {
-                        // This block will be executed regardless of success or failure
-                    }
-                });
-            });
-        });
-    </script>
 </footer>
 

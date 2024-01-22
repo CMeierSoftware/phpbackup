@@ -1,0 +1,11 @@
+.step-container {
+    display: none;
+}
+
+.active-step {
+    display: block;
+}
+
+.btn-container {
+    margin-top: 10px;
+}

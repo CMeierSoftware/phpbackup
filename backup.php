@@ -1,8 +1,7 @@
 <?php
 
 declare(strict_types=1);
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+namespace CMS\PhpBackup;
 
 if (!isset($_GET['key']) || 'pZk5ukBLtZ6wdQgZ' !== $_GET['key']) {
     $msg = 'Forbidden';

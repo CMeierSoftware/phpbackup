@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+namespace CMS\PhpBackup;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -37,9 +38,9 @@ function CMS_is_debug_mode()
 require_once ABS_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 if (CMS_is_debug_mode()) {
-    $logger = CMS\PhpBackup\Core\FileLogger::getInstance();
+    $logger = Core\FileLogger::getInstance();
     $logger->activateEchoLogs();
-    $logger->setLogLevel(CMS\PhpBackup\Core\LogLevel::DEBUG);
+    $logger->setLogLevel(Core\LogLevel::DEBUG);
 
     $logger->debug('ABS_PATH: ' . ABS_PATH);
     $logger->debug('CONFIG_DIR: ' . CONFIG_DIR);

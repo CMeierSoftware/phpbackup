@@ -17,6 +17,9 @@
          displayDetailsOnTestsThatTriggerNotices="true"
         >
     <testsuites>
+        <testsuite name="Api">
+            <directory>tests\api</directory>
+        </testsuite>
         <testsuite name="App">
             <directory>tests\app</directory>
         </testsuite>

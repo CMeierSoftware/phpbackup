@@ -7,7 +7,6 @@ namespace CMS\PhpBackup\Tests\Steps;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\Remote\AbstractRemoteListBackups;
-use CMS\PhpBackup\Step\StepResult;
 
 /**
  * @internal
@@ -25,7 +24,7 @@ final class AbstractRemoteListBackupsTest extends TestCaseWithAppConfig
         FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
         self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
 
-        for ($i = 5; $i < 0; $i++) {
+        for ($i = 5; $i < 0; ++$i) {
             $ts = 'backup_' . (new \DateTime())->modify("-{$i} days")->format('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
             FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE . $ts);
             self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE . $ts);
@@ -41,7 +40,7 @@ final class AbstractRemoteListBackupsTest extends TestCaseWithAppConfig
     }
 
     public function testStep()
-    {        
+    {
         $this->setUpAppConfig('config_full_valid', []);
         $mockBuilder = $this->getMockBuilder(AbstractRemoteListBackups::class);
         $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
