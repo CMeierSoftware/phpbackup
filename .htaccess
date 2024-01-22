@@ -10,3 +10,11 @@ Deny from All
   Order Deny,Allow
   Allow from all
 </Files>
+<Files restore.php>
+  Order Deny,Allow
+  Allow from all
+</Files>
+<Files ajax.php>
+  Order Deny,Allow
+  Allow from all
+</Files>
