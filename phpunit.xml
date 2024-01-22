@@ -35,6 +35,9 @@
         <testsuite name="Steps">
             <directory>tests\step</directory>
         </testsuite>
+        <testsuite name="Remote Steps">
+            <directory>tests\remoteStep</directory>
+        </testsuite>
         <testsuite name="Remote">
             <directory>tests\remote</directory>
         </testsuite>

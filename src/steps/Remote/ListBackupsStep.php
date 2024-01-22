@@ -13,11 +13,9 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
-abstract class AbstractRemoteDeleteOldFilesStep extends AbstractStep
+final class ListBackupsStep extends AbstractStep
 {
     private readonly AbstractRemoteHandler $remote;
-    private readonly int $keepBackupDays;
-    private readonly int $keepBackupAmount;
 
     /**
      * SendRemoteStep constructor.
@@ -28,10 +26,7 @@ abstract class AbstractRemoteDeleteOldFilesStep extends AbstractStep
     public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config)
     {
         parent::__construct($config);
-
         $this->remote = $remoteHandler;
-        $this->keepBackupDays = (int) $this->config->getBackupSettings()['keepBackupDays'];
-        $this->keepBackupAmount = (int) $this->config->getBackupSettings()['keepBackupAmount'];
     }
 
     /**
@@ -42,7 +37,7 @@ abstract class AbstractRemoteDeleteOldFilesStep extends AbstractStep
     protected function _execute(): StepResult
     {
         $this->remote->connect();
-        $result = $this->remote->deleteOld('', $this->keepBackupDays, $this->keepBackupAmount);
+        $result = $this->remote->dirList('.');
 
         return new StepResult($result, false);
     }

@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Steps;
+namespace CMS\PhpBackup\Tests\Step\Remote;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteListBackups;
+use CMS\PhpBackup\Step\Remote\ListBackupsStep;
+use CMS\PhpBackup\Tests\Step\TestCaseWithAppConfig;
 
 /**
  * @internal
  *
- * @covers \CMS\PhpBackup\Step\DeleteOldFilesRemoteStep
+ * @covers \CMS\PhpBackup\Step\ListBackupsStep
  */
-final class AbstractRemoteListBackupsTest extends TestCaseWithAppConfig
+final class ListBackupsTest extends TestCaseWithAppConfig
 {
     private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private Local $remoteHandler;
@@ -42,14 +43,11 @@ final class AbstractRemoteListBackupsTest extends TestCaseWithAppConfig
     public function testStep()
     {
         $this->setUpAppConfig('config_full_valid', []);
-        $mockBuilder = $this->getMockBuilder(AbstractRemoteListBackups::class);
-        $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
 
-        $sendRemoteStep = $mockBuilder->getMockForAbstractClass();
+        $sendRemoteStep = new ListBackupsStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
         self::assertFalse($result->repeat);
         self::assertSame($this->backupFolder, $result->returnValue);
     }
-    
 }

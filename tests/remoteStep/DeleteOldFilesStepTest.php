@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Steps;
+namespace CMS\PhpBackup\Tests\Step\Remote;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
+use CMS\PhpBackup\Step\Remote\DeleteOldFilesStep;
 use CMS\PhpBackup\Step\StepResult;
+use CMS\PhpBackup\Tests\Step\TestCaseWithAppConfig;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\DeleteOldFilesRemoteStep
  */
-final class AbstractRemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
+final class DeleteOldFilesStepTest extends TestCaseWithAppConfig
 {
     private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
     private Local $remoteHandler;
@@ -44,28 +45,7 @@ final class AbstractRemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
 
     public function testDeleteDeactivated()
     {
-        list($expiredDirs, $validDirs) = self::setupRemoteStorage(7);
-
-        $this->setUpAppConfig(
-            'config_full_valid',
-            [
-                ['tag' => 'keepBackupDays', 'value' => (string) 0],
-                ['tag' => 'keepBackupAmount', 'value' => (string) 0],
-            ]
-        );
-
-        $mockBuilder = $this->getMockBuilder(AbstractRemoteDeleteOldFilesStep::class);
-        $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
-
-        $sendRemoteStep = $mockBuilder->getMockForAbstractClass();
-
-        $result = $sendRemoteStep->execute();
-
-        self::assertInstanceOf(StepResult::class, $result);
-        self::assertFalse($result->repeat);
-
-        $this->assertDirectoriesExist($validDirs);
-        $this->assertDirectoriesExist($expiredDirs);
+        $this->executeDeleteOldFilesTest(0, 0);
     }
 
     private function executeDeleteOldFilesTest($keepDays, $keepAmount)
@@ -80,17 +60,18 @@ final class AbstractRemoteDeleteOldFilesStepTest extends TestCaseWithAppConfig
             ]
         );
 
-        $mockBuilder = $this->getMockBuilder(AbstractRemoteDeleteOldFilesStep::class);
-        $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
-
-        $sendRemoteStep = $mockBuilder->getMockForAbstractClass();
+        $sendRemoteStep = new DeleteOldFilesStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
 
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);
 
-        $this->assertDirectoriesExist($validDirs);
+        if (0 === $keepDays && 0 === $keepAmount) {
+            $this->assertDirectoriesDoNotExist($validDirs);
+        } else {
+            $this->assertDirectoriesExist($validDirs);
+        }
         $this->assertDirectoriesDoNotExist($expiredDirs);
     }
 

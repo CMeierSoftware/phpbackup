@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Steps;
+namespace CMS\PhpBackup\Tests\Step;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteSendFileStep;
+use CMS\PhpBackup\Step\Remote\SendFileStep;
 use CMS\PhpBackup\Step\StepResult;
 
 /**
  * @internal
  *
- * @covers \CMS\PhpBackup\Step\SendRemoteStep
+ * @covers \CMS\PhpBackup\Step\SendFileStep
  */
-final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
+final class SendFileStepTest extends TestCaseWithAppConfig
 {
     private const WORK_DIR_LOCAL = self::TEST_DIR . 'Local' . DIRECTORY_SEPARATOR;
     private const WORK_DIR_REMOTE_BASE = self::TEST_DIR . 'Remote' . DIRECTORY_SEPARATOR;
@@ -51,33 +51,30 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::uploadFileMapping()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @uses \CMS\PhpBackup\Step\SendFileStep::_execute()
+     * @uses \CMS\PhpBackup\Step\SendFileStep::getUploadedFiles()
+     * @uses \CMS\PhpBackup\Step\SendFileStep::uploadFileMapping()
+     * @uses \CMS\PhpBackup\Step\SendFileStep::sendArchives()
      *
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
+     * @covers \CMS\PhpBackup\Step\SendFileStep::execute()
      */
     public function testCreateBaseDir()
     {
         FileHelper::deleteDirectory($this->workDirRemote);
         self::assertDirectoryDoesNotExist($this->workDirRemote);
 
-        $sendRemoteStep = $this->getMockedClass();
+        $sendRemoteStep = new SendFileStep($this->remoteHandler, $this->config);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($this->archives);
     }
 
     /**
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @covers \CMS\PhpBackup\Step\SendFileStep::execute()
      */
     public function testExecute()
     {
-        $sendRemoteStep = $this->getMockedClass();
+        $sendRemoteStep = new SendFileStep($this->remoteHandler, $this->config);
 
         $result = $sendRemoteStep->execute();
 
@@ -88,10 +85,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @covers \CMS\PhpBackup\Step\SendFileStep::execute()
      */
     public function testExecuteReinitialization()
     {
@@ -100,7 +94,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
             $archives[$file] = $content;
             $this->setStepData(['archives' => $archives, 'backupDirectory' => self::WORK_DIR_LOCAL]);
 
-            $sendRemoteStep = $this->getMockedClass();
+            $sendRemoteStep = new SendFileStep($this->remoteHandler, $this->config);
             $result = $sendRemoteStep->execute();
 
             self::assertInstanceOf(StepResult::class, $result);
@@ -111,19 +105,14 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     *
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @covers \CMS\PhpBackup\Step\SendFileStep::execute()
      */
     public function testReentryFileMappingDoesMatch()
     {
         $files = [TEST_FIXTURES_FILE_1, TEST_FIXTURES_FILE_2];
         $ts = $this->setupRemoteStorage($files);
 
-        $sendRemoteStep = $this->getMockedClass();
+        $sendRemoteStep = new SendFileStep($this->remoteHandler, $this->config);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($this->archives);
@@ -133,12 +122,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     *
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
+     * @covers \CMS\PhpBackup\Step\SendFileStep::execute()
      */
     public function testReentryFileMappingDoesNotMatch()
     {
@@ -146,7 +130,7 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
         $filesInFileMapping = [TEST_FIXTURES_FILE_1];
         $ts = $this->setupRemoteStorage($filesUploaded, $filesInFileMapping);
 
-        $sendRemoteStep = $this->getMockedClass();
+        $sendRemoteStep = new SendFileStep($this->remoteHandler, $this->config);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($this->archives);
@@ -162,18 +146,13 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::_execute()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::getUploadedFiles()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::createBaseDir()
-     * @uses \CMS\PhpBackup\Step\DatabaseBackupStep::sendArchives()
-     *
-     * @covers \CMS\PhpBackup\Step\DatabaseBackupStep::updateFileMapping()
+     * @covers \CMS\PhpBackup\Step\SendFileStep::updateFileMapping()
      */
     public function testUpdateFileMapping()
     {
         $this->setupRemoteStorage([]);
 
-        $sendRemoteStep = $this->getMockedClass();
+        $sendRemoteStep = new SendFileStep($this->remoteHandler, $this->config);
         $sendRemoteStep->execute();
 
         self::assertRemoteStorage($this->archives);
@@ -231,13 +210,5 @@ final class AbstractRemoteSendFileStepTest extends TestCaseWithAppConfig
         sleep(2);
 
         return $ts;
-    }
-
-    private function getMockedClass()
-    {
-        $mockBuilder = $this->getMockBuilder(AbstractRemoteSendFileStep::class);
-        $mockBuilder->setConstructorArgs([$this->remoteHandler, $this->config]);
-
-        return $mockBuilder->getMockForAbstractClass();
     }
 }
