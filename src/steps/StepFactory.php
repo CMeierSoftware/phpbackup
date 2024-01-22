@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Step\Remote;
+namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
@@ -15,15 +15,17 @@ if (!defined('ABS_PATH')) {
 
 final class StepFactory
 {
-    public static function build(string $stepClass, string $remoteHandler, AppConfig $config)
+    public static function build(string $stepClass, string $remoteHandler, AppConfig $config): AbstractStep
     {
         if (!class_exists($stepClass)) {
-            throw new \InvalidArgumentException("Class {$stepClass} does not exist");
+            throw new \InvalidArgumentException("Class {$stepClass} does not exist.");
         }
 
-        $remote = self::buildRemoteHandler($remoteHandler, $config);
-
-        return new $stepClass($remote, $config);
+        if (!empty($remoteHandler)) {
+            $remote = self::buildRemoteHandler($remoteHandler, $config);
+            return new $stepClass($remote, $config);
+        }
+        return new $stepClass($config);
     }
 
     private static function buildRemoteHandler(string $remoteHandler, AppConfig $config): AbstractRemoteHandler
