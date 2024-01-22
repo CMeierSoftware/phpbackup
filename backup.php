@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace CMS\PhpBackup;
 
 if (!isset($_GET['key']) || 'pZk5ukBLtZ6wdQgZ' !== $_GET['key']) {

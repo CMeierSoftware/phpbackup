@@ -28,6 +28,7 @@ class Pcloud extends AbstractRemoteHandler
     public function disconnect(): bool
     {
         $this->connection = null;
+
         return null === $this->connection;
     }
 
@@ -68,13 +69,7 @@ class Pcloud extends AbstractRemoteHandler
         return file_exists($this->buildAbsPath($remoteFilePath));
     }
 
-    protected function _dirDelete(string $remotePath): bool
-    {
+    protected function _dirDelete(string $remotePath): bool {}
 
-    }
-
-    protected function _dirList(string $remotePath): array
-    {
-
-    }
+    protected function _dirList(string $remotePath): array {}
 }
