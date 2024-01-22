@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace CMS\PhpBackup;
 
 ini_set('display_errors', '1');
@@ -10,7 +11,9 @@ error_reporting(E_ALL);
 @ini_set('memory_limit', '512M');
 set_time_limit(1200);
 
-define('CMS_DEBUG', true);
+if (!defined('CMS_DEBUG')) {
+    define('CMS_DEBUG', true);
+}
 
 if (!defined('ABS_PATH')) {
     define('ABS_PATH', realpath(__DIR__) . DIRECTORY_SEPARATOR);
@@ -46,7 +49,6 @@ if (CMS_is_debug_mode()) {
     $logger->debug('CONFIG_DIR: ' . CONFIG_DIR);
     $logger->debug('TEMP_DIR: ' . TEMP_DIR);
 }
-
 
 // Set an environment variable
 putenv('MYSQLDUMP_EXE=C:\\xampp\\mysql\\bin\\mysqldump');

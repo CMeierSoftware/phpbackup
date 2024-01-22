@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+define('CMS_DEBUG', false);
+
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..\\defines.php';
 
 if (!defined('TEST_WORK_DIR')) {
