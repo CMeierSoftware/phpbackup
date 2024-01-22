@@ -39,13 +39,14 @@ final class AbstractStepTest extends TestCaseWithAppConfig
 
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
-        $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
-        $step->expects(self::exactly(1))->method('getRequiredStepDataKeys')->willReturn([]);
+        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
+        $step->expects(self::once())->method('getRequiredStepDataKeys')->willReturn([]);
 
         $result = $step->execute();
 
         self::assertSame($stepResult, $result);
-        self::assertFileDoesNotExist(self::CONFIG_STEP_RESULT_FILE);
+        self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
+        self::assertStringEqualsFile(self::CONFIG_STEP_RESULT_FILE, '[]');
     }
 
     /**
@@ -57,8 +58,8 @@ final class AbstractStepTest extends TestCaseWithAppConfig
 
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
-        $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
-        $step->expects(self::exactly(1))->method('getRequiredStepDataKeys')->willReturn([]);
+        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
+        $step->expects(self::once())->method('getRequiredStepDataKeys')->willReturn([]);
 
         $reflectionProp = new \ReflectionProperty($step, 'stepData');
         $reflectionProp->setAccessible(true);
@@ -81,8 +82,8 @@ final class AbstractStepTest extends TestCaseWithAppConfig
 
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
-        $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
-        $step->expects(self::exactly(1))->method('getRequiredStepDataKeys')->willReturn([]);
+        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
+        $step->expects(self::once())->method('getRequiredStepDataKeys')->willReturn([]);
 
         $result = $step->execute();
 
@@ -101,8 +102,8 @@ final class AbstractStepTest extends TestCaseWithAppConfig
 
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
-        $step->expects(self::exactly(1))->method('_execute')->willReturn($stepResult);
-        $step->expects(self::exactly(1))->method('getRequiredStepDataKeys')->willReturn(['key']);
+        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
+        $step->expects(self::once())->method('getRequiredStepDataKeys')->willReturn(['key']);
 
         $result = $step->execute();
 
@@ -122,7 +123,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::never())->method('_execute')->willReturn($stepResult);
-        $step->expects(self::exactly(1))->method('getRequiredStepDataKeys')->willReturn(['missing']);
+        $step->expects(self::once())->method('getRequiredStepDataKeys')->willReturn(['missing']);
 
         self::expectException(\InvalidArgumentException::class);
         $step->execute();
@@ -189,7 +190,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         self::assertStringContainsString('"attempts": 0', file_get_contents(self::WATCHDOG_FILE));
     }
 
-    private function getMockedHandler(): MockObject
+    private function getMockedHandler(): AbstractStep|MockObject
     {
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
         $mockBuilder->setConstructorArgs([$this->config]);
