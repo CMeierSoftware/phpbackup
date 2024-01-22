@@ -18,6 +18,13 @@ abstract class AbstractRemoteHandler
     public array $fileExistsCache = [];
     protected mixed $connection = null;
 
+    protected FileLogger $logger;
+
+    public function __construct()
+    {
+        $this->logger = FileLogger::getInstance();
+    }
+
     /**
      * Destructor to ensure disconnection upon object destruction.
      */
@@ -55,6 +62,8 @@ abstract class AbstractRemoteHandler
      */
     public function fileUpload(string $localPath, string $remotePath): bool
     {
+        $this->logger->debug("Upload local file '{$localPath}' to remote storage '{$remotePath}'");
+
         $this->sanitizeFileCheck($remotePath);
 
         if (!is_file($localPath)) {
@@ -67,7 +76,6 @@ abstract class AbstractRemoteHandler
             throw new FileNotFoundException("Can not create directory for '{$remotePath}' in remote storage.");
         }
 
-        FileLogger::getInstance()->debug("Upload local file '{$localPath}' to remote storage '{$remotePath}'");
         $this->fileExistsCache[$remotePath] = $this->_fileUpload($localPath, $remotePath);
 
         return $this->fileExistsCache[$remotePath];
@@ -86,6 +94,8 @@ abstract class AbstractRemoteHandler
      */
     public function fileDownload(string $localPath, string $remotePath): bool
     {
+        $this->logger->debug("Download remote file '{$remotePath}' to local storage '{$localPath}'");
+
         $this->sanitizeFileCheck($remotePath);
 
         if (file_exists($localPath)) {
@@ -96,8 +106,6 @@ abstract class AbstractRemoteHandler
         }
 
         FileHelper::makeDir(dirname($localPath));
-
-        FileLogger::getInstance()->debug("Download remote file '{$remotePath}' to local storage '{$localPath}'");
 
         return $this->_fileDownload($localPath, $remotePath);
     }
@@ -113,20 +121,16 @@ abstract class AbstractRemoteHandler
      */
     public function fileDelete(string $remotePath): bool
     {
+        $this->logger->debug("Delete remote file '{$remotePath}'");
         $this->sanitizeFileCheck($remotePath);
 
         if (!$this->fileExists($remotePath)) {
             throw new FileNotFoundException("The file '{$remotePath}' was not found in remote storage.");
         }
 
-        FileLogger::getInstance()->debug("Delete remote file '{$remotePath}'");
+        $this->fileExistsCache[$remotePath] = !$this->_fileDelete($remotePath);
 
-        $result = $this->_fileDelete($remotePath);
-        if ($result) {
-            $this->fileExistsCache[$remotePath] = false;
-        }
-
-        return $result;
+        return !$this->fileExistsCache[$remotePath];
     }
 
     /**
@@ -140,22 +144,21 @@ abstract class AbstractRemoteHandler
      */
     public function fileExists(string $remotePath): bool
     {
-        if (!$this->isConnected()) {
-            throw new RemoteStorageNotConnectedException('The remote storage is not connected. Call connect() function.');
-        }
+        $this->logger->debug("Check if remote file '{$remotePath}' exists.");
+
+        $this->sanitizeDirCheck($remotePath, true);
+
+        $source = 'cache';
 
         if (!isset($this->fileExistsCache[$remotePath])) {
-            $result = $this->_fileExists($remotePath);
-            $this->fileExistsCache[$remotePath] = $result;
-            if ($this->fileExistsCache[$remotePath]) {
-                FileLogger::getInstance()->debug("Remote file '{$remotePath}' does exist (request).");
-            } else {
-                FileLogger::getInstance()->debug("Remote file '{$remotePath}' doesn't exist (request).");
-            }
-        } elseif ($this->fileExistsCache[$remotePath]) {
-            FileLogger::getInstance()->debug("Remote file '{$remotePath}' does exist (cache).");
+            $this->fileExistsCache[$remotePath] = $this->_fileExists($remotePath);
+            $source = 'request';
+        }
+
+        if ($this->fileExistsCache[$remotePath]) {
+            $this->logger->debug("Remote file '{$remotePath}' does exist ({$source}).");
         } else {
-            FileLogger::getInstance()->debug("Remote file '{$remotePath}' doesn't exist (cache).");
+            $this->logger->debug("Remote file '{$remotePath}' doesn't exist ({$source}).");
         }
 
         return $this->fileExistsCache[$remotePath];
@@ -172,13 +175,13 @@ abstract class AbstractRemoteHandler
      */
     public function dirList(string $remotePath, bool $onlyFiles = false): array
     {
+        $this->logger->debug("List remote directory '{$remotePath}'.");
+
         $this->sanitizeDirCheck($remotePath);
 
         if (!$this->fileExists($remotePath)) {
             throw new FileNotFoundException("The directory '{$remotePath}' was not found in remote storage.");
         }
-
-        FileLogger::getInstance()->debug("List remote directory '{$remotePath}'.");
 
         $result = $this->_dirList($remotePath);
         $result = array_values(array_diff($result, ['..', '.']));
@@ -192,6 +195,8 @@ abstract class AbstractRemoteHandler
         if ($onlyFiles) {
             $result = array_filter($result, [self::class, 'isFilePath']);
         }
+        $countElements = count($result);
+        $this->logger->debug("Found {$countElements} elements in remote directory '{$remotePath}'.");
 
         return array_values($result);
     }
@@ -207,16 +212,17 @@ abstract class AbstractRemoteHandler
      */
     public function dirCreate(string $remotePath): bool
     {
+        $this->logger->debug("Create remote directory '{$remotePath}'.");
+
         // if its a file, get the directory
         if ($this->isFilePath($remotePath)) {
             $remotePath = dirname($remotePath);
+            $this->logger->debug("Extracted directory path from file path '{$remotePath}'.");
         }
 
         $this->sanitizeDirCheck($remotePath);
 
         if (!$this->fileExists($remotePath)) {
-            FileLogger::getInstance()->debug("Create remote directory '{$remotePath}'.");
-
             $this->fileExistsCache[$remotePath] = $this->_dirCreate($remotePath);
         }
 
@@ -232,15 +238,11 @@ abstract class AbstractRemoteHandler
      */
     public function dirDelete(string $remotePath): bool
     {
+        $this->logger->debug("Delete remote directory recursively '{$remotePath}'.");
         $this->sanitizeDirCheck($remotePath);
 
-        $success = false;
-
         if ($this->fileExists($remotePath)) {
-            FileLogger::getInstance()->debug("Delete remote directory recursively '{$remotePath}'.");
-
-            $success = $this->_dirDelete($remotePath);
-            $this->fileExistsCache[$remotePath] = !$success;
+            $this->fileExistsCache[$remotePath] = !$this->_dirDelete($remotePath);
         }
 
         if (!$this->fileExistsCache[$remotePath]) {
@@ -251,7 +253,7 @@ abstract class AbstractRemoteHandler
             }
         }
 
-        return $success;
+        return !$this->fileExistsCache[$remotePath];
     }
 
     /**
@@ -269,11 +271,13 @@ abstract class AbstractRemoteHandler
      */
     public function clearCache(): void
     {
+        $this->logger->debug('Clear file cache.');
         $this->fileExistsCache = [];
     }
 
     public function deleteOld(string $remotePath, int $ageInDays, int $amount): int
     {
+        $this->logger->debug("Delete old files in {$remotePath}. Age: {$ageInDays}, Amount: {$amount}.");
         $this->sanitizeDirCheck($remotePath);
 
         if ($ageInDays <= 0 && $amount <= 0) {
@@ -291,16 +295,14 @@ abstract class AbstractRemoteHandler
                 $validDirs[$dir] = $dirTimestamp;
             }
         }
-
-        // Sort valid directories based on creation time, oldest first
         asort($validDirs);
 
-        // Delete oldest directories until the desired amount is reached
         $deletedCount = 0;
 
         if ($amount > 0) {
             $countToDelete = max(0, count($validDirs) - $amount);
 
+            $this->logger->debug("Delete {$countToDelete} by amount.");
             foreach (array_slice($validDirs, 0, $countToDelete) as $dir => $timestamp) {
                 $this->dirDelete("{$remotePath}/{$dir}");
                 unset($validDirs[$dir]);
@@ -308,10 +310,10 @@ abstract class AbstractRemoteHandler
             }
         }
 
-        // Delete directories older than the specified days
         if ($ageInDays > 0) {
             $cutoffTime = time() - ($ageInDays * 24 * 60 * 60);
 
+            $this->logger->debug("Delete by age with cutoff time {$cutoffTime}.");
             foreach ($validDirs as $dir => $timestamp) {
                 if ($timestamp < $cutoffTime) {
                     $this->dirDelete("{$remotePath}/{$dir}");
@@ -320,6 +322,8 @@ abstract class AbstractRemoteHandler
                 }
             }
         }
+
+        $this->logger->debug("Deleted {$deletedCount} old files in {$remotePath}.");
 
         return $deletedCount;
     }
@@ -400,16 +404,16 @@ abstract class AbstractRemoteHandler
     /**
      * Checks if the provided remote path belongs to a file.
      *
-     * @param string $remotePath The remote path to check
+     * @param string $path The remote path to check
      *
      * @return bool True if the path belongs to a file, false if it belongs to a directory
      */
-    private function isFilePath(string $remotePath): bool
+    private function isFilePath(string $path): bool
     {
-        // Split the path and file name
-        $pathInfo = pathinfo($remotePath);
+        $isFilePath = !empty($pathInfo['extension']);
 
-        // Check if it's a file path, if true, remove the file name
-        return !empty($pathInfo['extension']);
+        $this->logger->debug("The path '{$path}' is " . ($isFilePath ? '' : 'not') . ' a file.');
+
+        return $isFilePath;
     }
 }

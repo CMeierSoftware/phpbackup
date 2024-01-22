@@ -17,6 +17,7 @@ class Backblaze extends AbstractRemoteHandler
 
     public function __construct(string $keyId, string $applicationKey, string $bucketName)
     {
+        parent::__construct();
         $this->accountId = substr($keyId, 3, 12);
         $this->keyId = $keyId;
         $this->applicationKey = $applicationKey;
@@ -40,8 +41,10 @@ class Backblaze extends AbstractRemoteHandler
 
     public function disconnect(): bool
     {
-        // For local storage, disconnection is not applicable
-        return true;
+        $this->logger->debug('Disconnect.');
+        $this->connection = null;
+
+        return null === $this->connection;
     }
 
     public function _dirCreate(string $remoteDirectoryPath): bool
@@ -166,7 +169,10 @@ class Backblaze extends AbstractRemoteHandler
     {
         $lastDotPosition = strrpos($path, '.');
 
-        // Check if a dot was found and it is not the last character in the path
-        return false !== $lastDotPosition && $lastDotPosition < strlen($path) - 1;
+        $isFilePath = false !== $lastDotPosition && $lastDotPosition < strlen($path) - 1;
+
+        $this->logger->debug("The path '{$path}' is " . ($isFilePath ? '' : 'not') . ' a file.');
+
+        return $isFilePath;
     }
 }
