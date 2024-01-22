@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Core\AppConfig;
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -23,21 +24,24 @@ final class StepConfig
      * @readonly
      */
     public readonly int $delay;
-
     private readonly string $stepClass;
+    private readonly string $remoteHandler;
 
     /**
      * StepConfig constructor.
      *
      * @param string $stepClass the fully qualified class name of the step extending AbstractStep
      * @param int $delay (Optional) The delay (in seconds) before executing the step. Defaults to 0.
+     * @param string $remote (Optional) the fully qualified class name of a required remote handler
      *
      * @throws \UnexpectedValueException if $stepClass is not a class extending AbstractStep or if $delay is less than 0
      */
-    public function __construct(string $stepClass, int $delay = 0)
+    public function __construct(string $stepClass, int $delay = 0, string $remote = '')
     {
-        if (!class_exists($stepClass) || !is_subclass_of($stepClass, AbstractStep::class)) {
-            throw new \UnexpectedValueException("All entries in the array must be classes extending AbstractStep. {$stepClass} is not.");
+        $this->validateClass($stepClass, AbstractStep::class);
+
+        if (!empty($remote)) {
+            $this->validateClass($remote, AbstractRemoteHandler::class);
         }
 
         if ($delay < 0) {
@@ -45,6 +49,7 @@ final class StepConfig
         }
 
         $this->stepClass = $stepClass;
+        $this->remoteHandler = $remote;
         $this->delay = $delay;
     }
 
@@ -57,6 +62,13 @@ final class StepConfig
      */
     public function getStepObject(AppConfig $appConfig): AbstractStep
     {
-        return new $this->stepClass($appConfig, $this->delay);
+        return StepFactory::build($this->stepClass, $this->remoteHandler, $appConfig);
+    }
+
+    private function validateClass(string $class, string $parentClass)
+    {
+        if (!class_exists($class) || !is_subclass_of($class, $parentClass)) {
+            throw new \UnexpectedValueException("All entries in the array must be classes extending {$parentClass}, {$class} is not.");
+        }
     }
 }

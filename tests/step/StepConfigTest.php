@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Step;
 
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Step\AbstractStep;
+use CMS\PhpBackup\Step\Remote\AbstractRemoteStep;
 use CMS\PhpBackup\Step\StepConfig;
-use CMS\PhpBackup\Step\StepResult;
 
 /**
  * @internal
@@ -15,9 +16,14 @@ use CMS\PhpBackup\Step\StepResult;
  */
 final class StepConfigTest extends TestCaseWithAppConfig
 {
+    private $stepMock;
+    private $remoteMock;
+
     protected function setUp(): void
     {
         $this->setUpAppConfig('config_full_valid');
+        $this->stepMock = $this->getMockForAbstractClass(AbstractStep::class, [$this->config]);
+        $this->remoteMock = $this->getMockForAbstractClass(AbstractRemoteHandler::class);
     }
 
     protected function tearDown(): void
@@ -25,36 +31,40 @@ final class StepConfigTest extends TestCaseWithAppConfig
         parent::tearDown();
     }
 
-    /**
-     * @covers \CMS\PhpBackup\Core\StepConfig::__construct()
-     *
-     * @dataProvider provideInvalidStepValueClassCases
-     */
-    public function testInvalidStepValueClass(string $step, int $delay)
+    public function testValidParameter()
     {
-        $this->expectException(\UnexpectedValueException::class);
-        new StepConfig($step, $delay);
+        $step = new StepConfig($this->stepMock::class, 0, $this->remoteMock::class);
+
+        self::assertInstanceOf(StepConfig::class, $step);
     }
 
-    public static function provideInvalidStepValueClassCases(): iterable
+    /**
+     * @dataProvider provideInvalidClassNameCases
+     */
+    public function testInvalidClassName(string $step)
     {
-        $invalidClassNames = ['nonExistent', \stdClass::class, 'null'];
-        $invalidDelays = [-1];
-        $validDelays = [0, 1, 20, PHP_INT_MAX - 1];
+        $this->expectException(\UnexpectedValueException::class);
+        new StepConfig($step);
+    }
 
-        $result = [];
+    public static function provideInvalidClassNameCases(): iterable
+    {
+        return [['nonExistent'], [\stdClass::class], ['null']];
+    }
 
-        foreach ($invalidClassNames as $className) {
-            foreach (array_merge($invalidDelays, $validDelays) as $delay) {
-                $result[] = [$className, $delay];
-            }
-        }
+    public function testInvalidDelay()
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        new StepConfig($this->stepMock::class, -1);
+    }
 
-        foreach ($invalidDelays as $delay) {
-            $result[] = [StepStub::class, $delay];
-        }
-
-        return $result;
+    /**
+     * @dataProvider provideInvalidClassNameCases
+     */
+    public function testInvalidRemoteClass(string $remote)
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        new StepConfig($this->stepMock::class, 0, $remote);
     }
 
     /**
@@ -62,30 +72,25 @@ final class StepConfigTest extends TestCaseWithAppConfig
      */
     public function testGetStepObject()
     {
-        $stepConfig = new StepConfig(StepStub::class);
+        $stepConfig = new StepConfig($this->stepMock::class);
 
         $obj = $stepConfig->getStepObject($this->config);
 
         self::assertIsObject($obj);
-        self::assertInstanceOf(StepStub::class, $obj);
-
-        $expected = new StepResult('', false);
-        $actual = $obj->execute();
-        self::assertSame($expected->returnValue, $actual->returnValue);
-        self::assertSame($expected->repeat, $actual->repeat);
-    }
-}
-
-// Define a static class with a method for testing
-final class StepStub extends AbstractStep
-{
-    protected function _execute(): StepResult
-    {
-        return new StepResult('', false);
+        self::assertInstanceOf(AbstractStep::class, $obj);
     }
 
-    protected function getRequiredStepDataKeys(): array
+    /**
+     * @covers \CMS\PhpBackup\Core\StepConfig::getStepObject()
+     */
+    public function testGetRemoteStepObject()
     {
-        return [];
+        $remoteStepMock = $this->getMockForAbstractClass(AbstractRemoteStep::class, [$this->remoteMock, $this->config]);
+        $stepConfig = new StepConfig($remoteStepMock::class, 0, $remoteStepMock::class);
+
+        $obj = $stepConfig->getStepObject($this->config);
+
+        self::assertIsObject($obj);
+        self::assertInstanceOf(AbstractStep::class, $obj);
     }
 }

@@ -23,8 +23,10 @@ final class StepFactory
 
         if (!empty($remoteHandler)) {
             $remote = self::buildRemoteHandler($remoteHandler, $config);
+
             return new $stepClass($remote, $config);
         }
+
         return new $stepClass($config);
     }
 
