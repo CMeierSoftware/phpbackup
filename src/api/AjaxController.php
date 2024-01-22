@@ -11,12 +11,10 @@ if (!defined('ABS_PATH')) {
 }
 
 class AjaxController
-{    
+{
     public const CSRF_TOKEN_HEADER_NAME = 'HTTP_X_CSRF_TOKEN';
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public static function handleRequest()
     {
@@ -30,11 +28,19 @@ class AjaxController
             list($nonce, $action, $data) = self::sanitizePostData($_POST);
 
             $config = AppConfig::loadAppConfig($app);
-    
-            ActionHandler::getInstance($config)->executeAction($action ,$nonce, $data);
+
+            ActionHandler::getInstance($config)->executeAction($action, $nonce, $data);
         } catch (\Exception $e) {
             JsonResponse::sendError($e->getMessage(), 500);
         }
+    }
+
+    public static function printCsrfToken()
+    {
+        $csrfTokenName = htmlspecialchars(self::CSRF_TOKEN_HEADER_NAME, ENT_QUOTES, 'UTF-8');
+        $csrfTokenContent = htmlspecialchars(self::getCsrfToken(), ENT_QUOTES, 'UTF-8');
+
+        echo '<meta name="' . $csrfTokenName . '" content="' . $csrfTokenContent . '">';
     }
 
     private static function getCsrfToken()
@@ -46,16 +52,7 @@ class AjaxController
         return $_SESSION[self::CSRF_TOKEN_HEADER_NAME];
     }
 
-    public static function printCsrfToken()
-    {      
-        ;
-        $csrfTokenName = htmlspecialchars(self::CSRF_TOKEN_HEADER_NAME, ENT_QUOTES, 'UTF-8');
-        $csrfTokenContent = htmlspecialchars(self::getCsrfToken(), ENT_QUOTES, 'UTF-8');
-    
-        echo '<meta name="' . $csrfTokenName . '" content="' . $csrfTokenContent . '">';
-    }
-
-   private static function validateCSRFToken()
+    private static function validateCSRFToken()
     {
         $token = $_SERVER[self::CSRF_TOKEN_HEADER_NAME] ?? '';
 
@@ -74,9 +71,10 @@ class AjaxController
             JsonResponse::sendError('Invalid or missing referer header.', 400);
         }
     }
+
     private static function validateMethod()
-    {        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    {
+        if ('POST' !== $_SERVER['REQUEST_METHOD']) {
             JsonResponse::sendError('Invalid HTTP method.', 405);
         }
     }
@@ -103,7 +101,7 @@ class AjaxController
         return [
             htmlspecialchars($postData['nonce'] ?? '', ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($postData['action'] ?? '', ENT_QUOTES, 'UTF-8'),
-            $postData['data'],
+            json_decode($postData['data'], true),
         ];
     }
 }

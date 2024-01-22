@@ -65,9 +65,9 @@ class ActionHandler
      * @param string $actionName the name of the action
      * @param callable $callback the callback function to be executed when the action is triggered
      */
-    public function registerAction(string $actionName, callable $callback): void
+    public function registerAction(string $actionName, callable $callback, bool $requiresConfig = false): void
     {
-        $this->actions[$actionName] = $callback;
+        $this->actions[$actionName] = ['callback' => $callback, 'config' => $requiresConfig];
         $this->config->saveTempData(self::CONFIG_TYPE, $this->actions);
     }
 
@@ -101,9 +101,10 @@ class ActionHandler
 
         $this->validateNonce($actionName, $nonce);
 
-        $callback = $this->actions[$actionName];
-
-        // Use call_user_func_array to pass an unknown number of arguments
+        $callback = $this->actions[$actionName]['callback'];
+        if ($this->actions[$actionName]['config']) {
+            $params['config'] = $this->config;
+        }
         call_user_func_array($callback, $params);
     }
 

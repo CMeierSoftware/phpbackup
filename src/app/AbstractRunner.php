@@ -123,7 +123,7 @@ abstract class AbstractRunner
      */
     protected function configureLogger(): void
     {
-        $this->logger = FileLogger::GetInstance();
+        $this->logger = FileLogger::getInstance();
         $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
         $this->logger->setLogLevel(LogLevel::INFO);
         $this->logger->activateEchoLogs();
