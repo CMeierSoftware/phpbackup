@@ -9,8 +9,8 @@ use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
 use CMS\PhpBackup\Step\DirectoryBackupStep;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteDeleteOldFilesStep;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteSendFileStep;
+use CMS\PhpBackup\Step\Remote\DeleteOldFilesStep;
+use CMS\PhpBackup\Step\Remote\SendFileStep;
 use CMS\PhpBackup\Step\StepConfig;
 
 if (!defined('ABS_PATH')) {
@@ -31,8 +31,8 @@ class BackupRunner extends AbstractRunner
         $steps[] = new StepConfig(DirectoryBackupStep::class);
         $steps[] = new StepConfig(DatabaseBackupStep::class);
 
-        $steps = array_merge($steps, $this->getRemoteStepsFor(AbstractRemoteSendFileStep::class));
-        $steps = array_merge($steps, $this->getRemoteStepsFor(AbstractRemoteDeleteOldFilesStep::class));
+        $steps = array_merge($steps, $this->getRemoteStepsFor(SendFileStep::class));
+        $steps = array_merge($steps, $this->getRemoteStepsFor(DeleteOldFilesStep::class));
 
         $steps[] = new StepConfig(CleanUpStep::class);
 

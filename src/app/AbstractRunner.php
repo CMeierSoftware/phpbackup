@@ -129,12 +129,12 @@ abstract class AbstractRunner
         $this->logger->activateEchoLogs();
     }
 
-    protected function getRemoteStepsFor(string $baseClass): array
+    protected function getRemoteStepsFor(string $class, int $delay = 0): array
     {
-        $remoteHandler = $this->config->getDefinedRemoteClasses($baseClass);
+        $remoteHandler = $this->config->getDefinedRemoteClasses();
 
         return array_map(
-            static fn (string $handler): StepConfig => new StepConfig($handler),
+            static fn (string $handler): StepConfig => new StepConfig($class, $delay, $handler),
             $remoteHandler
         );
     }
