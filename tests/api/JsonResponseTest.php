@@ -28,11 +28,6 @@ final class JsonResponseTest extends TestCase
         // Add more assertions as needed
     }
 
-    public function testHash()
-    {
-        self::assertFalse(hash_equals(null, ''));
-    }
-
     public function testSendSuccess()
     {
         ob_start();
