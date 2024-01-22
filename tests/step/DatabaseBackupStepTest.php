@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Steps;
+namespace CMS\PhpBackup\Tests\Step;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
