@@ -65,11 +65,12 @@ final class FileLogger
      */
     public function setLogLevel(LogLevel $newLogLevel): void
     {
-        $this->info('set log level to ' . $newLogLevel->name);
         $this->logLevel = $newLogLevel;
-        if (!CMS_is_debug_mode()) {
+        $this->info('set log level to ' . $this->logLevel->name);
+        
+        if (function_exists('CMS_is_debug_mode') && CMS_is_debug_mode()) {
             $this->logLevel = LogLevel::DEBUG;
-            $this->info('Debugging is active, overwrite log level to ' . LogLevel::DEBUG->name);
+            $this->info('Debugging is active, overwrite log level to ' . $this->logLevel->name);
         }
     }
 
@@ -117,7 +118,7 @@ final class FileLogger
     }
 
     /**
-     * Writes a message of the level 'Info'.
+     * Writes a message of the level 'Debug'.
      *
      * @param string $message The message to be logged
      */

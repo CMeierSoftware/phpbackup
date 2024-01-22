@@ -35,11 +35,11 @@ abstract class FileHelper
      */
     public static function makeDir(string $path, int $mode = 0o755): void
     {
-        if ('.' === $path) {
+        if ('.' === $path || is_dir($path)) {
             return;
         }
         FileLogger::getInstance()->debug("Create directory {$path}.");
-        if (!is_dir($path) && !mkdir($path, $mode, true)) {
+        if (!mkdir($path, $mode, true)) {
             throw new \Exception("Cannot create {$path}.");
         }
     }
