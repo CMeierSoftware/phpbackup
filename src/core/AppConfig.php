@@ -22,6 +22,7 @@ final class AppConfig
     private const TEMP_DATA_KEY_SEP = '_-_';
     private array $config;
     private readonly string $configFile;
+    private static ?self $instance = null;
     private readonly string $tempDir;
 
     /**
@@ -52,8 +53,9 @@ final class AppConfig
      *
      * @throws FileNotFoundException if the configuration file does not exist
      */
-    public static function loadAppConfig(string $app): self
-    {
+    public static function loadAppConfig(string $app = ''): self
+{
+    if (!empty($app)) {
         $configFile = CONFIG_DIR . $app . '.xml';
         $tempDir = CONFIG_DIR . self::TMP_DIR . $app;
 
@@ -61,8 +63,16 @@ final class AppConfig
             throw new FileNotFoundException("Configuration file does not exist: {$configFile}");
         }
 
-        return new self($configFile, $tempDir);
+        if (null === self::$instance) {
+            self::$instance = new self($configFile, $tempDir);
+        }
+    } elseif (null === self::$instance) {
+        throw new \RuntimeException('AppConfig must be initialized before using.');
     }
+
+    return self::$instance;
+}
+   
 
     /**
      * Returns the path of the temporary directory.

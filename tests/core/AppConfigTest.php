@@ -63,6 +63,31 @@ final class AppConfigTest extends TestCase
     /**
      * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
      */
+    public function testLoadAppConfigSingleton(): void
+    {
+        $appConfig = AppConfig::loadAppConfig('valid_app');
+
+        $cfg2 = AppConfig::loadAppConfig();
+        self::assertSame($appConfig, $cfg2);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     */
+    public function testLoadAppConfigNotInitialized(): void
+    {
+        // clean the instance of the singleton to make mocking possible
+        $ref = new \ReflectionProperty(AppConfig::class, 'instance');
+        $ref->setAccessible(true);
+        $ref->setValue(null, null);
+
+        self::expectException(\RuntimeException::class);
+        AppConfig::loadAppConfig();
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\AppConfig::loadAppConfig()
+     */
     public function testLoadAppConfigEmpty(): void
     {
         self::expectException(UnprocessableConfigException::class);

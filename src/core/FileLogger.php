@@ -23,7 +23,7 @@ final class FileLogger
 {
     public const DEFAULT_LOG_FILE = './logs.log';
 
-    private static ?FileLogger $instance = null;
+    private static ?self $instance = null;
     private string $logFile = self::DEFAULT_LOG_FILE;
     private LogLevel $logLevel = LogLevel::OFF;
     private bool $echoLogs = false;
