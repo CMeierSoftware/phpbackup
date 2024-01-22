@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Step;
 
+use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\Remote\SendFileStep;
-use CMS\PhpBackup\Step\Remote\StepFactory;
+use CMS\PhpBackup\Step\StepFactory;
 
 /**
  * @internal
@@ -24,14 +25,23 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         parent::tearDown();
     }
 
-    public function testBuildWithExistingClass()
+    public function testBuild()
     {
-        $stepClass = SendFileStep::class;
+        $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
+
+        $result = StepFactory::build($stepClass::class, '', $this->config);
+
+        self::assertInstanceOf($stepClass::class, $result);
+    }
+
+    public function testBuildWithRemoteClass()
+    {
+        $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
         $remoteHandler = 'Local';
 
-        $result = StepFactory::build($stepClass, $remoteHandler, $this->config);
+        $result = StepFactory::build($stepClass::class, $remoteHandler, $this->config);
 
-        self::assertInstanceOf($stepClass, $result);
+        self::assertInstanceOf($stepClass::class, $result);
     }
 
     public function testBuildWithNonExistingClass()
