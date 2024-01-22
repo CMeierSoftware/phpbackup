@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests\Step;
 
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Step\Remote\SendFileStep;
 use CMS\PhpBackup\Step\StepFactory;
 
 /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Remote;
 
+use CMS\PhpBackup\Helper\FileHelper;
 use obregonco\B2\Client;
 use obregonco\B2\File;
 
@@ -56,7 +57,7 @@ class Backblaze extends AbstractRemoteHandler
         try {
             $result = $this->_fileUpload($localEmptyFilePath, $emptyFilePath);
         } finally {
-            unlink($localEmptyFilePath);
+            FileHelper::deleteFile($localEmptyFilePath);
         }
 
         return $result;

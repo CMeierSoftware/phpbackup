@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
+use CMS\PhpBackup\Helper\FileHelper;
+
 if (!defined('ABS_PATH')) {
     return;
 }
@@ -76,12 +78,12 @@ final class FileCrypt
             $method = strtolower($action) . 'FileWithPassword';
             File::$method($inputFile, $tempFile, $key);
         } catch (\Exception $th) {
-            unlink($tempFile);
+            FileHelper::deleteFile($tempFile);
 
             throw $th;
         }
 
-        if (!unlink($inputFile)) {
+        if (!FileHelper::deleteFile($inputFile)) {
             throw new \Exception("Failed to delete the original file after {$action}.");
         }
 

@@ -7,6 +7,7 @@ namespace CMS\PhpBackup\Step\Remote;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Step\StepResult;
 
@@ -137,7 +138,7 @@ final class SendFileStep extends AbstractRemoteStep
         $remotePath = $this->backupDirName . '/' . basename($fileMapping);
 
         if (file_exists($fileMapping)) {
-            unlink($fileMapping);
+            FileHelper::deleteFile($fileMapping);
         }
 
         try {

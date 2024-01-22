@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Tests\Backup;
 
 use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,7 +58,7 @@ final class FileBackupCreatorTest extends TestCase
             self::assertStringEndsWith('.zip', $filename);
         } finally {
             if ($filename) {
-                unlink($filename);
+                FileHelper::deleteFile($filename);
             }
         }
     }
@@ -75,7 +76,7 @@ final class FileBackupCreatorTest extends TestCase
             self::assertStringEndsWith('.zip', $filename);
         } finally {
             if ($filename) {
-                unlink($filename);
+                FileHelper::deleteFile($filename);
             }
         }
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Helper;
 
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Exceptions\FileNotWriteableException;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -55,6 +57,40 @@ final class FileHelperTest extends TestCase
 
         $this->expectException(\Exception::class);
         FileHelper::moveFile($src, $dest);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::deleteFile
+     */
+    public function testDeleteFileWhereFileNotFound(): void
+    {
+        self::assertFileExists(self::TEST_FILE);
+        FileHelper::deleteFile(self::TEST_FILE);
+        self::assertFileDoesNotExist(self::TEST_FILE);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::deleteFile
+     */
+    public function testDeleteFileNonExistentFile(): void
+    {
+        $nonexistentFile = '/path/to/nonexistent/file';
+        $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessage("File not found: '{$nonexistentFile}'.");
+        FileHelper::deleteFile($nonexistentFile);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileHelper::deleteFile
+     */
+    public function testDeleteFileNonWritableFile(): void
+    {
+        chmod(self::TEST_FILE, 0o400);
+
+        // Test FileNotWriteableException
+        $this->expectException(FileNotWriteableException::class);
+        $this->expectExceptionMessage('File is not writable: \'' . self::TEST_FILE . '\'.');
+        FileHelper::deleteFile(self::TEST_FILE);
     }
 
     /**

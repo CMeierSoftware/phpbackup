@@ -28,7 +28,7 @@ abstract class TestCaseWithAppConfig extends TestCase
                 new \RecursiveDirectoryIterator(self::TEST_DIR, \RecursiveDirectoryIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::SELF_FIRST
             );
-        
+
             foreach ($iterator as $item) {
                 $path = $item->getPathname();
                 if ($item->isFile()) {

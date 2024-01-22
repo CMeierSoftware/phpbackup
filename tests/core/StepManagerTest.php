@@ -42,7 +42,7 @@ final class StepManagerTest extends TestCase
 
     protected function tearDown(): void
     {
-        unlink(self::CONFIG_FILE);
+        FileHelper::deleteFile(self::CONFIG_FILE);
         FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
         FileHelper::deleteDirectory(self::SYSTEM_PATH);
     }

@@ -81,7 +81,7 @@ final class FileLoggerTest extends TestCase
 
         $this->logger->setLogLevel(LogLevel::WARNING);
         // unlink after changing the level, because SetLogLevel will also create a Info
-        unlink(self::LOG_FILE_PATH);
+        FileHelper::deleteFile(self::LOG_FILE_PATH);
 
         $this->logger->error($message);
         $this->logger->warning($message);

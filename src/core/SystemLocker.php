@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileHelper;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -64,7 +65,7 @@ final class SystemLocker
         FileLogger::getInstance()->debug('unlock the system.');
 
         if (LOCK_TS === self::readLockFile($system_path)) {
-            unlink(self::getLockFilePath($system_path));
+            FileHelper::deleteFile(self::getLockFilePath($system_path));
         }
     }
 

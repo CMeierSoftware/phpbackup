@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Helper;
 
 use CMS\PhpBackup\Core\FileLogger;
+use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Exceptions\FileNotWriteableException;
 use Exception;
 
 abstract class FileHelper
@@ -24,6 +26,32 @@ abstract class FileHelper
         if (!rename($src, $dest)) {
             throw new \Exception("Cannot move '{$src}' to '{$dest}'.");
         }
+    }
+
+    /**
+     * Deletes a file at the specified source path. Throws exceptions for various error scenarios.
+     *
+     * @param string $src the source path of the file to be deleted
+     *
+     * @throws FileNotFoundException if the file does not exist
+     * @throws FileNotWriteableException if the file is not writable
+     * @throws \Exception if the file cannot be deleted for any other reason
+     */
+    public static function deleteFile(string $src): void
+    {
+        if (!file_exists($src) || !is_file($src)) {
+            throw new FileNotFoundException("File not found: '{$src}'.");
+        }
+
+        if (!is_writable($src)) {
+            throw new FileNotWriteableException("File is not writable: '{$src}'.");
+        }
+
+        if (!unlink($src)) {
+            throw new \Exception("Unable to delete file '{$src}'.");
+        }
+
+        FileLogger::getInstance()->debug("File '{$src}' successfully deleted.");
     }
 
     /**
@@ -67,7 +95,7 @@ abstract class FileHelper
             if ($file->isDir()) {
                 rmdir($file->getPathname());
             } else {
-                unlink($file->getPathname());
+                self::deleteFile($file->getPathname());
             }
         }
 

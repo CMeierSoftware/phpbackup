@@ -17,8 +17,10 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
 {
     protected function setUp(): void
     {
-        $this->setUpAppConfig('config_create_bundle_step_test', 
-        [['tag' => 'src', 'value' => '../tests/work']]);
+        $this->setUpAppConfig(
+            'config_create_bundle_step_test',
+            [['tag' => 'src', 'value' => '../tests/work']]
+        );
 
         $this->createTestFileStructure(self::TEST_DIR);
     }

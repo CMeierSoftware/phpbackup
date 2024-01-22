@@ -13,10 +13,8 @@ use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
 use CMS\PhpBackup\Step\DirectoryBackupStep;
-use CMS\PhpBackup\Step\Remote\BackblazeRemoteDeleteOldFilesStep;
-use CMS\PhpBackup\Step\Remote\BackblazeRemoteSendFileStep;
-use CMS\PhpBackup\Step\Remote\LocalRemoteDeleteOldFilesStep;
-use CMS\PhpBackup\Step\Remote\LocalRemoteSendFileStep;
+use CMS\PhpBackup\Step\Remote\DeleteOldFilesStep;
+use CMS\PhpBackup\Step\Remote\SendFileStep;
 use CMS\PhpBackup\Step\StepConfig;
 use PHPUnit\Framework\TestCase;
 
@@ -49,7 +47,7 @@ final class BackupRunnerTest extends TestCase
         FileHelper::deleteDirectory(self::TEST_DIR);
         FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
 
-        unlink(self::CONFIG_FILE);
+        FileHelper::deleteFile(self::CONFIG_FILE);
         parent::tearDown();
     }
 
@@ -59,10 +57,10 @@ final class BackupRunnerTest extends TestCase
             new StepConfig(CreateBundlesStep::class, 5 * 24 * 60 * 60),
             new StepConfig(DirectoryBackupStep::class),
             new StepConfig(DatabaseBackupStep::class),
-            new StepConfig(LocalRemoteSendFileStep::class),
-            new StepConfig(BackblazeRemoteSendFileStep::class),
-            new StepConfig(LocalRemoteDeleteOldFilesStep::class),
-            new StepConfig(BackblazeRemoteDeleteOldFilesStep::class),
+            new StepConfig(SendFileStep::class),
+            new StepConfig(SendFileStep::class),
+            new StepConfig(DeleteOldFilesStep::class),
+            new StepConfig(DeleteOldFilesStep::class),
             new StepConfig(CleanUpStep::class),
         ];
 
