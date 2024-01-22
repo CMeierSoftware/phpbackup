@@ -17,7 +17,8 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
 {
     protected function setUp(): void
     {
-        $this->setUpAppConfig('config_create_bundle_step_test', [['tag' => 'src', 'value' => self::TEST_DIR]]);
+        $this->setUpAppConfig('config_create_bundle_step_test', 
+        [['tag' => 'src', 'value' => '../tests/work']]);
 
         $this->createTestFileStructure(self::TEST_DIR);
     }
@@ -41,12 +42,12 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
     public function testFileBundlesAreCreatedCorrectly()
     {
         $expectedResult = [
-            '\test_file_5.txt',
+            ['\test_file_5.txt'],
             [
                 '\test_file_2.txt',
                 '\test_file_1.txt',
             ],
-            '\sub\test_file_5.txt',
+            ['\sub\test_file_5.txt'],
             [
                 '\test_file_0.txt',
                 '\test_file_3.txt',
