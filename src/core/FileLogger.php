@@ -67,6 +67,10 @@ final class FileLogger
     {
         $this->info('set log level to ' . $newLogLevel->name);
         $this->logLevel = $newLogLevel;
+        if (!CMS_is_debug_mode()) {
+            $this->logLevel = LogLevel::DEBUG;
+            $this->info('Debugging is active, overwrite log level to ' . LogLevel::DEBUG->name);
+        }
     }
 
     /**

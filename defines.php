@@ -9,6 +9,8 @@ error_reporting(E_ALL);
 @ini_set('memory_limit', '512M');
 set_time_limit(1200);
 
+define('CMS_DEBUG', true);
+
 if (!defined('ABS_PATH')) {
     define('ABS_PATH', realpath(__DIR__) . DIRECTORY_SEPARATOR);
 }
@@ -27,7 +29,23 @@ if (!file_exists(TEMP_DIR)) {
     mkdir(TEMP_DIR, 0o755, true);
 }
 
+function CMS_is_debug_mode()
+{
+    return defined('CMS_DEBUG') && CMS_DEBUG;
+}
+
 require_once ABS_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+if (CMS_is_debug_mode()) {
+    $logger = CMS\PhpBackup\Core\FileLogger::getInstance();
+    $logger->activateEchoLogs();
+    $logger->setLogLevel(CMS\PhpBackup\Core\LogLevel::DEBUG);
+
+    $logger->debug('ABS_PATH: ' . ABS_PATH);
+    $logger->debug('CONFIG_DIR: ' . CONFIG_DIR);
+    $logger->debug('TEMP_DIR: ' . TEMP_DIR);
+}
+
 
 // Set an environment variable
 putenv('MYSQLDUMP_EXE=C:\\xampp\\mysql\\bin\\mysqldump');
