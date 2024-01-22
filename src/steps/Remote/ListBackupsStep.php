@@ -6,14 +6,13 @@ namespace CMS\PhpBackup\Step\Remote;
 
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
-use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepResult;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class ListBackupsStep extends AbstractStep
+final class ListBackupsStep extends AbstractRemoteStep
 {
     private readonly AbstractRemoteHandler $remote;
 
@@ -25,8 +24,7 @@ final class ListBackupsStep extends AbstractStep
      */
     public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config)
     {
-        parent::__construct($config);
-        $this->remote = $remoteHandler;
+        parent::__construct($remoteHandler, $config);
     }
 
     /**

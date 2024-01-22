@@ -8,14 +8,13 @@ use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
-use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepResult;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class SendFileStep extends AbstractStep
+final class SendFileStep extends AbstractRemoteStep
 {
     private const FILE_MAPPING_NAME = 'file_mapping.json';
     private readonly AbstractRemoteHandler $remote;
@@ -31,9 +30,7 @@ final class SendFileStep extends AbstractStep
      */
     public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config)
     {
-        parent::__construct($config);
-
-        $this->remote = $remoteHandler;
+        parent::__construct($remoteHandler, $config);
     }
 
     /**
