@@ -26,7 +26,6 @@ abstract class AbstractRemoteListBackups extends AbstractStep
     public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config)
     {
         parent::__construct($config);
-
         $this->remote = $remoteHandler;
     }
 

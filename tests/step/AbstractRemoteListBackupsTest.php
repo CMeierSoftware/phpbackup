@@ -51,4 +51,5 @@ final class AbstractRemoteListBackupsTest extends TestCaseWithAppConfig
         self::assertFalse($result->repeat);
         self::assertSame($this->backupFolder, $result->returnValue);
     }
+    
 }

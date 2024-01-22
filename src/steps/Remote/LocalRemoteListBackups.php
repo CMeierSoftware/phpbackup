@@ -24,4 +24,5 @@ final class LocalRemoteListBackups extends AbstractRemoteListBackups
         $remote = new Local($config->toAbsolutePath($cfg['rootDir']));
         parent::__construct($remote, $config);
     }
+    
 }
