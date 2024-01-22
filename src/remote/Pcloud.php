@@ -17,19 +17,18 @@ class Pcloud extends AbstractRemoteHandler
 
     public function connect(): bool
     {
-        // For local storage, connection is not applicable
         $this->connection = new App();
         $this->connection->setAccessToken($this->access_token);
         $this->connection->setLocationId(1);
         $this->connection->setCurlExecutionTimeout(10);
 
-        return true;
+        return null !== $this->connection;
     }
 
     public function disconnect(): bool
     {
-        // For local storage, disconnection is not applicable
-        return true;
+        $this->connection = null;
+        return null === $this->connection;
     }
 
     public function _dirCreate(string $remoteFilePath): bool
@@ -67,5 +66,15 @@ class Pcloud extends AbstractRemoteHandler
     protected function _fileExists(string $remoteFilePath): bool
     {
         return file_exists($this->buildAbsPath($remoteFilePath));
+    }
+
+    protected function _dirDelete(string $remotePath): bool
+    {
+
+    }
+
+    protected function _dirList(string $remotePath): array
+    {
+
     }
 }
