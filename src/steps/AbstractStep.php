@@ -97,7 +97,7 @@ abstract class AbstractStep
             $watchdogData = [];
         }
 
-        return isset($watchdogData['attempts']) ? (int) $watchdogData['attempts'] : 0;
+        return (int) ($watchdogData['attempts'] ?? 0);
     }
 
     private function validateStepData()

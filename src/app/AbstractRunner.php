@@ -118,17 +118,6 @@ abstract class AbstractRunner
         }
     }
 
-    /**
-     * Configures the logger with default settings.
-     */
-    protected function configureLogger(): void
-    {
-        $this->logger = FileLogger::getInstance();
-        $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
-        $this->logger->setLogLevel(LogLevel::INFO);
-        $this->logger->activateEchoLogs();
-    }
-
     protected function getRemoteStepsFor(string $class, int $delay = 0): array
     {
         $remoteHandler = $this->config->getDefinedRemoteClasses();
@@ -145,4 +134,15 @@ abstract class AbstractRunner
      * @return array the array of backup steps
      */
     abstract protected function setupSteps(): array;
+
+    /**
+     * Configures the logger with default settings.
+     */
+    private function configureLogger(): void
+    {
+        $this->logger = FileLogger::getInstance();
+        $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
+        $this->logger->setLogLevel(LogLevel::INFO);
+        $this->logger->activateEchoLogs();
+    }
 }

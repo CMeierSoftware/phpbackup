@@ -63,7 +63,7 @@ class AjaxController
 
     private static function validateReferer()
     {
-        $httpRef = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+        $httpRef = $_SERVER['HTTP_REFERER'] ?? null;
         $serverProtocol = isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS'] ? 'https://' : 'http://';
         $address = $serverProtocol . $_SERVER['SERVER_NAME'] . '/';
 
