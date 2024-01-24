@@ -12,6 +12,11 @@ if (!defined('ABS_PATH')) {
 
 final class CleanUpStep extends AbstractStep
 {
+    public function getRequiredDataKeys(): array
+    {
+        return ['backupDirectory'];
+    }
+
     protected function _execute(): StepResult
     {
         FileHelper::deleteDirectory($this->stepData['backupDirectory']);
@@ -19,10 +24,5 @@ final class CleanUpStep extends AbstractStep
         $this->stepData = [];
 
         return new StepResult('Backup process done.', false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return ['backupDirectory'];
     }
 }

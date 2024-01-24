@@ -15,7 +15,7 @@ if (!defined('ABS_PATH')) {
 /**
  * Abstract base class for implementing steps in a process.
  */
-abstract class AbstractStep
+abstract class AbstractStep implements StepInterface
 {
     protected const MAX_ATTEMPTS = 3;
     protected readonly FileLogger $logger;
@@ -68,7 +68,6 @@ abstract class AbstractStep
      *
      * @return array list of required step data keys
      */
-    abstract protected function getRequiredStepDataKeys(): array;
 
     /**
      * Increment the attempts count in the watchdog data.
@@ -100,7 +99,7 @@ abstract class AbstractStep
 
     private function validateStepData()
     {
-        $requiredKeys = $this->getRequiredStepDataKeys();
+        $requiredKeys = $this->getRequiredDataKeys();
 
         $missingKeys = array_diff($requiredKeys, array_keys($this->stepData));
 

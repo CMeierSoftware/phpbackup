@@ -33,6 +33,11 @@ final class DirectoryBackupStep extends AbstractStep
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
     }
 
+    public function getRequiredDataKeys(): array
+    {
+        return ['backupDirectory', 'bundles'];
+    }
+
     /**
      * Executes the remote step to send backup archives to a remote server.
      *
@@ -67,11 +72,6 @@ final class DirectoryBackupStep extends AbstractStep
         $this->logger->info("Archived and encrypted bundle {$cntArchives} of {$cntBundles} bundles.");
 
         return new StepResult($backupFileName, $cntArchives < $cntBundles);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return ['backupDirectory', 'bundles'];
     }
 
     /**

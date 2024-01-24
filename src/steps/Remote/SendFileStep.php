@@ -36,6 +36,11 @@ final class SendFileStep extends AbstractRemoteStep
         $this->archives = &$this->stepData['archives'];
     }
 
+    public function getRequiredDataKeys(): array
+    {
+        return ['backupDirectory', 'archives'];
+    }
+
     /**
      * Executes the remote step to send backup archives to a remote server.
      *
@@ -53,11 +58,6 @@ final class SendFileStep extends AbstractRemoteStep
         }
 
         return new StepResult('', count($this->archives) !== count($this->uploadedFiles));
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return ['backupDirectory', 'archives'];
     }
 
     /**

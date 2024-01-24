@@ -110,41 +110,41 @@ final class StepManagerTest extends TestCase
 
 final class StepStub1 extends AbstractStep
 {
+    public function getRequiredDataKeys(): array
+    {
+        return [];
+    }
+
     protected function _execute(): StepResult
     {
         return new StepResult('Result: Hello ' . self::class, false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return [];
     }
 }
 final class StepStub2 extends AbstractStep
 {
+    public function getRequiredDataKeys(): array
+    {
+        return [];
+    }
+
     protected function _execute(): StepResult
     {
         return new StepResult('Result: Hello ' . self::class, false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return [];
     }
 }
 final class StepStub3 extends AbstractStep
 {
     private static $repeat = true;
 
+    public function getRequiredDataKeys(): array
+    {
+        return [];
+    }
+
     protected function _execute(): StepResult
     {
         self::$repeat = !self::$repeat;
 
         return new StepResult('Result: Hello ' . self::class, !self::$repeat);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return [];
     }
 }

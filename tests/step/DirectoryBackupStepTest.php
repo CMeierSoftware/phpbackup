@@ -33,7 +33,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     protected function tearDown(): void
     {
         parent::tearDown();
-        // FileHelper::deleteDirectory(TEMP_DIR);
+        FileHelper::deleteDirectory(TEMP_DIR);
     }
 
     public function testCreateBackupFolder()
