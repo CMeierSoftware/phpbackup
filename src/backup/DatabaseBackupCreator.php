@@ -42,7 +42,7 @@ class DatabaseBackupCreator
     /**
      * Creates a backup of the specified MySQL database using mysqldump.
      *
-     * @param string $compression_mode The compression mode (default is 'zlib')
+     * @param string $compressionMode The compression mode (default is 'zlib')
      *
      * @return string The backup filename if the backup was successful
      *
@@ -51,38 +51,24 @@ class DatabaseBackupCreator
      * @throws \UnexpectedValueException If an invalid compression mode is provided
      * @throws \Exception If the backup fails
      */
-    public function backupMySql(string $compression_mode = 'zlib'): string
+    public function backupMySql(string $compressionMode = 'zlib'): string
     {
         if (!$this->isMysqldumpAvailable()) {
             throw new ShellCommandUnavailableException('mysqldump is not available. please provide a correct path.');
         }
 
-        $conn = mysqli_connect($this->host, $this->username, $this->password, $this->database);
-        if (!$conn) {
+        if (!mysqli_connect($this->host, $this->username, $this->password, $this->database)) {
             throw new \mysqli_sql_exception('Database connection failed: ' . mysqli_connect_error());
         }
 
+        list($compExt, $compCmd) = $this->getCompressionCommand($compressionMode);
+
         // Set the name of the backup file with timestamp
-        $backupFile = TEMP_DIR . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
+        $backupFile = TEMP_DIR . 'backup_database_' . date('Y-m-d_H-i-s') . '.sql' . $compExt;
 
-        $compression = '';
-
-        if (extension_loaded('zlib') && 'zlib' === $compression_mode) {
-            // Use gzip compression
-            $backupFile .= '.gz';
-            $compression = ' | gzip ';
-        } elseif (extension_loaded('bz2') && 'bz2' === $compression_mode) {
-            // Use bzip2 compression
-            $backupFile .= '.bz2';
-            $compression = ' | bzip2 ';
-        } elseif ('None' !== $compression_mode) {
-            throw new \UnexpectedValueException('Invalid compression mode or compression mode not available.');
-        }
+        $command = "{$this->mysqldumpExe} --user={$this->username} --password={$this->password} --host={$this->host} {$this->database} {$compCmd} > {$backupFile}";
 
         try {
-            // Construct the mysqldump command
-            $command = "{$this->mysqldumpExe} --user={$this->username} --password={$this->password} --host={$this->host} {$this->database} {$compression} > {$backupFile}";
-
             $output = shell_exec($command);
 
             if (empty($output)) {
@@ -91,9 +77,9 @@ class DatabaseBackupCreator
                 return $backupFile;
             }
 
-            throw new \Exception($output);
+            throw new \mysqli_sql_exception($output);
         } catch (\Exception $e) {
-            throw new \Exception('Backup failed: ' . $e->getMessage());
+            throw new \Exception('Backup failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -104,8 +90,43 @@ class DatabaseBackupCreator
      */
     private function isMysqldumpAvailable(): bool
     {
-        $output = shell_exec("{$this->mysqldumpExe} --version 2>&1");
+        $output = self::getVersionInfo($this->mysqldumpExe);
 
         return str_starts_with($output, 'mysqldump.exe  Ver ') || str_starts_with($output, 'mysqldump  Ver ');
+    }
+
+    private static function getCompressionCommand(string $mode): array
+    {
+        $fileExtension = '';
+        $command = '';
+
+        if ('zlib' === $mode) {
+            $exe = getenv('GZIP_CMD') ?: 'gzip';
+            $pattern = '/^gzip \d+(\.\d+)?/';
+            if (self::isCompressionAvailable($exe, $pattern)) {
+                $backupFile .= '.gz';
+                $command = " | {$exe} ";
+            }
+        } elseif ('None' !== $mode) {
+            throw new \UnexpectedValueException("Invalid compression mode '{$mode}'.");
+        }
+
+        return [$fileExtension, $command];
+    }
+
+    private static function getVersionInfo($command): string
+    {
+        return shell_exec("{$command} --version 2>&1");
+    }
+
+    private static function isCompressionAvailable($cmd, $regex): bool
+    {
+        $output = self::getVersionInfo($cmd);
+        $result = 1 === preg_match($regex, $output);
+        if (!$result) {
+            FileLogger::getInstance()->info("Compression mode {$cmd} not available.");
+        }
+
+        return $result;
     }
 }

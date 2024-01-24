@@ -58,9 +58,23 @@ final class DatabaseBackupCreatorTest extends TestCase
     public function testBackup()
     {
         $backupFile = $this->backupCreator->backupMySql('None');
-        // Assert that the backup file exists
-        self::assertStringStartsWith(TEMP_DIR . 'backup_', $backupFile);
-        self::assertStringEndsWith('.sql', $backupFile);
+
+        $dtPattern = '/^backup_database_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/';
+        self::assertMatchesRegularExpression($dtPattern, basename($backupFile));
+        self::assertFileExists($backupFile);
+        self::assertNotEmpty(file_get_contents($backupFile));
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Backup\DatabaseBackupCreator::backupMySql()
+     */
+    public function testBackupNotExistentCompressionMethod()
+    {
+        // zlib is not available in path on xampp
+        $backupFile = $this->backupCreator->backupMySql('zlib');
+
+        $dtPattern = '/^backup_database_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/';
+        self::assertMatchesRegularExpression($dtPattern, basename($backupFile));
         self::assertFileExists($backupFile);
         self::assertNotEmpty(file_get_contents($backupFile));
     }
