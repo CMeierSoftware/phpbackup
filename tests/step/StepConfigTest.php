@@ -22,7 +22,7 @@ final class StepConfigTest extends TestCaseWithAppConfig
     protected function setUp(): void
     {
         $this->setUpAppConfig('config_full_valid');
-        $this->stepMock = $this->getMockForAbstractClass(AbstractStep::class, [$this->config]);
+        $this->stepMock = $this->getMockForAbstractClass(AbstractStep::class);
         $this->remoteMock = $this->getMockForAbstractClass(AbstractRemoteHandler::class);
     }
 
@@ -74,7 +74,7 @@ final class StepConfigTest extends TestCaseWithAppConfig
     {
         $stepConfig = new StepConfig($this->stepMock::class);
 
-        $obj = $stepConfig->getStepObject($this->config);
+        $obj = $stepConfig->getStepObject();
 
         self::assertIsObject($obj);
         self::assertInstanceOf(AbstractStep::class, $obj);
@@ -85,10 +85,10 @@ final class StepConfigTest extends TestCaseWithAppConfig
      */
     public function testGetRemoteStepObject()
     {
-        $remoteStepMock = $this->getMockForAbstractClass(AbstractRemoteStep::class, [$this->remoteMock, $this->config]);
-        $stepConfig = new StepConfig($remoteStepMock::class, 0, $remoteStepMock::class);
+        $remoteStepMock = $this->getMockForAbstractClass(AbstractRemoteStep::class, [$this->remoteMock]);
+        $stepConfig = new StepConfig($remoteStepMock::class, 0, $this->remoteMock::class);
 
-        $obj = $stepConfig->getStepObject($this->config);
+        $obj = $stepConfig->getStepObject();
 
         self::assertIsObject($obj);
         self::assertInstanceOf(AbstractStep::class, $obj);

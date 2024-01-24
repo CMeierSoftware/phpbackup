@@ -13,24 +13,49 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
+/**
+ * Class StepFactory.
+ *
+ * Factory class for creating instances of AbstractStep with optional remote handler.
+ */
 final class StepFactory
 {
-    public static function build(string $stepClass, string $remoteHandler, AppConfig $config): AbstractStep
+    /**
+     * Builds an instance of AbstractStep based on the provided step class and remote handler.
+     *
+     * @param string $stepClass the class name of the step to be created
+     * @param string $remoteHandler the class name of the remote handler (optional)
+     *
+     * @return AbstractStep the created instance of AbstractStep
+     *
+     * @throws \InvalidArgumentException if the specified step class does not exist
+     * @throws \Exception if the specified remote handler method does not exist
+     */
+    public static function build(string $stepClass, string $remoteHandler = ''): AbstractStep
     {
         if (!class_exists($stepClass)) {
             throw new \InvalidArgumentException("Class {$stepClass} does not exist.");
         }
 
         if (!empty($remoteHandler)) {
-            $remote = self::buildRemoteHandler($remoteHandler, $config);
+            $remote = self::buildRemoteHandler($remoteHandler);
 
-            return new $stepClass($remote, $config);
+            return new $stepClass($remote);
         }
 
-        return new $stepClass($config);
+        return new $stepClass();
     }
 
-    private static function buildRemoteHandler(string $remoteHandler, AppConfig $config): AbstractRemoteHandler
+    /**
+     * Builds an instance of AbstractRemoteHandler based on the provided remote handler class.
+     *
+     * @param string $remoteHandler the class name of the remote handler
+     *
+     * @return AbstractRemoteHandler the created instance of AbstractRemoteHandler
+     *
+     * @throws \Exception if the specified remote handler creation method does not exist
+     */
+    private static function buildRemoteHandler(string $remoteHandler): AbstractRemoteHandler
     {
         $remoteHandler = ucfirst(strtolower($remoteHandler));
         $function = 'create' . $remoteHandler;
@@ -39,19 +64,29 @@ final class StepFactory
             throw new \Exception("Method {$function} does not exist in class " . self::class);
         }
 
-        return self::$function($config);
+        return self::$function();
     }
 
-    private static function createLocal(AppConfig $config): Local
+    /**
+     * Creates a Local remote handler instance.
+     *
+     * @return Local the created instance of Local remote handler
+     */
+    private static function createLocal(): Local
     {
-        $cfg = $config->getRemoteSettings('local', ['rootDir']);
+        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('local', ['rootDir']);
 
-        return new Local($config->toAbsolutePath($cfg['rootDir']));
+        return new Local(AppConfig::toAbsolutePath($cfg['rootDir']));
     }
 
-    private static function createBackblaze(AppConfig $config): Backblaze
+    /**
+     * Creates a Backblaze remote handler instance.
+     *
+     * @return Backblaze the created instance of Backblaze remote handler
+     */
+    private static function createBackblaze(): Backblaze
     {
-        $cfg = $config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
+        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
 
         return new Backblaze($cfg['accountId'], $cfg['applicationKey'], $cfg['bucketName']);
     }

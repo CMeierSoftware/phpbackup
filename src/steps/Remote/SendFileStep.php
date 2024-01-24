@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step\Remote;
 
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Helper\FileHelper;
@@ -18,7 +17,6 @@ if (!defined('ABS_PATH')) {
 final class SendFileStep extends AbstractRemoteStep
 {
     private const FILE_MAPPING_NAME = 'file_mapping.json';
-    private readonly AbstractRemoteHandler $remote;
     private readonly string $backupDir;
     private readonly string $backupDirName;
     private array $archives;
@@ -29,9 +27,9 @@ final class SendFileStep extends AbstractRemoteStep
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
      */
-    public function __construct(AbstractRemoteHandler $remoteHandler, AppConfig $config)
+    public function __construct(AbstractRemoteHandler $remoteHandler)
     {
-        parent::__construct($remoteHandler, $config);
+        parent::__construct($remoteHandler);
     }
 
     /**

@@ -32,7 +32,7 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
 
     public function testBackupDirectoryCreation()
     {
-        $step = new CreateBundlesStep($this->config);
+        $step = new CreateBundlesStep();
 
         $result = $step->execute();
 
@@ -66,11 +66,11 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
             ],
         ];
 
-        $step = new CreateBundlesStep($this->config);
+        $step = new CreateBundlesStep();
 
         $step->execute();
 
-        $fileBundles = $this->config->readTempData('StepData')['bundles'];
+        $fileBundles = $this->getStepData()['bundles'];
 
         self::assertNotEmpty($fileBundles);
         self::assertCount(count($expectedResult), $fileBundles);

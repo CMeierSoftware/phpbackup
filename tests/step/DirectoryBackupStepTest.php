@@ -33,14 +33,14 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     protected function tearDown(): void
     {
         parent::tearDown();
-        FileHelper::deleteDirectory(TEMP_DIR);
+        // FileHelper::deleteDirectory(TEMP_DIR);
     }
 
     public function testCreateBackupFolder()
     {
         self::assertDirectoryDoesNotExist(self::TEST_DIR);
 
-        $step = new DirectoryBackupStep($this->config);
+        $step = new DirectoryBackupStep();
         $result = $step->execute();
 
         self::assertStepResult(true, $result);
@@ -52,7 +52,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
             'archive_part_0.zip' => $this->oneBundle,
         ];
 
-        $step = new DirectoryBackupStep($this->config);
+        $step = new DirectoryBackupStep();
         $result = $step->execute();
 
         self::assertStepResult(true, $result);
@@ -65,7 +65,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
         $archivesResult = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $step = new DirectoryBackupStep($this->config);
+            $step = new DirectoryBackupStep();
             $archivesResult["archive_part_{$i}.zip"] = $this->oneBundle;
             $result = $step->execute();
 
@@ -78,7 +78,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteMissingBackupFolder()
     {
         $this->setStepData(['bundles' => 'some value']);
-        $step = new DirectoryBackupStep($this->config);
+        $step = new DirectoryBackupStep();
 
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: backupDirectory');
@@ -88,7 +88,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteMissingBundle()
     {
         $this->setStepData(['backupDirectory' => 'some value']);
-        $step = new DirectoryBackupStep($this->config);
+        $step = new DirectoryBackupStep();
 
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: bundles');
@@ -102,7 +102,7 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
      */
     private function assertStepData(array $archivesResult)
     {
-        $stepData = $this->config->readTempData('StepData');
+        $stepData = $this->getStepData();
         self::assertSame($archivesResult, $stepData['archives']);
         self::assertSame($this->bundlesResult, $stepData['bundles']);
     }

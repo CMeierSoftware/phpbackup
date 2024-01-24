@@ -9,6 +9,8 @@ use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Remote\Backblaze;
+use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\DatabaseBackupStep;
@@ -29,14 +31,12 @@ final class BackupRunnerTest extends TestCase
     protected const CONFIG_TEMP_DIR = CONFIG_DIR . 'temp_app' . DIRECTORY_SEPARATOR;
     protected const TEST_DIR = TEST_WORK_DIR;
 
-    protected AppConfig $config;
-
     protected function setUp(): void
     {
         copy(TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml', self::CONFIG_FILE);
         self::assertFileExists(self::CONFIG_FILE);
 
-        $this->config = AppConfig::loadAppConfig('app');
+        AppConfig::loadAppConfig('app');
     }
 
     protected function tearDown(): void
@@ -57,16 +57,14 @@ final class BackupRunnerTest extends TestCase
             new StepConfig(CreateBundlesStep::class, 5 * 24 * 60 * 60),
             new StepConfig(DirectoryBackupStep::class),
             new StepConfig(DatabaseBackupStep::class),
-            new StepConfig(SendFileStep::class),
-            new StepConfig(SendFileStep::class),
-            new StepConfig(DeleteOldFilesStep::class),
-            new StepConfig(DeleteOldFilesStep::class),
+            new StepConfig(SendFileStep::class, 0, Local::class),
+            new StepConfig(SendFileStep::class, 0, Backblaze::class),
+            new StepConfig(DeleteOldFilesStep::class, 0, Local::class),
+            new StepConfig(DeleteOldFilesStep::class, 0, Backblaze::class),
             new StepConfig(CleanUpStep::class),
         ];
 
-        $runner = new BackupRunner($this->config);
-        FileLogger::getInstance()->deactivateEchoLogs();
-        FileLogger::getInstance()->setLogLevel(LogLevel::OFF);
+        $runner = new BackupRunner();
 
         $property = new \ReflectionProperty($runner, 'steps');
         self::assertEqualsIgnoringCase($expectedSteps, $property->getValue($runner));

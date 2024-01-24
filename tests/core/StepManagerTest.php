@@ -25,13 +25,12 @@ final class StepManagerTest extends TestCase
     private const STEP_FILE = self::SYSTEM_PATH . DIRECTORY_SEPARATOR . 'last.step';
     private const STUBS = [StepStub1::class, StepStub2::class, StepStub3::class];
     private array $steps = [];
-    private AppConfig $config;
 
     protected function setUp(): void
     {
         copy(TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml', self::CONFIG_FILE);
         self::assertFileExists(self::CONFIG_FILE);
-        $this->config = AppConfig::loadAppConfig('app');
+        AppConfig::loadAppConfig('app');
 
         $this->steps = array_map(static fn (string $stub): StepConfig => new StepConfig($stub), self::STUBS);
 
@@ -54,7 +53,7 @@ final class StepManagerTest extends TestCase
     {
         $steps = [];
         $this->expectException(\LengthException::class);
-        new StepManager($steps, $this->config);
+        new StepManager($steps);
     }
 
     /**
@@ -68,7 +67,7 @@ final class StepManagerTest extends TestCase
     {
         $this->expectException(\UnexpectedValueException::class);
         self::expectExceptionMessage('All entries in the array must be of type ' . StepConfig::class);
-        new StepManager([$step], $this->config);
+        new StepManager([$step]);
     }
 
     public static function provideMissingStepArgumentsCases(): iterable
@@ -84,7 +83,7 @@ final class StepManagerTest extends TestCase
         $calledStubs = array_merge(self::STUBS, [StepStub3::class], self::STUBS);
 
         for ($i = 0; $i < count($calledStubs); ++$i) {
-            $stepManager = new StepManager($this->steps, $this->config);
+            $stepManager = new StepManager($this->steps);
             $result = $stepManager->executeNextStep();
 
             self::assertSame('Result: Hello ' . $calledStubs[$i], $result);
@@ -96,14 +95,14 @@ final class StepManagerTest extends TestCase
      */
     public function testStepsChanged()
     {
-        $stepManager = new StepManager($this->steps, $this->config);
+        $stepManager = new StepManager($this->steps);
         $result = $stepManager->executeNextStep();
         self::assertSame('Result: Hello ' . StepStub1::class, $result);
-        $stepManager = new StepManager($this->steps, $this->config);
+        $stepManager = new StepManager($this->steps);
         $result = $stepManager->executeNextStep();
         self::assertSame('Result: Hello ' . StepStub2::class, $result);
         array_pop($this->steps);
-        $stepManager = new StepManager($this->steps, $this->config);
+        $stepManager = new StepManager($this->steps);
         $result = $stepManager->executeNextStep();
         self::assertSame('Result: Hello ' . StepStub1::class, $result);
     }

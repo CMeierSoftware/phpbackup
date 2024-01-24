@@ -23,7 +23,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
 
         $this->setStepData(['bundles' => ['something'], 'backupDirectory' => self::TEST_DIR]);
 
-        $this->databaseBackupStep = new DatabaseBackupStep($this->config);
+        $this->databaseBackupStep = new DatabaseBackupStep();
     }
 
     protected function tearDown(): void
@@ -37,21 +37,20 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
      */
     public function testExecuteWithSuccessfulBackup(): void
     {
-        $expected = new StepResult('unknown', false);
         $actual = $this->databaseBackupStep->execute();
 
         self::assertInstanceOf(StepResult::class, $actual);
 
-        $dtPattern = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql(?:\.[a-zA-Z]{0,3})?$/';
+        $dtPattern = '/^backup_database_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql(?:\.[a-zA-Z]{0,3})?$/';
         self::assertMatchesRegularExpression($dtPattern, basename($actual->returnValue));
         self::assertStringStartsWith(self::TEST_DIR, $actual->returnValue);
-        self::assertSame($expected->repeat, $actual->repeat);
+        self::assertFalse($actual->repeat);
         self::assertFileExists($actual->returnValue);
 
         // the encryption is at least 84 bytes
         self::assertGreaterThan(85, filesize($actual->returnValue));
 
-        $stepData = $this->config->readTempData('StepData');
+        $stepData = $this->getStepData();
         $archivesResult = [basename($actual->returnValue) => 'Database backup.'];
         self::assertSame($archivesResult, $stepData['archives']);
     }
@@ -62,7 +61,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteNoDbInConfig(): void
     {
         $this->setUpAppConfig('config_no_db');
-        $this->databaseBackupStep = new DatabaseBackupStep($this->config);
+        $this->databaseBackupStep = new DatabaseBackupStep();
 
         $actual = $this->databaseBackupStep->execute();
 
@@ -73,7 +72,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteMissingBackupDirectory()
     {
         $this->setStepData(['bundles' => 'some value']);
-        $step = new DatabaseBackupStep($this->config);
+        $step = new DatabaseBackupStep();
 
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: backupDirectory');
@@ -83,7 +82,7 @@ final class DatabaseBackupStepTest extends TestCaseWithAppConfig
     public function testExecuteMissingBundle()
     {
         $this->setStepData(['backupDirectory' => 'some value']);
-        $step = new DatabaseBackupStep($this->config);
+        $step = new DatabaseBackupStep();
 
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Missing required keys: bundles');

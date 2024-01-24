@@ -51,18 +51,16 @@ abstract class AbstractRunner
 
     /**
      * AbstractRunner constructor.
-     *
-     * @param AppConfig $config the application configuration
      */
-    public function __construct(AppConfig $config)
+    public function __construct()
     {
-        $this->config = $config;
+        $this->config = AppConfig::loadAppConfig();
         $this->configureLogger();
 
         $this->logger->info('Run App "' . $this->config->getAppName() . '"');
 
         $this->steps = $this->setupSteps();
-        $this->stepManager = new StepManager($this->steps, $this->config);
+        $this->stepManager = new StepManager($this->steps);
     }
 
     /**

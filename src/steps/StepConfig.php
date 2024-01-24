@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
@@ -54,15 +53,13 @@ final class StepConfig
     }
 
     /**
-     * Creates and returns an instance of the step class with the provided AppConfig and delay.
-     *
-     * @param AppConfig $appConfig the application configuration
+     * Creates and returns an instance of the step class.
      *
      * @return AbstractStep the instance of the step class
      */
-    public function getStepObject(AppConfig $appConfig): AbstractStep
+    public function getStepObject(): AbstractStep
     {
-        return StepFactory::build($this->stepClass, $this->remoteHandler, $appConfig);
+        return StepFactory::build($this->stepClass, $this->remoteHandler);
     }
 
     private function validateClass(string $class, string $parentClass)

@@ -24,13 +24,11 @@ abstract class AbstractStep
 
     /**
      * AbstractStep constructor.
-     *
-     * @param AppConfig $config configuration for this step
      */
-    public function __construct(AppConfig $config)
+    public function __construct()
     {
         $this->logger = FileLogger::getInstance();
-        $this->config = $config;
+        $this->config = AppConfig::loadAppConfig();
 
         try {
             $this->stepData = $this->config->readTempData('StepData');

@@ -14,14 +14,12 @@ final class StepManager
     private readonly string $stepFile;
     private readonly array $steps;
     private ?int $currentStepIdx = null;
-    private readonly AppConfig $config;
 
-    public function __construct(array $steps, AppConfig $config)
+    public function __construct(array $steps)
     {
         $this->validateSteps($steps);
         $this->steps = $steps;
-        $this->config = $config;
-        $this->stepFile = $this->config->getTempDir() . DIRECTORY_SEPARATOR . 'last.step';
+        $this->stepFile = AppConfig::loadAppConfig()->getTempDir() . DIRECTORY_SEPARATOR . 'last.step';
     }
 
     public function executeNextStep(): mixed
@@ -32,7 +30,7 @@ final class StepManager
             return null;
         }
 
-        $result = $currentStep->getStepObject($this->config)->execute();
+        $result = $currentStep->getStepObject()->execute();
 
         $this->saveCurrentStep($result->repeat);
 

@@ -39,7 +39,7 @@ abstract class TestCaseWithAppConfig extends TestCase
         FileHelper::deleteDirectory(self::TEST_DIR);
         FileHelper::deleteDirectory(self::CONFIG_TEMP_DIR);
 
-        unlink(self::CONFIG_FILE);
+        FileHelper::deleteFile(self::CONFIG_FILE);
         parent::tearDown();
     }
 
@@ -58,6 +58,11 @@ abstract class TestCaseWithAppConfig extends TestCase
     protected function setStepData(array $data)
     {
         $this->config->saveTempData('StepData', $data);
+    }
+
+    protected function getStepData(): array
+    {
+        return $this->config->readTempData('StepData');
     }
 
     private function replaceConfigValue(string $tag, string $newValue)

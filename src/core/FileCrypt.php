@@ -75,7 +75,7 @@ final class FileCrypt
         FileLogger::getInstance()->debug("{$action} '{$inputFile}' into temp file '{$tempFile}'.");
 
         $method = strtolower($action) . 'FileWithPassword';
-        
+
         try {
             File::$method($inputFile, $tempFile, $key);
 
@@ -83,8 +83,9 @@ final class FileCrypt
             FileHelper::moveFile($tempFile, $inputFile);
         } catch (\Throwable $th) {
             FileHelper::deleteFile($tempFile);
+
             throw new ($th::class)(
-                'Failed to replace original file with temporary file: ' . $th->getMessage(), 
+                'Failed to replace original file with temporary file: ' . $th->getMessage(),
                 $th->getCode(),
                 $th
             );

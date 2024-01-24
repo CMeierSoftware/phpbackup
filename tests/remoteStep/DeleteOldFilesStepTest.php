@@ -60,7 +60,7 @@ final class DeleteOldFilesStepTest extends TestCaseWithAppConfig
             ]
         );
 
-        $sendRemoteStep = new DeleteOldFilesStep($this->remoteHandler, $this->config);
+        $sendRemoteStep = new DeleteOldFilesStep($this->remoteHandler);
 
         $result = $sendRemoteStep->execute();
 

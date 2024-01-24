@@ -87,6 +87,4 @@ final class FileCryptTest extends TestCase
         self::expectException(FileNotWriteableException::class);
         FileCrypt::encryptFile(self::TEST_FILE_PLAIN, self::TEST_KEY);
     }
-
-    
 }

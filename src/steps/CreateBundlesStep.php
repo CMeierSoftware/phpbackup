@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileBundleCreator;
 use CMS\PhpBackup\Helper\FileHelper;
 
@@ -21,12 +20,10 @@ final class CreateBundlesStep extends AbstractStep
 
     /**
      * CreateBundlesStep constructor.
-     *
-     * @param AppConfig $config configuration for this step
      */
-    public function __construct(AppConfig $config)
+    public function __construct()
     {
-        parent::__construct($config);
+        parent::__construct();
 
         $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->excludeDirs = $this->config->getBackupDirectory()['exclude'];

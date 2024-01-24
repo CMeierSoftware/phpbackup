@@ -63,9 +63,7 @@ final class AppConfig
                 throw new FileNotFoundException("Configuration file does not exist: {$configFile}");
             }
 
-            if (null === self::$instance) {
-                self::$instance = new self($configFile, $tempDir);
-            }
+            self::$instance = new self($configFile, $tempDir);
         } elseif (null === self::$instance) {
             throw new \RuntimeException('AppConfig must be initialized before using.');
         }
@@ -212,7 +210,7 @@ final class AppConfig
         return array_filter($remoteClasses, 'class_exists');
     }
 
-    public function toAbsolutePath($relativePath, $baseDir = CONFIG_DIR): string
+    public static function toAbsolutePath($relativePath, $baseDir = CONFIG_DIR): string
     {
         $regex = '\\/\\' . DIRECTORY_SEPARATOR;
         $parts = preg_split("/[{$regex}]/", $relativePath);

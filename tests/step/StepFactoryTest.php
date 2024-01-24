@@ -28,7 +28,7 @@ final class StepFactoryTest extends TestCaseWithAppConfig
     {
         $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
 
-        $result = StepFactory::build($stepClass::class, '', $this->config);
+        $result = StepFactory::build($stepClass::class, '');
 
         self::assertInstanceOf($stepClass::class, $result);
     }
@@ -38,7 +38,7 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
         $remoteHandler = 'Local';
 
-        $result = StepFactory::build($stepClass::class, $remoteHandler, $this->config);
+        $result = StepFactory::build($stepClass::class, $remoteHandler);
 
         self::assertInstanceOf($stepClass::class, $result);
     }
@@ -51,6 +51,6 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         $stepClass = 'NonExistingClass';
         $remoteHandler = 'local';
 
-        StepFactory::build($stepClass, $remoteHandler, $this->config);
+        StepFactory::build($stepClass, $remoteHandler);
     }
 }

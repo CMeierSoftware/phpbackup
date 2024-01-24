@@ -12,8 +12,8 @@ if (!defined('ABS_PATH')) {
 
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use PhpZip\Constants\ZipCompressionLevel;
 use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
-use \PhpZip\Constants\ZipCompressionLevel;
 use PhpZip\ZipFile;
 
 /**

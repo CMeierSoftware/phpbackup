@@ -34,7 +34,7 @@ final class CleanUpStepTest extends TestCaseWithAppConfig
     {
         self::assertDirectoryExists(self::TEST_DIR);
 
-        $step = new CleanUpStep($this->config);
+        $step = new CleanUpStep();
 
         $result = $step->execute();
         self::assertInstanceOf(StepResult::class, $result);
@@ -46,13 +46,13 @@ final class CleanUpStepTest extends TestCaseWithAppConfig
 
     public function testCleanStepData()
     {
-        $step = new CleanUpStep($this->config);
+        $step = new CleanUpStep();
 
         $result = $step->execute();
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);
         self::assertSame('Backup process done.', $result->returnValue);
 
-        self::assertEmpty($this->config->readTempData('StepData'));
+        self::assertEmpty($this->getStepData());
     }
 }

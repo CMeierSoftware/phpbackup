@@ -44,7 +44,7 @@ final class ListBackupsTest extends TestCaseWithAppConfig
     {
         $this->setUpAppConfig('config_full_valid', []);
 
-        $sendRemoteStep = new ListBackupsStep($this->remoteHandler, $this->config);
+        $sendRemoteStep = new ListBackupsStep($this->remoteHandler);
 
         $result = $sendRemoteStep->execute();
         self::assertFalse($result->repeat);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Backup\DatabaseBackupCreator;
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Helper\FileHelper;
 
@@ -20,12 +19,10 @@ final class DatabaseBackupStep extends AbstractStep
 
     /**
      * DatabaseBackupStep constructor.
-     *
-     * @param AppConfig $config configuration for this step
      */
-    public function __construct(AppConfig $config)
+    public function __construct()
     {
-        parent::__construct($config);
+        parent::__construct();
 
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
         $this->dbConfig = $this->config->getBackupDatabase();
