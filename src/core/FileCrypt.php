@@ -65,7 +65,7 @@ final class FileCrypt
             throw new \InvalidArgumentException(($isEncrypt ? 'Encryption' : 'Decryption') . ' key cannot be empty.');
         }
 
-        if (!file_exists($inputFile)) {
+        if (!FileHelper::fileExists($inputFile)) {
             throw new FileNotFoundException("File not found: {$inputFile}");
         }
 
@@ -74,21 +74,20 @@ final class FileCrypt
 
         FileLogger::getInstance()->debug("{$action} '{$inputFile}' into temp file '{$tempFile}'.");
 
+        $method = strtolower($action) . 'FileWithPassword';
+        
         try {
-            $method = strtolower($action) . 'FileWithPassword';
             File::$method($inputFile, $tempFile, $key);
-        } catch (\Exception $th) {
+
+            FileHelper::deleteFile($inputFile);
+            FileHelper::moveFile($tempFile, $inputFile);
+        } catch (\Throwable $th) {
             FileHelper::deleteFile($tempFile);
-
-            throw $th;
-        }
-
-        if (!FileHelper::deleteFile($inputFile)) {
-            throw new \Exception("Failed to delete the original file after {$action}.");
-        }
-
-        if (!rename($tempFile, $inputFile)) {
-            throw new \Exception("Failed to rename the temporary file after {$action}.");
+            throw new ($th::class)(
+                'Failed to replace original file with temporary file: ' . $th->getMessage(), 
+                $th->getCode(),
+                $th
+            );
         }
 
         FileLogger::getInstance()->debug('Renamed tempFile back to inputFile.');

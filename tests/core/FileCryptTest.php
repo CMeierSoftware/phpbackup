@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Tests\Core;
 
 use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Exceptions\FileNotWriteableException;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +35,7 @@ final class FileCryptTest extends TestCase
 
     protected function tearDown(): void
     {
+        FileHelper::changeFilePermission(self::TEST_FILE_PLAIN, 0o755);
         FileHelper::deleteDirectory(TEST_WORK_DIR);
     }
 
@@ -74,4 +76,17 @@ final class FileCryptTest extends TestCase
         self::assertFileExists(self::TEST_FILE_ENCRYPTED);
         self::assertFileEquals(self::TEST_FILE_PLAIN, self::TEST_FILE_ENCRYPTED);
     }
+
+    /**
+     * @covers \CMS\PhpBackup\Core\FileCrypt::processFile
+     */
+    public function testOrigFileNotDeletable()
+    {
+        FileHelper::changeFilePermission(self::TEST_FILE_PLAIN, 0o400);
+
+        self::expectException(FileNotWriteableException::class);
+        FileCrypt::encryptFile(self::TEST_FILE_PLAIN, self::TEST_KEY);
+    }
+
+    
 }
