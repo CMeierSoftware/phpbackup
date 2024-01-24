@@ -68,11 +68,11 @@ final class DeleteOldFilesStepTest extends TestCaseWithAppConfig
         self::assertFalse($result->repeat);
 
         if (0 === $keepDays && 0 === $keepAmount) {
-            $this->assertDirectoriesDoNotExist($validDirs);
+            $this->assertDirectoriesExist($expiredDirs);
         } else {
-            $this->assertDirectoriesExist($validDirs);
+            $this->assertDirectoriesDoNotExist($expiredDirs);
         }
-        $this->assertDirectoriesDoNotExist($expiredDirs);
+        $this->assertDirectoriesExist($validDirs);
     }
 
     private function assertDirectoriesExist(array $dirs): void
