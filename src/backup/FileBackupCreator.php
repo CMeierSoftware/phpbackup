@@ -13,6 +13,7 @@ if (!defined('ABS_PATH')) {
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;
+use \PhpZip\Constants\ZipCompressionLevel;
 use PhpZip\ZipFile;
 
 /**
@@ -54,6 +55,7 @@ class FileBackupCreator
 
         try {
             $this->archive->addFilesFromIterator($ignoreIterator);
+            $this->archive->setCompressionLevel(ZipCompressionLevel::MAXIMUM);
             $this->archive->saveAsFile($this->archiveName);
             FileLogger::getInstance()->info("Backup created for '{$src}' at '{$this->archiveName}'.");
         } finally {
@@ -97,6 +99,7 @@ class FileBackupCreator
             foreach ($files as $file) {
                 $this->archive->addFile($file, basename($file));
             }
+            $this->archive->setCompressionLevel(ZipCompressionLevel::MAXIMUM);
             $this->archive->saveAsFile($this->archiveName);
             FileLogger::getInstance()->info("Backup created for '{$src}' with specific files at '{$this->archiveName}'.");
         } finally {

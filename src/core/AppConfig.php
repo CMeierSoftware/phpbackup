@@ -54,25 +54,24 @@ final class AppConfig
      * @throws FileNotFoundException if the configuration file does not exist
      */
     public static function loadAppConfig(string $app = ''): self
-{
-    if (!empty($app)) {
-        $configFile = CONFIG_DIR . $app . '.xml';
-        $tempDir = CONFIG_DIR . self::TMP_DIR . $app;
+    {
+        if (!empty($app)) {
+            $configFile = CONFIG_DIR . $app . '.xml';
+            $tempDir = CONFIG_DIR . self::TMP_DIR . $app;
 
-        if (!file_exists($configFile)) {
-            throw new FileNotFoundException("Configuration file does not exist: {$configFile}");
+            if (!file_exists($configFile)) {
+                throw new FileNotFoundException("Configuration file does not exist: {$configFile}");
+            }
+
+            if (null === self::$instance) {
+                self::$instance = new self($configFile, $tempDir);
+            }
+        } elseif (null === self::$instance) {
+            throw new \RuntimeException('AppConfig must be initialized before using.');
         }
 
-        if (null === self::$instance) {
-            self::$instance = new self($configFile, $tempDir);
-        }
-    } elseif (null === self::$instance) {
-        throw new \RuntimeException('AppConfig must be initialized before using.');
+        return self::$instance;
     }
-
-    return self::$instance;
-}
-   
 
     /**
      * Returns the path of the temporary directory.
