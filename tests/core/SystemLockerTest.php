@@ -108,4 +108,43 @@ final class SystemLockerTest extends TestCase
         self::expectException(FileNotFoundException::class);
         SystemLocker::readLockFile(self::TEST_DIR);
     }
+
+    public function testLockAlreadyLocked()
+    {
+        SystemLocker::lock(self::TEST_DIR);
+        self::assertTrue(SystemLocker::isLocked(self::TEST_DIR));
+
+        $this->setNewTimestamp(time() + 500);
+
+        self::expectException(SystemAlreadyLockedException::class);
+        SystemLocker::lock(self::TEST_DIR);
+    }
+
+    public function testUnlockWithAnotherTs()
+    {
+        SystemLocker::lock(self::TEST_DIR);
+        self::assertTrue(SystemLocker::isLocked(self::TEST_DIR));
+
+        list($oldTs, $newTs) = $this->setNewTimestamp(time() + 500);
+
+        // with a new ts set, the system should not be unlocked
+        SystemLocker::unlock(self::TEST_DIR);
+
+        self::assertTrue(SystemLocker::isLocked(self::TEST_DIR));
+        self::assertSame($oldTs, SystemLocker::readLockFile(self::TEST_DIR));
+    }
+
+    private function setNewTimestamp(int $newTimestamp): array
+    {
+        $ref = new \ReflectionProperty(SystemLocker::class, 'lockTimestamp');
+        $ref->setAccessible(true);
+        $oldTs = $ref->getValue();
+
+        // redefine Lock timestamp to simulate a new execution
+        $newTs = date('Y.m.d-H:i:s', $newTimestamp);
+        $ref->setValue(null, $newTs);
+        self::assertNotSame($newTs, $oldTs);
+
+        return [$oldTs, $newTs];
+    }
 }

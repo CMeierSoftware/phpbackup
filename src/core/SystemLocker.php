@@ -13,11 +13,11 @@ if (!defined('ABS_PATH')) {
 
 use CMS\PhpBackup\Exceptions\SystemAlreadyLockedException;
 
-define('LOCK_TS', date('Y.m.d-H:i:s', time()));
-
 final class SystemLocker
 {
     public const DEFAULT_LOCK_FILE = '.lock_system';
+
+    private static $lockTimestamp;
 
     /**
      * Tries to lock the system by creating a lock file.
@@ -35,7 +35,7 @@ final class SystemLocker
             throw new SystemAlreadyLockedException('System-Locker: System is locked since ' . self::readLockFile($system_path) . ' UTC.');
         }
 
-        $result = file_put_contents(self::getLockFilePath($system_path), LOCK_TS);
+        $result = file_put_contents(self::getLockFilePath($system_path), self::getLockTimestamp());
 
         if (false === $result && !self::isLocked($system_path)) {
             throw new \Exception('System-Locker: Can not lock system.');
@@ -64,7 +64,7 @@ final class SystemLocker
     {
         FileLogger::getInstance()->debug('unlock the system.');
 
-        if (LOCK_TS === self::readLockFile($system_path)) {
+        if (self::getLockTimestamp() === self::readLockFile($system_path)) {
             FileHelper::deleteFile(self::getLockFilePath($system_path));
         }
     }
@@ -85,6 +85,15 @@ final class SystemLocker
         }
 
         return file_get_contents(self::getLockFilePath($system_path));
+    }
+
+    private static function getLockTimestamp(): string
+    {
+        if (null === self::$lockTimestamp) {
+            self::$lockTimestamp = date('Y.m.d-H:i:s', time());
+        }
+
+        return self::$lockTimestamp;
     }
 
     /**
