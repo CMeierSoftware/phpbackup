@@ -200,10 +200,10 @@ final class SendFileStepTest extends TestCaseWithAppConfig
             $ts[$remoteFile] = filemtime($remoteFile);
         }
 
-        $filesToEncode = empty($fileMapping) ? $files : $fileMapping;
+        $fileMappingContent = array_fill_keys(array_map('basename', $fileMapping ?: $files), 'content');
         file_put_contents(
             $this->fileMappingPath,
-            json_encode(array_map('basename', $filesToEncode), JSON_PRETTY_PRINT)
+            json_encode($fileMappingContent, JSON_PRETTY_PRINT)
         );
 
         // we need to sleep, to be able to detect changes in filemtime

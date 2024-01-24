@@ -30,6 +30,10 @@ final class SendFileStep extends AbstractRemoteStep
     public function __construct(AbstractRemoteHandler $remoteHandler)
     {
         parent::__construct($remoteHandler);
+
+        $this->backupDir = $this->stepData['backupDirectory'];
+        $this->backupDirName = basename($this->backupDir);
+        $this->archives = &$this->stepData['archives'];
     }
 
     /**
@@ -39,10 +43,6 @@ final class SendFileStep extends AbstractRemoteStep
      */
     protected function _execute(): StepResult
     {
-        $this->backupDir = $this->stepData['backupDirectory'];
-        $this->backupDirName = basename($this->backupDir);
-        $this->archives = &$this->stepData['archives'];
-
         $this->remote->connect();
         $this->getUploadedFiles();
         $this->createBaseDirectory();
