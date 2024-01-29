@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Core\FileCrypt;
+use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Helper\FileHelper;
 
 if (!defined('ABS_PATH')) {
@@ -45,33 +46,44 @@ final class DirectoryBackupStep extends AbstractStep
      */
     protected function _execute(): StepResult
     {
-        $bundles = &$this->stepData['bundles'];
-
         if (!isset($this->stepData['archives'])) {
             $this->stepData['archives'] = [];
         }
-        $archives = &$this->stepData['archives'];
 
-        $idx = count($archives);
+        $cntBundles = count($this->stepData['bundles']);
+
+        for ($idx = count($this->stepData['archives']); $idx < $cntBundles; ++$idx) {
+            if ($this->isTimeoutClose()) {
+                break;
+            }
+
+            if ($this->incrementAttemptsCount() > self::MAX_ATTEMPTS) {
+                throw new MaximalAttemptsReachedException("Maximal attempts to backup index '{$idx}' reached (max. " . (string) self::MAX_ATTEMPTS . 'attempts)');
+            }
+
+            $this->backupBundle($idx);
+            $this->resetAttemptsCount();
+
+            $this->logger->info("Archived and encrypted bundle {$idx} of {$cntBundles} bundles.");
+        }
+
+        return new StepResult('', count($this->stepData['archives']) < $cntBundles);
+    }
+
+    private function backupBundle(int $bundleIndex): void
+    {
         $f = new FileBackupCreator($this->excludeDirs);
 
-        $backupFileName = $f->backupOnly($this->srcDir, $bundles[$idx]);
+        $backupFileName = $f->backupOnly($this->srcDir, $this->stepData['bundles'][$bundleIndex]);
+
         $this->logger->debug("Archive files to '{$backupFileName}'");
 
         if (!empty($this->encryptionKey)) {
             FileCrypt::encryptFile($backupFileName, $this->encryptionKey);
         }
 
-        $backupFileName = $this->moveToBackupDirectory($backupFileName, "archive_part_{$idx}.zip");
-
-        $archives[basename($backupFileName)] = $bundles[$idx];
-
-        $cntBundles = count($bundles);
-        $cntArchives = count($archives);
-
-        $this->logger->info("Archived and encrypted bundle {$cntArchives} of {$cntBundles} bundles.");
-
-        return new StepResult($backupFileName, $cntArchives < $cntBundles);
+        $backupFileName = $this->moveToBackupDirectory($backupFileName, "archive_part_{$bundleIndex}.zip");
+        $this->stepData['archives'][basename($backupFileName)] = $this->stepData['bundles'][$bundleIndex];
     }
 
     /**

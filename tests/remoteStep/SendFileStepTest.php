@@ -196,6 +196,7 @@ final class SendFileStepTest extends TestCaseWithAppConfig
         foreach ($files as $f) {
             $remoteFile = $this->workDirRemote . basename($f);
             copy($f, $remoteFile);
+            touch($remoteFile, time() - 5);
             self::assertFileExists($remoteFile);
             $ts[$remoteFile] = filemtime($remoteFile);
         }
@@ -205,9 +206,6 @@ final class SendFileStepTest extends TestCaseWithAppConfig
             $this->fileMappingPath,
             json_encode($fileMappingContent, JSON_PRETTY_PRINT)
         );
-
-        // we need to sleep, to be able to detect changes in filemtime
-        sleep(2);
 
         return $ts;
     }

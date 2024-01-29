@@ -54,7 +54,16 @@ final class SendFileStep extends AbstractRemoteStep
 
         $filesToUpload = array_diff(array_keys($this->archives), $this->uploadedFiles);
         foreach ($filesToUpload as $archiveFileName) {
+            if ($this->isTimeoutClose()) {
+                break;
+            }
+
+            if ($this->incrementAttemptsCount() > self::MAX_ATTEMPTS) {
+                throw new MaximalAttemptsReachedException("Maximal attempts to upload '{$archiveFileName}' reached (max. " . (string) self::MAX_ATTEMPTS . 'attempts)');
+            }
+
             $this->sendArchives($archiveFileName);
+            $this->resetAttemptsCount();
         }
 
         return new StepResult('', count($this->archives) !== count($this->uploadedFiles));
@@ -98,18 +107,11 @@ final class SendFileStep extends AbstractRemoteStep
      */
     private function sendArchives(string $archiveFileName): void
     {
-        $this->incrementAttemptsCount();
-
-        if ($this->getAttemptCount() > self::MAX_ATTEMPTS) {
-            throw new MaximalAttemptsReachedException("Maximal attempts to upload '{$archiveFileName}' reached (max. " . (string) self::MAX_ATTEMPTS . 'attempts)');
-        }
-
         $localPath = $this->backupDir . $archiveFileName;
         $remotePath = $this->backupDirName . '/' . basename($archiveFileName);
         $this->remote->fileUpload($localPath, $remotePath);
         $this->uploadedFiles[] = $archiveFileName;
         $this->updateFileMapping();
-        $this->resetAttemptsCount();
     }
 
     /**

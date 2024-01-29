@@ -43,35 +43,58 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
         $step = new DirectoryBackupStep();
         $result = $step->execute();
 
-        self::assertStepResult(true, $result);
+        self::assertStepResult(false, $result);
     }
 
-    public function testFirstStep()
+    public function testBackupAll()
     {
         $archivesResult = [
-            'archive_part_0.zip' => $this->oneBundle,
+            'archive_part_0.zip',
+            'archive_part_1.zip',
+            'archive_part_2.zip',
+            'archive_part_3.zip',
+            'archive_part_4.zip',
         ];
 
         $step = new DirectoryBackupStep();
         $result = $step->execute();
 
-        self::assertStepResult(true, $result);
+        self::assertStepResult(false, $result);
         $this->assertStepData($archivesResult);
     }
 
-    public function testAllSteps()
+    public function testReentryStep()
     {
-        $count = count($this->bundles);
-        $archivesResult = [];
+        $existingArchives = ['archive_part_0.zip', 'archive_part_1.zip'];
 
-        for ($i = 0; $i < $count; ++$i) {
-            $step = new DirectoryBackupStep();
-            $archivesResult["archive_part_{$i}.zip"] = $this->oneBundle;
-            $result = $step->execute();
+        $newArchives = ['archive_part_2.zip', 'archive_part_3.zip', 'archive_part_4.zip'];
 
-            self::assertStepResult(count($archivesResult) < $count, $result);
+        $this->setStepData(
+            [
+                'bundles' => $this->bundles,
+                'backupDirectory' => self::TEST_DIR,
+                'archives' => array_fill_keys($existingArchives, $this->oneBundle),
+            ]
+        );
 
-            $this->assertStepData($archivesResult);
+        $ts = [];
+        FileHelper::makeDir(self::TEST_DIR);
+        foreach ($existingArchives as $file) {
+            $filePath = self::TEST_DIR . $file;
+            copy(TEST_FIXTURES_FILE_1, $filePath);
+            self::assertFileExists($filePath);
+            touch($filePath, time() - 5);
+            $ts[$file] = filemtime($filePath);
+        }
+
+        $step = new DirectoryBackupStep();
+        $result = $step->execute();
+
+        self::assertStepResult(false, $result);
+        $this->assertStepData(array_merge($existingArchives, $newArchives));
+
+        foreach ($ts as $file => $fileTime) {
+            self::assertSame($fileTime, filemtime(self::TEST_DIR . $file), "File {$file} was modified.");
         }
     }
 
@@ -103,8 +126,16 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     private function assertStepData(array $archivesResult)
     {
         $stepData = $this->getStepData();
-        self::assertSame($archivesResult, $stepData['archives']);
+        self::assertSame($archivesResult, array_keys($stepData['archives']));
+        self::assertSame(array_fill(0, count($archivesResult), $this->oneBundle), array_values($stepData['archives']));
         self::assertSame($this->bundlesResult, $stepData['bundles']);
+
+        foreach ($archivesResult as $file) {
+            $filePath = self::TEST_DIR . $file;
+            self::assertFileExists($filePath);
+            // the encryption is at least 84 bytes
+            self::assertGreaterThan(85, filesize($filePath));
+        }
     }
 
     /**
@@ -116,9 +147,5 @@ final class DirectoryBackupStepTest extends TestCaseWithAppConfig
     {
         self::assertInstanceOf(StepResult::class, $actually);
         self::assertSame($expectedRepeat, $actually->repeat);
-
-        self::assertFileExists($actually->returnValue);
-        // the encryption is at least 84 bytes
-        self::assertGreaterThan(85, filesize($actually->returnValue));
     }
 }

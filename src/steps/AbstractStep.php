@@ -103,6 +103,8 @@ abstract class AbstractStep
     {
         $attempts = $this->getAttemptCount();
         $this->updateWatchdog(['attempts' => ++$attempts, 'last_attempt_time' => time()]);
+
+        return $attempts;
     }
 
     /**
