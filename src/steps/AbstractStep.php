@@ -23,7 +23,7 @@ abstract class AbstractStep
     protected array $stepData = [];
     private float $lastExeTs;
     private float $maxElapsedTime = 0;
-    private readonly float $maxExecutionTs;
+    private readonly float $timeoutTs;
 
     /**
      * AbstractStep constructor.
@@ -70,7 +70,7 @@ abstract class AbstractStep
      */
     public function isTimeoutClose(): bool
     {
-        if (0 === $this->maxExecutionTs) {
+        if (0 === $this->timeoutTs) {
             return false;
         }
 
@@ -80,7 +80,7 @@ abstract class AbstractStep
 
         $this->lastExeTs = $currentTime;
 
-        return $this->maxExecutionTs <= $currentTime + 1.5 * $this->maxElapsedTime;
+        return $this->timeoutTs <= $currentTime + 1.5 * $this->maxElapsedTime;
     }
 
     /**
