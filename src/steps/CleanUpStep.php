@@ -12,7 +12,7 @@ if (!defined('ABS_PATH')) {
 
 final class CleanUpStep extends AbstractStep
 {
-    public function getRequiredDataKeys(): array
+    protected function getRequiredDataKeys(): array
     {
         return ['backupDirectory'];
     }

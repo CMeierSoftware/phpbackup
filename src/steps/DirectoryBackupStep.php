@@ -33,7 +33,7 @@ final class DirectoryBackupStep extends AbstractStep
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
     }
 
-    public function getRequiredDataKeys(): array
+    protected function getRequiredDataKeys(): array
     {
         return ['backupDirectory', 'bundles'];
     }

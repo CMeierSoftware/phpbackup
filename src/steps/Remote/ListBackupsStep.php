@@ -23,7 +23,7 @@ final class ListBackupsStep extends AbstractRemoteStep
         parent::__construct($remoteHandler);
     }
 
-    public function getRequiredDataKeys(): array
+    protected function getRequiredDataKeys(): array
     {
         return [];
     }

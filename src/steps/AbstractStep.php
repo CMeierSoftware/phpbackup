@@ -15,7 +15,7 @@ if (!defined('ABS_PATH')) {
 /**
  * Abstract base class for implementing steps in a process.
  */
-abstract class AbstractStep implements StepInterface
+abstract class AbstractStep
 {
     protected const MAX_ATTEMPTS = 3;
     protected readonly FileLogger $logger;
@@ -96,6 +96,8 @@ abstract class AbstractStep implements StepInterface
 
         return (int) ($watchdogData['attempts'] ?? 0);
     }
+
+    abstract protected function getRequiredDataKeys(): array;
 
     private function validateStepData()
     {

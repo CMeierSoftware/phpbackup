@@ -29,7 +29,7 @@ final class DeleteOldFilesStep extends AbstractRemoteStep
         $this->keepBackupAmount = (int) $this->config->getBackupSettings()['keepBackupAmount'];
     }
 
-    public function getRequiredDataKeys(): array
+    protected function getRequiredDataKeys(): array
     {
         return [];
     }

@@ -28,7 +28,7 @@ final class DatabaseBackupStep extends AbstractStep
         $this->dbConfig = $this->config->getBackupDatabase();
     }
 
-    public function getRequiredDataKeys(): array
+    protected function getRequiredDataKeys(): array
     {
         return ['backupDirectory', 'bundles'];
     }
