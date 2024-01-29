@@ -22,14 +22,12 @@ class AjaxController
         self::validateCSRFToken();
         self::validateMethod();
 
-        $app = self::getApp();
+        AppConfig::loadAppConfig(self::getApp());
 
         try {
             list($nonce, $action, $data) = self::sanitizePostData($_POST);
 
-            $config = AppConfig::loadAppConfig($app);
-
-            ActionHandler::getInstance($config)->executeAction($action, $nonce, $data);
+            $result = ActionHandler::getInstance()->exec($action, $nonce, $data);
         } catch (\Exception $e) {
             JsonResponse::sendError($e->getMessage(), 500);
         }
