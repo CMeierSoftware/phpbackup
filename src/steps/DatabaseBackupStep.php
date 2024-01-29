@@ -28,6 +28,11 @@ final class DatabaseBackupStep extends AbstractStep
         $this->dbConfig = $this->config->getBackupDatabase();
     }
 
+    public function getRequiredDataKeys(): array
+    {
+        return ['backupDirectory', 'bundles'];
+    }
+
     /**
      * Executes the database backup step.
      *
@@ -75,11 +80,6 @@ final class DatabaseBackupStep extends AbstractStep
         $this->logger->info('Database dump created and encrypted.');
 
         return new StepResult($backupFileName, false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return ['backupDirectory', 'bundles'];
     }
 
     /**

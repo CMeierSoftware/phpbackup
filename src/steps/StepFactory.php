@@ -31,7 +31,7 @@ final class StepFactory
      * @throws \InvalidArgumentException if the specified step class does not exist
      * @throws \Exception if the specified remote handler method does not exist
      */
-    public static function build(string $stepClass, string $remoteHandler = ''): AbstractStep
+    public static function build(string $stepClass, string $remoteHandler = ''): StepInterface
     {
         if (!class_exists($stepClass)) {
             throw new \InvalidArgumentException("Class {$stepClass} does not exist.");

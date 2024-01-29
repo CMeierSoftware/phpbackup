@@ -29,6 +29,11 @@ final class DeleteOldFilesStep extends AbstractRemoteStep
         $this->keepBackupAmount = (int) $this->config->getBackupSettings()['keepBackupAmount'];
     }
 
+    public function getRequiredDataKeys(): array
+    {
+        return [];
+    }
+
     /**
      * Executes the remote step to send backup archives to a remote server.
      *
@@ -40,10 +45,5 @@ final class DeleteOldFilesStep extends AbstractRemoteStep
         $result = $this->remote->deleteOld('', $this->keepBackupDays, $this->keepBackupAmount);
 
         return new StepResult($result, false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return [];
     }
 }

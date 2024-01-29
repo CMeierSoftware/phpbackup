@@ -23,6 +23,11 @@ final class ListBackupsStep extends AbstractRemoteStep
         parent::__construct($remoteHandler);
     }
 
+    public function getRequiredDataKeys(): array
+    {
+        return [];
+    }
+
     /**
      * Executes the remote step to send backup archives to a remote server.
      *
@@ -34,10 +39,5 @@ final class ListBackupsStep extends AbstractRemoteStep
         $result = $this->remote->dirList('.');
 
         return new StepResult($result, false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return [];
     }
 }

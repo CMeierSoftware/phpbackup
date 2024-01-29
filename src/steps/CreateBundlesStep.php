@@ -31,6 +31,11 @@ final class CreateBundlesStep extends AbstractStep
         $this->maxArchiveSize = (int) $this->config->getBackupSettings()['maxArchiveSize'];
     }
 
+    public function getRequiredDataKeys(): array
+    {
+        return [];
+    }
+
     protected function _execute(): StepResult
     {
         $this->stepData['bundles'] = [];
@@ -46,10 +51,5 @@ final class CreateBundlesStep extends AbstractStep
         $this->stepData['backupDirectory'] = $backupDirectory;
 
         return new StepResult($backupDirectory, false);
-    }
-
-    protected function getRequiredStepDataKeys(): array
-    {
-        return [];
     }
 }
