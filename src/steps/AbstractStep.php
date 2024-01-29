@@ -21,6 +21,9 @@ abstract class AbstractStep
     protected readonly FileLogger $logger;
     protected readonly AppConfig $config;
     protected array $stepData = [];
+    private float $lastExeTs;
+    private float $maxElapsedTime = 0;
+    private readonly float $maxExecutionTs;
 
     /**
      * AbstractStep constructor.
@@ -35,6 +38,9 @@ abstract class AbstractStep
         } catch (FileNotFoundException) {
             $this->logger->info('No StepData found. Starting empty.');
         }
+
+        $this->lastExeTs = microtime(true);
+        $this->timeoutTs = 0 === (int) ini_get('max_execution_time') ? 0 : microtime(true) + ini_get('max_execution_time');
     }
 
     /**
@@ -54,6 +60,27 @@ abstract class AbstractStep
         $this->config->saveTempData('StepData', $this->stepData);
 
         return $result;
+    }
+
+    /**
+     * Checks if it's close to reaching the timeout. Close means 150% of a elapsed time of the longest iteration.
+     * One iteration is measured between two calls of this function.
+     *
+     * @return bool true if it's close to timeout, false otherwise
+     */
+    public function isTimeoutClose(): bool
+    {
+        if (0 === $this->maxExecutionTs) {
+            return false;
+        }
+
+        $currentTime = microtime(true);
+
+        $this->maxElapsedTime = max($this->maxElapsedTime, $currentTime - $this->lastExeTs);
+
+        $this->lastExeTs = $currentTime;
+
+        return $this->maxExecutionTs <= $currentTime + 1.5 * $this->maxElapsedTime;
     }
 
     /**

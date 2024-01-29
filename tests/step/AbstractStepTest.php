@@ -190,10 +190,34 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         self::assertStringContainsString('"attempts": 0', file_get_contents(self::WATCHDOG_FILE));
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Step\AbstractStep::isTimeoutClose()
+     */
+    public function testIsTimeoutClose()
+    {
+        $oldMaxTime = ini_get('max_execution_time');
+        ini_set('max_execution_time', 10);
+        $step = $this->getMockedHandler();
+        ini_set('max_execution_time', $oldMaxTime);
+
+        self::assertFalse($step->isTimeoutClose());
+        sleep(1);
+        // elapsed ~1 secs. Has 1.5 secs more time?
+        self::assertFalse($step->isTimeoutClose());
+        sleep(2);
+        //  elapsed ~3 secs. Has 3 secs more time?
+        self::assertFalse($step->isTimeoutClose());
+        sleep(2);
+        //  elapsed ~5 secs. Has 3 secs more time?
+        self::assertFalse($step->isTimeoutClose());
+        sleep(2);
+        //  elapsed ~8 secs. Has 3 secs more time?
+        self::assertTrue($step->isTimeoutClose());
+    }
+
     private function getMockedHandler(): AbstractStep|MockObject
     {
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
-        $mockBuilder->setConstructorArgs([$this->config]);
         $mockBuilder->onlyMethods(['_execute', 'getRequiredDataKeys']);
 
         return $mockBuilder->getMockForAbstractClass();
