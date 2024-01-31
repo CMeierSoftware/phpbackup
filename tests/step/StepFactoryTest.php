@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Step;
 
+use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepFactory;
 
@@ -33,14 +34,25 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         self::assertInstanceOf($stepClass::class, $result);
     }
 
-    public function testBuildWithRemoteClass()
+    /**
+     * @dataProvider RemoteClassNameProvider
+     */
+    public function testBuildWithRemoteClass(string $remoteHandler)
     {
         $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
-        $remoteHandler = 'Local';
 
         $result = StepFactory::build($stepClass::class, $remoteHandler);
 
         self::assertInstanceOf($stepClass::class, $result);
+    }
+
+    public static function RemoteClassNameProvider()
+    {
+        return [
+            ['local'],
+            ['Local'],
+            [Local::class]
+        ];
     }
 
     public function testBuildWithNonExistingClass()

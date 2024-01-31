@@ -59,7 +59,7 @@ final class StepFactory
     private static function buildRemoteHandler(string $remoteHandler): AbstractRemoteHandler
     {
         $remoteHandler = ucfirst(strtolower($remoteHandler));
-        $function = 'create' . $remoteHandler;
+        $function = 'create' . ucfirst(basename($remoteHandler));
 
         if (!method_exists(self::class, $function)) {
             throw new \Exception("Method {$function} does not exist in class " . self::class);
