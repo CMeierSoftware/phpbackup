@@ -199,7 +199,8 @@ final class AppConfig
 
     public function getDefinedRemoteClasses(): array
     {
-        $namespace = dirname(AbstractRemoteHandler::class) . '\\';
+    
+        $namespace = substr(AbstractRemoteHandler::class, 0, strrpos(AbstractRemoteHandler::class, '\\') + 1);
         $remoteClasses = $this->getRemoteSettings() ?? [];
 
         $remoteClasses = array_map(
