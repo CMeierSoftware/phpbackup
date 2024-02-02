@@ -51,6 +51,7 @@ final class DirectoryBackupStep extends AbstractStep
         }
 
         $cntBundles = count($this->stepData['bundles']);
+        $cntArchives = count($this->stepData['archives']);
 
         for ($idx = count($this->stepData['archives']); $idx < $cntBundles; ++$idx) {
             if ($this->isTimeoutClose()) {
@@ -63,11 +64,12 @@ final class DirectoryBackupStep extends AbstractStep
 
             $this->backupBundle($idx);
             $this->resetAttemptsCount();
+            $cntArchives = count($this->stepData['archives']);
 
-            $this->logger->info("Archived and encrypted bundle {$idx} of {$cntBundles} bundles.");
+            $this->logger->info("Archived and encrypted bundle {$cntArchives} of {$cntBundles} bundles.");
         }
 
-        return new StepResult('', count($this->stepData['archives']) < $cntBundles);
+        return new StepResult('', $cntArchives < $cntBundles);
     }
 
     private function backupBundle(int $bundleIndex): void
@@ -100,8 +102,6 @@ final class DirectoryBackupStep extends AbstractStep
         $newFile = $backupDirectory . $newName;
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);
-        FileHelper::changeFilePermission($newFile, 0o0400);
-
         return $newFile;
     }
 }
