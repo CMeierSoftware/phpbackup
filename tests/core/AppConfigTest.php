@@ -247,11 +247,11 @@ final class AppConfigTest extends TestCase
     public function testDefinedRemoteClasses(): void
     {
         $classes = [
-            Local::class,
-            Backblaze::class,
+            'local',
+            'backblaze',
         ];
 
-        $result = $this->config->getDefinedRemoteClasses();
+        $result = $this->config->getDefinedRemoteHandler();
         self::assertSame($classes, $result);
     }
 
@@ -263,7 +263,7 @@ final class AppConfigTest extends TestCase
     public function testDefinedRemoteClassesNoRemote(): void
     {
         $config = AppConfig::loadAppConfig('valid_app_no_remote');
-        self::assertEmpty($config->getDefinedRemoteClasses());
+        self::assertEmpty($config->getDefinedRemoteHandler());
     }
 
     /**

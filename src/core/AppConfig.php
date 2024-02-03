@@ -197,18 +197,10 @@ final class AppConfig
         return $remoteSettings;
     }
 
-    public function getDefinedRemoteClasses(): array
+    public function getDefinedRemoteHandler(): array
     {
-    
-        $namespace = substr(AbstractRemoteHandler::class, 0, strrpos(AbstractRemoteHandler::class, '\\') + 1);
         $remoteClasses = $this->getRemoteSettings() ?? [];
-
-        $remoteClasses = array_map(
-            static fn (string $cls): string => $namespace . ucfirst($cls),
-            array_keys($remoteClasses)
-        );
-
-        return array_filter($remoteClasses, 'class_exists');
+        return array_keys($remoteClasses);
     }
 
     public static function toAbsolutePath($relativePath, $baseDir = CONFIG_DIR): string

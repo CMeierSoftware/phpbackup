@@ -65,4 +65,12 @@ final class StepFactoryTest extends TestCaseWithAppConfig
 
         StepFactory::build($stepClass, $remoteHandler);
     }
+
+    public function testGetRemoteClasses()
+    {
+        $handler = ['local', 'Local', 'LOCAL', Local::class, 'invalid'];
+        $classes = StepFactory::getRemoteClasses($handler);
+
+        self::assertSame(array_fill(0, 4, Local::class), $classes);
+    }
 }

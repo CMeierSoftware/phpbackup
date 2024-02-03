@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\App;
 
 use CMS\PhpBackup\Step\StepConfig;
+use CMS\PhpBackup\Step\StepFactory;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -118,7 +119,8 @@ abstract class AbstractRunner
 
     protected function getRemoteStepsFor(string $class, int $delay = 0): array
     {
-        $remoteHandler = $this->config->getDefinedRemoteClasses();
+        $remoteHandler = $this->config->getDefinedRemoteHandler();
+        $remoteHandler = StepFactory::getRemoteClasses($remoteHandler);
 
         return array_map(
             static fn (string $handler): StepConfig => new StepConfig($class, $delay, $handler),

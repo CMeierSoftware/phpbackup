@@ -58,14 +58,26 @@ final class StepFactory
      */
     private static function buildRemoteHandler(string $remoteHandler): AbstractRemoteHandler
     {
-        $remoteHandler = ucfirst(strtolower($remoteHandler));
-        $function = 'create' . ucfirst(basename($remoteHandler));
+        $function = 'create' . ucfirst(strtolower($remoteHandler));
 
         if (!method_exists(self::class, $function)) {
             throw new \Exception("Method {$function} does not exist in class " . self::class);
         }
 
         return self::$function();
+    }
+
+    public static function getRemoteClasses(array $remoteHandler): array
+    {
+        $namespace = substr(AbstractRemoteHandler::class, 0, strrpos(AbstractRemoteHandler::class, '\\') + 1);
+        $remoteClasses = array_map(
+            static function (string $cls) use($namespace) : string {
+                $p = explode('\\', $cls);
+                return $namespace . ucfirst(strtolower(end($p)));
+            },
+            $remoteHandler
+        );
+        return array_filter($remoteClasses, 'class_exists');
     }
 
     /**
