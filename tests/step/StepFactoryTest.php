@@ -29,7 +29,7 @@ final class StepFactoryTest extends TestCaseWithAppConfig
     {
         $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
 
-        $result = StepFactory::build($stepClass::class, '');
+        $result = StepFactory::build($stepClass::class);
 
         self::assertInstanceOf($stepClass::class, $result);
     }
