@@ -50,8 +50,7 @@ abstract class AbstractStep
      */
     public function execute(): StepResult
     {
-        $class = $this::class;
-        $this->logger->info("Execute {$class}");
+        $this->logger->info("Execute " . $this->classDetails());
 
         $this->validateStepData();
 
@@ -60,6 +59,11 @@ abstract class AbstractStep
         $this->config->saveTempData('StepData', $this->stepData);
 
         return $result;
+    }
+
+    protected function classDetails(): string
+    {
+        return $this::class;
     }
 
     /**

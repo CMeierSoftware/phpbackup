@@ -25,4 +25,9 @@ abstract class AbstractRemoteStep extends AbstractStep
         parent::__construct();
         $this->remote = $remoteHandler;
     }
+
+    protected function classDetails(): string
+    {
+        return $this::class . ' Remote: ' . $this->remote::class;
+    }
 }
