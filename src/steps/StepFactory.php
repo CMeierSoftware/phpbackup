@@ -47,6 +47,17 @@ final class StepFactory
         return new $stepClass();
     }
 
+    public static function getRemoteClasses(array $remoteHandler): array
+    {
+        $namespace = substr(AbstractRemoteHandler::class, 0, strrpos(AbstractRemoteHandler::class, '\\') + 1);
+        $remoteClasses = array_map(
+            static fn (string $cls): string => $namespace . self::extractClassName($cls),
+            $remoteHandler
+        );
+
+        return array_filter($remoteClasses, 'class_exists');
+    }
+
     /**
      * Builds an instance of AbstractRemoteHandler based on the provided remote handler class.
      *
@@ -67,19 +78,10 @@ final class StepFactory
         return self::$function();
     }
 
-    public static function getRemoteClasses(array $remoteHandler): array
-    {
-        $namespace = substr(AbstractRemoteHandler::class, 0, strrpos(AbstractRemoteHandler::class, '\\') + 1);
-        $remoteClasses = array_map(
-            static fn (string $cls): string => $namespace . self::extractClassName($cls),
-            $remoteHandler
-        );
-        return array_filter($remoteClasses, 'class_exists');
-    }
-
-    private static function extractClassName(string $cls) : string
+    private static function extractClassName(string $cls): string
     {
         $p = explode('\\', $cls);
+
         return ucfirst(strtolower(end($p)));
     }
 

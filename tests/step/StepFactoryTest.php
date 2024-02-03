@@ -35,7 +35,7 @@ final class StepFactoryTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @dataProvider RemoteClassNameProvider
+     * @dataProvider provideBuildWithRemoteClassCases
      */
     public function testBuildWithRemoteClass(string $remoteHandler)
     {
@@ -46,12 +46,12 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         self::assertInstanceOf($stepClass::class, $result);
     }
 
-    public static function RemoteClassNameProvider()
+    public static function provideBuildWithRemoteClassCases(): iterable
     {
         return [
             ['local'],
             ['Local'],
-            [Local::class]
+            [Local::class],
         ];
     }
 

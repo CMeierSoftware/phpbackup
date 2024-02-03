@@ -7,8 +7,6 @@ namespace CMS\PhpBackup\Tests\Core;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Remote\Backblaze;
-use CMS\PhpBackup\Remote\Local;
 use Laminas\Config\Exception\RuntimeException;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use PHPUnit\Framework\TestCase;

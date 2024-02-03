@@ -6,7 +6,6 @@ namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use Laminas\Config\Config;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use Laminas\Config\Factory as LaminasConfigFactory;
@@ -200,6 +199,7 @@ final class AppConfig
     public function getDefinedRemoteHandler(): array
     {
         $remoteClasses = $this->getRemoteSettings() ?? [];
+
         return array_keys($remoteClasses);
     }
 

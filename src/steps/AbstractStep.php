@@ -50,7 +50,7 @@ abstract class AbstractStep
      */
     public function execute(): StepResult
     {
-        $this->logger->info("Execute " . $this->classDetails());
+        $this->logger->info('Execute ' . $this->classDetails());
 
         $this->validateStepData();
 
@@ -59,11 +59,6 @@ abstract class AbstractStep
         $this->config->saveTempData('StepData', $this->stepData);
 
         return $result;
-    }
-
-    protected function classDetails(): string
-    {
-        return $this::class;
     }
 
     /**
@@ -85,6 +80,11 @@ abstract class AbstractStep
         $this->lastExeTs = $currentTime;
 
         return $this->timeoutTs <= $currentTime + 1.5 * $this->maxElapsedTime;
+    }
+
+    protected function classDetails(): string
+    {
+        return $this::class;
     }
 
     /**
