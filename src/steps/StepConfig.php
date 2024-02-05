@@ -23,7 +23,7 @@ final class StepConfig
      * @readonly
      */
     public readonly int $delay;
-    private readonly string $stepClass;
+    public readonly string $stepClass;
     private readonly string $remoteHandler;
 
     /**
