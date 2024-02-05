@@ -24,9 +24,11 @@ final class FileBundleCreator
 
         $this->sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
 
-        $this->excludes = array_map(fn (string $dir): string => $this->rootDir . DIRECTORY_SEPARATOR . trim($dir, $separator), $excludedDirs);
+        $this->excludes = array_map(static fn (string $path): string => rtrim($path, $separator), $excludedDirs);
 
         $this->bundles = &$refBundles;
+
+        FileLogger::getInstance()->debug('Exclude folder: ' . implode('; ', $this->excludes));
     }
 
     /**
