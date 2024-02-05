@@ -93,15 +93,18 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         self::assertSame(array_fill(0, 4, Local::class), $classes);
     }
 
-     /**
-     * @dataProvider namespaceProvider
+    /**
+     * @dataProvider provideExtractNamespaceCases
+     *
+     * @param mixed $cls
+     * @param mixed $expectedResult
      */
     public function testExtractNamespace($cls, $expectedResult)
     {
-        $this->assertEquals($expectedResult, StepFactory::extractNamespace($cls));
+        self::assertSame($expectedResult, StepFactory::extractNamespace($cls));
     }
 
-    public function namespaceProvider()
+    public function provideExtractNamespaceCases(): iterable
     {
         return [
             ['Namespace1\Namespace2\Namespace3\ClassName', 'Namespace1\Namespace2\Namespace3'],
