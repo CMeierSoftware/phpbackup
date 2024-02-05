@@ -41,16 +41,10 @@ final class StepFactory
         if (!empty($remoteHandler)) {
             $remote = self::buildRemoteHandler($remoteHandler);
 
-            $cls = new $stepClass($remote);
+            return new $stepClass($remote);
         }
 
-        $cls = new $stepClass();
-
-        if ($cls instanceof AbstractAjaxStep) {
-            $cls->setPostData($postData);
-        }
-
-        return $cls;
+        return new $stepClass();
     }
 
     public static function getRemoteClasses(array $remoteHandler): array
@@ -92,7 +86,7 @@ final class StepFactory
         return implode('\\', $p);
     }
 
-    private static function extractClassName(string $cls): string
+    public static function extractClassName(string $cls): string
     {
         $p = explode('\\', $cls);
 
