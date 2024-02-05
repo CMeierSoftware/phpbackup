@@ -163,7 +163,8 @@ class Backblaze extends AbstractRemoteHandler
                 continue;
             }
 
-            $name = explode('/', str_replace($remotePath, '', $file->getFileName()))[0];
+            $name = array_filter(explode('/', str_replace($remotePath, '', $file->getFileName())));
+            $name = reset($name);
 
             if (!in_array($name, $result, true)) {
                 $result[] = $name;
@@ -172,7 +173,6 @@ class Backblaze extends AbstractRemoteHandler
 
         return $result;
     }
-
 
     /**
      * Maps the provided bucket name to the appropriate bucket ID.
