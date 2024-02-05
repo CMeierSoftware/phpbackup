@@ -32,19 +32,25 @@ final class StepFactory
      * @throws \InvalidArgumentException if the specified step class does not exist
      * @throws \Exception if the specified remote handler method does not exist
      */
-    public static function build(string $stepClass, string $remoteHandler = ''): AbstractAjaxStep|AbstractStep
+    public static function build(string $stepClass, string $remoteHandler = '', array $postData = []): AbstractAjaxStep|AbstractStep
     {
         if (!class_exists($stepClass)) {
-            throw new \InvalidArgumentException("Class {$stepClass} does not exist.");
+            throw new \InvalidArgumentException("Class '{$stepClass}' does not exist.");
         }
 
         if (!empty($remoteHandler)) {
             $remote = self::buildRemoteHandler($remoteHandler);
 
-            return new $stepClass($remote);
+            $cls = new $stepClass($remote);
         }
 
-        return new $stepClass();
+        $cls = new $stepClass();
+
+        if ($cls instanceof AbstractAjaxStep) {
+            $cls->setPostData($postData);
+        }
+
+        return $cls;
     }
 
     public static function getRemoteClasses(array $remoteHandler): array
@@ -67,15 +73,23 @@ final class StepFactory
      *
      * @throws \Exception if the specified remote handler creation method does not exist
      */
-    private static function buildRemoteHandler(string $remoteHandler): AbstractRemoteHandler
+    public static function buildRemoteHandler(string $remoteHandler): AbstractRemoteHandler
     {
         $function = 'create' . self::extractClassName($remoteHandler);
 
         if (!method_exists(self::class, $function)) {
-            throw new \Exception("Method {$function} does not exist in class " . self::class);
+            throw new \InvalidArgumentException("Method '{$function}' does not exist in class " . self::class);
         }
 
         return self::$function();
+    }
+
+    public static function extractNamespace(string $cls): string
+    {
+        $p = explode('\\', $cls);
+        array_pop($p);
+
+        return implode('\\', $p);
     }
 
     private static function extractClassName(string $cls): string

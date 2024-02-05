@@ -35,42 +35,80 @@ final class StepFactoryTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @dataProvider provideBuildWithRemoteClassCases
+     * @covers \CMS\PhpBackup\Step\StepFactory::build()
      */
-    public function testBuildWithRemoteClass(string $remoteHandler)
+    public function testBuildWithNonExistingClass()
     {
-        $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Class 'NonExistingClass' does not exist");
 
-        $result = StepFactory::build($stepClass::class, $remoteHandler);
+        $stepClass = 'NonExistingClass';
 
-        self::assertInstanceOf($stepClass::class, $result);
+        StepFactory::build($stepClass);
     }
 
-    public static function provideBuildWithRemoteClassCases(): iterable
+    /**
+     * @dataProvider provideBuildRemoteClassCases
+     *
+     * @covers \CMS\PhpBackup\Step\StepFactory::buildRemoteHandler()
+     */
+    public function testBuildRemoteClass(string $remoteHandler)
+    {
+        $result = StepFactory::buildRemoteHandler($remoteHandler);
+
+        self::assertInstanceOf(Local::class, $result);
+    }
+
+    public static function provideBuildRemoteClassCases(): iterable
     {
         return [
             ['local'],
             ['Local'],
+            ['LOCAL'],
             [Local::class],
         ];
     }
 
-    public function testBuildWithNonExistingClass()
+    /**
+     * @covers \CMS\PhpBackup\Step\StepFactory::build()
+     */
+    public function testBuildRemoteClassWithNonExistingClass()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Class NonExistingClass does not exist');
+        $this->expectExceptionMessage("Method 'createNonexistingclass' does not exist in class CMS\\PhpBackup\\Step\\StepFactory");
 
         $stepClass = 'NonExistingClass';
-        $remoteHandler = 'local';
 
-        StepFactory::build($stepClass, $remoteHandler);
+        StepFactory::buildRemoteHandler($stepClass);
     }
 
+    /**
+     * @covers \CMS\PhpBackup\Step\StepFactory::testGetRemoteClasses()
+     */
     public function testGetRemoteClasses()
     {
         $handler = ['local', 'Local', 'LOCAL', Local::class, 'invalid'];
         $classes = StepFactory::getRemoteClasses($handler);
 
         self::assertSame(array_fill(0, 4, Local::class), $classes);
+    }
+
+     /**
+     * @dataProvider namespaceProvider
+     */
+    public function testExtractNamespace($cls, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, StepFactory::extractNamespace($cls));
+    }
+
+    public function namespaceProvider()
+    {
+        return [
+            ['Namespace1\Namespace2\Namespace3\ClassName', 'Namespace1\Namespace2\Namespace3'],
+            ['Namespace\ClassName', 'Namespace'],
+            ['', ''],
+            ['ClassName', ''],
+            ['Namespace1\ClassName\Namespace2', 'Namespace1\ClassName'],
+        ];
     }
 }
