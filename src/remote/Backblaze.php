@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Remote;
 
 use CMS\PhpBackup\Helper\FileHelper;
+use obregonco\B2\Bucket;
 use obregonco\B2\Client;
-use obregonco\B2\File;
 
 class Backblaze extends AbstractRemoteHandler
 {
@@ -32,7 +32,7 @@ class Backblaze extends AbstractRemoteHandler
         // Lower limit for using large files upload support. Default: 3GB
         $this->connection->largeFileLimit = 3000000000;
 
-        $this->bucketId = $this->connection->getBucketIdFromName($this->bucketName);
+        $this->bucketId = $this->getBucketIdFromName($this->bucketName);
         if (null === $this->bucketId) {
             $this->connection = null;
         }
@@ -50,6 +50,7 @@ class Backblaze extends AbstractRemoteHandler
 
     public function _dirCreate(string $remoteDirectoryPath): bool
     {
+        $remoteDirectoryPath = $this->sanitizePath($remoteDirectoryPath);
         $emptyFilePath = rtrim(ltrim($remoteDirectoryPath, '/'), '/') . '/.bzEmpty';
         $localEmptyFilePath = TEMP_DIR . 'temp.txt';
         touch($localEmptyFilePath);
@@ -65,6 +66,7 @@ class Backblaze extends AbstractRemoteHandler
 
     protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
+        $remoteFilePath = $this->sanitizePath($remoteFilePath);
         $options = [
             'FileName' => $remoteFilePath,
             'BucketName' => $this->bucketName,
@@ -79,6 +81,7 @@ class Backblaze extends AbstractRemoteHandler
 
     protected function _fileDownload(string $localFilePath, string $remoteFilePath): bool
     {
+        $remoteFilePath = $this->sanitizePath($remoteFilePath);
         $options = [
             'FileName' => $remoteFilePath,
             'BucketName' => $this->bucketName,
@@ -93,6 +96,8 @@ class Backblaze extends AbstractRemoteHandler
 
     protected function _fileDelete(string $remoteFilePath): bool
     {
+        $remoteFilePath = $this->sanitizePath($remoteFilePath);
+
         $options = [
             'FileName' => $remoteFilePath,
             'BucketName' => $this->bucketName,
@@ -104,6 +109,7 @@ class Backblaze extends AbstractRemoteHandler
 
     protected function _fileExists(string $remoteFilePath): bool
     {
+        $remoteFilePath = $this->sanitizePath($remoteFilePath);
         $options = [
             'BucketName' => $this->bucketName,
             'BucketId' => $this->bucketId,
@@ -126,54 +132,69 @@ class Backblaze extends AbstractRemoteHandler
 
     protected function _dirDelete(string $remotePath): bool
     {
+        $remotePath = $this->sanitizePath($remotePath);
         $result = true;
-        $files = $this->_dirList($remotePath, true);
+        $files = $this->dirList($remotePath . '/', true);
         foreach ($files as $fileId => $fileName) {
-            $options = [
-                'BucketName' => $this->bucketName,
-                'BucketId' => $this->bucketId,
-                'FileId' => $fileId,
-                'FileName' => $fileName,
-            ];
-
-            $result = $result && $this->connection->deleteFile($options);
+            if (str_starts_with($fileName, 'dir_')) {
+                $result = $result && $this->dirDelete($remotePath . '/' . $fileName); // , $fileId, false);
+            } else {
+                $result = $result && $this->fileDelete($remotePath . '/' . $fileName);
+            }
         }
 
         return $result;
     }
 
-    protected function _dirList(string $remotePath, bool $includeFileId = false): array
+    protected function _dirList(string $remotePath): array
     {
+        $remotePath = $this->sanitizePath($remotePath);
+
         $options = [
             'BucketName' => $this->bucketName,
             'BucketId' => $this->bucketId,
         ];
 
         $fileList = $this->connection->listFiles($options);
-        $fileList = array_map(
-            static fn (File $file): array => [
-                'name' => $file->getFileName(),
-                'id' => $file->getFileId(),
-            ],
-            $fileList
-        );
+        $result = [];
 
-        $fileList = array_filter(
-            $fileList,
-            static fn (array $file): bool => str_starts_with($file['name'], $remotePath)
-        );
+        foreach ($fileList as $file) {
+            if (!str_starts_with($file->getFileName(), $remotePath)) {
+                continue;
+            }
 
-        return array_column($fileList, 'name', $includeFileId ? 'id' : null);
+            $name = explode('/', str_replace($remotePath, '', $file->getFileName()))[0];
+
+            if (!in_array($name, $result, true)) {
+                $result[] = $name;
+            }
+        }
+
+        return $result;
     }
 
-    private function isFilePath($path): bool
+
+    /**
+     * Maps the provided bucket name to the appropriate bucket ID.
+     *
+     * @param mixed $name
+     *
+     * @return null|string
+     */
+    private function getBucketIdFromName($name)
     {
-        $lastDotPosition = strrpos($path, '.');
+        $buckets = $this->connection->listBuckets(true); // we need to list the buckets with force
 
-        $isFilePath = false !== $lastDotPosition && $lastDotPosition < strlen($path) - 1;
+        $buckets = array_filter(
+            $buckets,
+            static fn (Bucket $bucket): bool => $name === $bucket->getName()
+        );
 
-        $this->logger->debug("The path '{$path}' is " . ($isFilePath ? '' : 'not') . ' a file.');
+        return !empty($buckets) ? reset($buckets)->getId() : null;
+    }
 
-        return $isFilePath;
+    private function sanitizePath(string $path): string
+    {
+        return ltrim($path, '/');
     }
 }
