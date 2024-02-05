@@ -57,7 +57,6 @@ final class SendFileStep extends AbstractRemoteStep
             if ($this->isTimeoutClose()) {
                 break;
             }
-
             if ($this->incrementAttemptsCount() > self::MAX_ATTEMPTS) {
                 throw new MaximalAttemptsReachedException("Maximal attempts to upload '{$archiveFileName}' reached (max. " . (string) self::MAX_ATTEMPTS . 'attempts)');
             }

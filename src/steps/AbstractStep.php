@@ -62,7 +62,7 @@ abstract class AbstractStep
     }
 
     /**
-     * Checks if it's close to reaching the timeout. Close means 150% of a elapsed time of the longest iteration.
+     * Checks if it's close to reaching the timeout. Close means 150% of an elapsed time of the longest iteration.
      * One iteration is measured between two calls of this function.
      *
      * @return bool true if it's close to timeout, false otherwise
@@ -76,10 +76,18 @@ abstract class AbstractStep
         $currentTime = microtime(true);
 
         $this->maxElapsedTime = max($this->maxElapsedTime, $currentTime - $this->lastExeTs);
+        $isClose = $this->timeoutTs <= $currentTime + 1.5 * $this->maxElapsedTime;
 
+        $this->logger->debug(sprintf(
+            'Last time check: %.2f --> elapsed time: %.2f --> Timeout: %.2f --> is close: %d',
+            $this->lastExeTs,
+            $this->maxElapsedTime,
+            $this->timeoutTs,
+            (int) $isClose
+        ));
         $this->lastExeTs = $currentTime;
 
-        return $this->timeoutTs <= $currentTime + 1.5 * $this->maxElapsedTime;
+        return $isClose;
     }
 
     protected function classDetails(): string

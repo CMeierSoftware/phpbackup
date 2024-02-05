@@ -17,7 +17,7 @@ final class DeleteOldFilesStep extends AbstractRemoteStep
     private readonly int $keepBackupAmount;
 
     /**
-     * SendRemoteStep constructor.
+     * DeleteOldFilesStep constructor.
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
      */
