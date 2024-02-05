@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step\Ajax;
 
-use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepResult;
 
@@ -18,8 +16,7 @@ if (!defined('ABS_PATH')) {
  */
 abstract class AbstractAjaxStep extends AbstractStep
 {
-    protected readonly FileLogger $logger;
-    protected readonly AppConfig $config;
+    protected array $postData = [];
 
     /**
      * AbstractStep constructor.
@@ -34,33 +31,30 @@ abstract class AbstractAjaxStep extends AbstractStep
      *
      * @return StepResult the result of the callback execution
      */
-    public function execute(array $postData): StepResult
+    public function execute(): StepResult
     {
-        $class = $this::class;
-        $this->logger->info("Execute {$class}");
+        $this->logger->info('Execute ' . $this->classDetails());
 
-        $postData = $this->parsePostData($postData);
+        $this->parsePostData();
 
-        return $this->_execute($postData);
+        return $this->_execute();
     }
 
-    /**
-     * Abstract method to be implemented by child classes.
-     *
-     * @return StepResult the result of the callback execution
-     */
-    abstract protected function _execute(array $postData): StepResult;
-
-    abstract protected function sanitizeData(array $postData): array;
-
-    private function parsePostData(array $postData): array
+    public function setPostData(array $postData): void
     {
-        $missingKeys = array_diff($this->getRequiredDataKeys(), $postData);
+        $this->postData = $postData;
+    }
+
+    abstract protected function sanitizeData(): void;
+
+    private function parsePostData(): void
+    {
+        $missingKeys = array_diff($this->getRequiredDataKeys(), array_keys($this->postData));
 
         if (!empty($missingKeys)) {
             throw new \InvalidArgumentException('Missing required keys: ' . implode(', ', $missingKeys));
         }
 
-        return $this->sanitizeData($postData);
+        $this->sanitizeData();
     }
 }
