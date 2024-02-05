@@ -25,12 +25,14 @@ class AjaxController
         AppConfig::loadAppConfig(self::getApp());
 
         try {
-            list($nonce, $action, $data) = self::sanitizePostData($_POST);
+            list($nonce, $step, $data) = self::sanitizePostData($_POST);
 
-            $result = ActionHandler::getInstance()->exec($action, $nonce, $data);
+            $data = ActionHandler::getInstance()->executeStep($step, $nonce, $data);
         } catch (\Exception $e) {
             JsonResponse::sendError($e->getMessage(), 500);
         }
+
+        JsonResponse::sendSuccess($data);
     }
 
     public static function printCsrfToken()
@@ -94,7 +96,7 @@ class AjaxController
         JsonResponse::sendError('Invalid URL parameter.', 403);
     }
 
-    private static function sanitizePostData(array $postData): array
+    private static function sanitizePostData(array &$postData): array
     {
         return [
             htmlspecialchars($postData['nonce'] ?? '', ENT_QUOTES, 'UTF-8'),
