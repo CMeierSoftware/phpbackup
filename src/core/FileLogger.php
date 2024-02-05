@@ -27,8 +27,11 @@ final class FileLogger
     private string $logFile = self::DEFAULT_LOG_FILE;
     private LogLevel $logLevel = LogLevel::OFF;
     private bool $echoLogs = false;
+    private readonly bool $isAjax;
 
-    private function __construct() {}
+    private function __construct() {
+        $this->isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    }
 
     /**
      * Clones the logger instance (disallowed).
@@ -167,7 +170,7 @@ final class FileLogger
     {
         file_put_contents($this->logFile, $entry, FILE_APPEND | LOCK_EX);
 
-        if ($this->echoLogs) {
+        if ($this->echoLogs && !$this->isAjax) {
             echo $entry . '<br>';
         }
     }
