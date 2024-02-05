@@ -277,18 +277,17 @@ abstract class AbstractRemoteHandler
     public function deleteOld(string $remotePath, int $ageInDays, int $amount): int
     {
         $this->logger->debug("Delete old files in {$remotePath}. Age: {$ageInDays}, Amount: {$amount}.");
-        $this->sanitizeDirCheck($remotePath);
-
         if ($ageInDays <= 0 && $amount <= 0) {
             return 0; // Nothing to do if both parameters are 0 or negative
         }
+        $this->sanitizeDirCheck($remotePath);
 
         $dirs = $this->dirList($remotePath);
 
         $validDirs = [];
 
         foreach ($dirs as $dir) {
-            if (preg_match('/^backup_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})$/', $dir, $matches)) {
+            if (preg_match('/^.*_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})$/', $dir, $matches)) {
                 $dateTime = \DateTime::createFromFormat('Y-m-d_H-i-s', $matches[1]);
                 $dirTimestamp = $dateTime->getTimestamp();
                 $validDirs[$dir] = $dirTimestamp;
@@ -322,7 +321,7 @@ abstract class AbstractRemoteHandler
             }
         }
 
-        $this->logger->debug("Deleted {$deletedCount} old files in {$remotePath}.");
+        $this->logger->debug("Deleted {$deletedCount} old files in '{$remotePath}'.");
 
         return $deletedCount;
     }
@@ -363,6 +362,22 @@ abstract class AbstractRemoteHandler
     abstract protected function _dirList(string $remotePath): array;
 
     /**
+     * Checks if the provided remote path belongs to a file.
+     *
+     * @param string $path The remote path to check
+     *
+     * @return bool True if the path belongs to a file, false if it belongs to a directory
+     */
+    protected function isFilePath(string $path): bool
+    {
+        $isFilePath = !empty(pathinfo($path)['extension']);
+
+        $this->logger->debug("The path '{$path}' is " . ($isFilePath ? '' : 'not') . ' a file.');
+
+        return $isFilePath;
+    }
+
+    /**
      * Sanitizes the remote path for file-related checks.
      *
      * @param string $remotePath The remote path to sanitize
@@ -398,21 +413,5 @@ abstract class AbstractRemoteHandler
         if (!$allowFilePaths && $this->isFilePath($remotePath)) {
             throw new \InvalidArgumentException('The provided path belongs to a file, not a directory.');
         }
-    }
-
-    /**
-     * Checks if the provided remote path belongs to a file.
-     *
-     * @param string $path The remote path to check
-     *
-     * @return bool True if the path belongs to a file, false if it belongs to a directory
-     */
-    private function isFilePath(string $path): bool
-    {
-        $isFilePath = !empty(pathinfo($path)['extension']);
-
-        $this->logger->debug("The path '{$path}' is " . ($isFilePath ? '' : 'not') . ' a file.');
-
-        return $isFilePath;
     }
 }

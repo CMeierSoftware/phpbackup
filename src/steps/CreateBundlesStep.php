@@ -46,7 +46,7 @@ final class CreateBundlesStep extends AbstractStep
             $this->excludeDirs
         );
 
-        $backupDirectory = TEMP_DIR . $this->config->getAppName() . '_backup_' . (new \DateTime())->format('Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
+        $backupDirectory = TEMP_DIR . $this->config->getAppName() . (new \DateTime())->format('_Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
         FileHelper::makeDir($backupDirectory);
         $this->stepData['backupDirectory'] = $backupDirectory;
 
