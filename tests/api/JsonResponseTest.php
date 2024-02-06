@@ -10,13 +10,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @covers CMS\PhpBackup\Api\JsonResponse
+ * @covers \CMS\PhpBackup\Api\JsonResponse
  */
 final class JsonResponseTest extends TestCase
 {
     /**
- * @covers CMS\PhpBackup\Api\JsonResponse::testSendError()
-     * 
+     * @covers \CMS\PhpBackup\Api\JsonResponse::testSendError()
      */
     public function testSendError()
     {
@@ -25,12 +24,11 @@ final class JsonResponseTest extends TestCase
         $output = ob_get_clean();
 
         self::assertStringContainsString('"error":"Test Error"', $output);
-        self::assertEquals(404, http_response_code());
+        self::assertSame(404, http_response_code());
     }
 
     /**
- * @covers CMS\PhpBackup\Api\JsonResponse::testSendSuccess()
-     * 
+     * @covers \CMS\PhpBackup\Api\JsonResponse::testSendSuccess()
      */
     public function testSendSuccess()
     {

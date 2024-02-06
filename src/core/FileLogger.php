@@ -29,8 +29,9 @@ final class FileLogger
     private bool $echoLogs = false;
     private readonly bool $isAjax;
 
-    private function __construct() {
-        $this->isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    private function __construct()
+    {
+        $this->isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 'xmlhttprequest' === strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
     }
 
     /**

@@ -9,6 +9,7 @@ use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Remote\Backblaze;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\Ajax\AbstractAjaxStep;
+use CMS\PhpBackup\Step\Remote\AbstractRemoteStep;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -27,12 +28,12 @@ final class StepFactory
      * @param string $stepClass the class name of the step to be created
      * @param string $remoteHandler the class name of the remote handler (optional)
      *
-     * @return AbstractAjaxStep|AbstractStep the created instance of AbstractStep
+     * @return AbstractAjaxStep|AbstractRemoteStep|AbstractStep the created instance of AbstractStep
      *
      * @throws \InvalidArgumentException if the specified step class does not exist
      * @throws \Exception if the specified remote handler method does not exist
      */
-    public static function build(string $stepClass, string $remoteHandler = ''): AbstractAjaxStep|AbstractStep
+    public static function build(string $stepClass, string $remoteHandler = ''): AbstractAjaxStep|AbstractRemoteStep|AbstractStep
     {
         if (!class_exists($stepClass)) {
             throw new \InvalidArgumentException("Class '{$stepClass}' does not exist.");

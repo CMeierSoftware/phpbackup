@@ -104,7 +104,7 @@ final class StepFactoryTest extends TestCaseWithAppConfig
         self::assertSame($expectedResult, StepFactory::extractNamespace($cls));
     }
 
-    public function provideExtractNamespaceCases(): iterable
+    public static function provideExtractNamespaceCases(): iterable
     {
         return [
             ['Namespace1\Namespace2\Namespace3\ClassName', 'Namespace1\Namespace2\Namespace3'],
