@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\App;
+namespace CMS\PhpBackup\Tests\Api;
 
 use CMS\PhpBackup\Api\JsonResponse;
 use PHPUnit\Framework\TestCase;
@@ -10,12 +10,13 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  *
- * @coversNothing
+ * @covers CMS\PhpBackup\Api\JsonResponse
  */
 final class JsonResponseTest extends TestCase
 {
     /**
-     * @runInSeparateProcess
+ * @covers CMS\PhpBackup\Api\JsonResponse::testSendError()
+     * 
      */
     public function testSendError()
     {
@@ -24,10 +25,13 @@ final class JsonResponseTest extends TestCase
         $output = ob_get_clean();
 
         self::assertStringContainsString('"error":"Test Error"', $output);
-        self::assertStringContainsString('HTTP/1.1 404 Not Found', $output);
-        // Add more assertions as needed
+        self::assertEquals(404, http_response_code());
     }
 
+    /**
+ * @covers CMS\PhpBackup\Api\JsonResponse::testSendSuccess()
+     * 
+     */
     public function testSendSuccess()
     {
         ob_start();
@@ -36,6 +40,5 @@ final class JsonResponseTest extends TestCase
 
         self::assertStringContainsString('"success":true', $output);
         self::assertStringContainsString('"data":{"data":"Test Data"}', $output);
-        // Add more assertions as needed
     }
 }

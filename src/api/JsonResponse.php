@@ -15,7 +15,7 @@ class JsonResponse
 {
     /**
      * Sends a JSON error response with the specified message and HTTP status code.
-     * Exits the script after sending the response.
+     * Doesn't exit the script after sending the response.
      *
      * @param string $message the error message
      * @param int $code the HTTP status code for the response
@@ -27,7 +27,7 @@ class JsonResponse
 
     /**
      * Sends a JSON success response with the specified data and optional HTTP status code.
-     * Exits the script after sending the response.
+     * Doesn't exit the script after sending the response.
      *
      * @param array $data the data to include in the success response
      * @param int $code the optional HTTP status code for the response (default is 200)
@@ -54,8 +54,6 @@ class JsonResponse
         }
 
         echo $jsonData;
-
-        exit;
     }
 
     private static function getStatusMessage(int $code): string
