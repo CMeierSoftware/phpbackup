@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
-use CMS\PhpBackup\Backup\DatabaseBackupCreator;
+use CMS\PhpBackup\Helper\DatabaseBackupCreator;
 use CMS\PhpBackup\Helper\FileCrypt;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;

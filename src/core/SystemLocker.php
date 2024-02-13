@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Helper\FileLogger;
 
 if (!defined('ABS_PATH')) {
     return;

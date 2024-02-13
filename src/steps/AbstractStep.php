@@ -93,9 +93,10 @@ abstract class AbstractStep
         return $isClose;
     }
 
-    protected function classDetails(): string
+    private function classDetails(): string
     {
-        return $this::class . (null === $this->remote) ? '' : ' Remote: ' . $this->remote::class;
+        $remote = (null === $this->remote) ? '' : ' Remote: ' . $this->remote::class;
+        return $this::class . $remote;
     }
 
     /**
