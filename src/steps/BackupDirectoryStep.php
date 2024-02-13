@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
-use CMS\PhpBackup\Backup\FileBackupCreator;
-use CMS\PhpBackup\Core\FileCrypt;
+use CMS\PhpBackup\Helper\FileBackupCreator;
+use CMS\PhpBackup\Helper\FileCrypt;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;

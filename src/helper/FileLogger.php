@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Core;
+namespace CMS\PhpBackup\Helper;
 
 use CMS\PhpBackup\Helper\FileHelper;
 
@@ -70,7 +70,7 @@ final class FileLogger
     public function setLogLevel(LogLevel $newLogLevel): void
     {
         $this->logLevel = $newLogLevel;
-        $this->info('set log level to ' . $this->logLevel->name);
+        $this->debug('set log level to ' . $this->logLevel->name);
 
         if (function_exists('CMS_is_debug_mode') && CMS_is_debug_mode()) {
             $this->logLevel = LogLevel::DEBUG;

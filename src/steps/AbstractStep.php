@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Core\FileLogger;
+use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\App;
 
-use CMS\PhpBackup\Core\FileLogger;
+use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
 use CMS\PhpBackup\Step\BackupDatabaseStep;

@@ -7,7 +7,7 @@ namespace CMS\PhpBackup\Tests\App;
 use CMS\PhpBackup\App\AbstractRunner;
 use CMS\PhpBackup\App\BackupRunner;
 use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Core\FileLogger;
+use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Core\LogLevel;
 use CMS\PhpBackup\Core\SystemLocker;
 use CMS\PhpBackup\Helper\FileHelper;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Helper;
 
-use CMS\PhpBackup\Core\FileLogger;
+use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\FileNotReadableException;

@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Helper\FileLogger;
 use Laminas\Config\Config;
 use Laminas\Config\Exception\UnprocessableConfigException;
 use Laminas\Config\Factory as LaminasConfigFactory;

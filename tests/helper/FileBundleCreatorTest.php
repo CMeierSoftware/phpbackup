@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Core;
+namespace CMS\PhpBackup\Tests\Helper;
 
-use CMS\PhpBackup\Core\FileBundleCreator;
+use CMS\PhpBackup\Helper\FileBundleCreator;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 

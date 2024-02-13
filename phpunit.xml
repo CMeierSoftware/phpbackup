@@ -26,17 +26,11 @@
         <testsuite name="Core">
             <directory>tests\core</directory>
         </testsuite>
-        <testsuite name="Backups">
-            <directory>tests\backup</directory>
-        </testsuite>
         <testsuite name="Helper">
             <directory>tests\helper</directory>
         </testsuite>
         <testsuite name="Steps">
-            <directory>tests\step</directory>
-        </testsuite>
-        <testsuite name="Remote Steps">
-            <directory>tests\remoteStep</directory>
+            <directory>tests\steps</directory>
         </testsuite>
         <testsuite name="Remote">
             <directory>tests\remote</directory>

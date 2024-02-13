@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Core;
+namespace CMS\PhpBackup\Helper;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileHelper;

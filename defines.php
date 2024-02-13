@@ -40,10 +40,13 @@ function CMS_is_debug_mode()
 
 require_once ABS_PATH . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
+use CMS\PhpBackup\Helper\FileLogger;
+use CMS\PhpBackup\Helper\LogLevel;
+
 if (CMS_is_debug_mode()) {
-    $logger = Core\FileLogger::getInstance();
+    $logger = FileLogger::getInstance();
     $logger->activateEchoLogs();
-    $logger->setLogLevel(Core\LogLevel::DEBUG);
+    $logger->setLogLevel(LogLevel::DEBUG);
 
     $logger->debug('ABS_PATH: ' . ABS_PATH);
     $logger->debug('CONFIG_DIR: ' . CONFIG_DIR);

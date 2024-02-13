@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Core;
+namespace CMS\PhpBackup\Tests\Helper;
 
-use CMS\PhpBackup\Core\FileLogger;
-use CMS\PhpBackup\Core\LogLevel;
+use CMS\PhpBackup\Helper\FileLogger;
+use CMS\PhpBackup\Helper\LogLevel;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
- * @covers \CMS\PhpBackup\Core\FileLogger
+ * @covers \CMS\PhpBackup\Helper\FileLogger
  */
 final class FileLoggerTest extends TestCase
 {
@@ -32,7 +32,7 @@ final class FileLoggerTest extends TestCase
 
         $this->logger = FileLogger::getInstance();
         $this->logger->setLogFile(self::LOG_FILE_PATH);
-        $this->logger->setLogLevel(LogLevel::DEBUG);
+        $this->logger->setLogLevel(LogLevel::ERROR);
     }
 
     protected function tearDown(): void
@@ -41,7 +41,7 @@ final class FileLoggerTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::getInstance()
      */
     public function testGetInstance()
     {
@@ -54,21 +54,18 @@ final class FileLoggerTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::setLogLevel()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::setLogLevel()
      *
-     * @uses \CMS\PhpBackup\Core\FileLogger::Error()
-     * @uses \CMS\PhpBackup\Core\FileLogger::Warning()
-     * @uses \CMS\PhpBackup\Core\FileLogger::Info()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::Error()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::Warning()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::Info()
      * @uses \CMS\PhpBackup\Core\LogLevel::toString()
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      */
     public function testSetLogLevel()
     {
-        $message = 'This is a message';
-        $this->logger->setLogLevel(LogLevel::INFO);
-        $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        self::assertStringStartsWith(LogLevel::INFO->name, $log_file_content);
-        self::assertStringEndsWith("set log level to INFO\n", $log_file_content);
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
+        $this->logger->setLogLevel(LogLevel::DEBUG);
 
         $this->logger->error($message);
         $this->logger->warning($message);
@@ -94,119 +91,136 @@ final class FileLoggerTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::ActivateEchoLogs()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::setLogLevel()
      *
-     * @uses \CMS\PhpBackup\Core\FileLogger::Error()
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Core\LogLevel::toString()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
+     */
+    public function testSetLogLevelMessage()
+    {
+        $this->logger->setLogLevel(LogLevel::DEBUG);
+        $log_file_content = file_get_contents(self::LOG_FILE_PATH);
+        self::assertStringStartsWith(LogLevel::DEBUG->name, $log_file_content);
+        self::assertStringEndsWith("set log level to DEBUG\n", $log_file_content);
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Helper\FileLogger::ActivateEchoLogs()
+     *
+     * @uses \CMS\PhpBackup\Helper\FileLogger::Error()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      */
     public function testActiveEchoLogEntry()
     {
-        $errorMessage = 'This is an error message';
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
+        
         $this->logger->activateEchoLogs();
-        // Capture output to check if it's echoed when echo_logs is activated
         ob_start();
-        $this->logger->error($errorMessage);
+        $this->logger->error($message);
         $output = ob_get_clean();
         $this->logger->deactivateEchoLogs();
-        // Assert that the log entry is written to the file
+
         self::assertFileExists(self::LOG_FILE_PATH);
         $logFileContent = file_get_contents(self::LOG_FILE_PATH);
-        self::assertStringContainsString($errorMessage, $logFileContent);
+        self::assertStringContainsString($message, $logFileContent);
         self::assertSame($output, $logFileContent . '<br>');
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::DeactivateEchoLogs()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::DeactivateEchoLogs()
      *
-     * @uses \CMS\PhpBackup\Core\FileLogger::Error()
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::Error()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      */
     public function testDisabledEchoLogEntry()
     {
-        $errorMessage = 'This is an error message';
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
 
         $this->logger->deactivateEchoLogs();
 
         // Capture output to check if it's echoed when echo_logs is activated
         ob_start();
-        $this->logger->error($errorMessage);
+        $this->logger->error($message);
         $output = ob_get_clean();
         // Assert that the log entry is written to the file
         self::assertEmpty($output);
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
-        self::assertStringContainsString($errorMessage, $log_file_content);
+        self::assertStringContainsString($message, $log_file_content);
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::Error()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::Error()
      *
      * @uses \CMS\PhpBackup\Core\LogLevel::toString()
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      */
     public function testErrorLogEntry()
     {
-        $errorMessage = 'This is an error message';
-        $this->logger->error($errorMessage);
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
+        $this->logger->error($message);
 
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringStartsWith(LogLevel::ERROR->name, $log_file_content);
-        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringEndsWith($message . "\n", $log_file_content);
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::Warning()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::Warning()
      *
      * @uses \CMS\PhpBackup\Core\LogLevel::toString()
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      */
     public function testWarningLogEntry()
     {
-        $errorMessage = 'This is a warning message';
-        $this->logger->warning($errorMessage);
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
+        $this->logger->setLogLevel(LogLevel::WARNING);
+        $this->logger->warning($message);
 
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringStartsWith(LogLevel::WARNING->name, $log_file_content);
-        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringEndsWith($message . "\n", $log_file_content);
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::Info()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::Info()
      *
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      * @uses \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testInfoLogEntry()
     {
-        $errorMessage = 'This is an error message';
-        $this->logger->info($errorMessage);
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
+        $this->logger->setLogLevel(LogLevel::INFO);
+        $this->logger->info($message);
 
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringStartsWith(LogLevel::INFO->name, $log_file_content);
-        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringEndsWith($message . "\n", $log_file_content);
     }
 
     /**
-     * @covers \CMS\PhpBackup\Core\FileLogger::debug()
+     * @covers \CMS\PhpBackup\Helper\FileLogger::debug()
      *
-     * @uses \CMS\PhpBackup\Core\FileLogger::getInstance()
+     * @uses \CMS\PhpBackup\Helper\FileLogger::getInstance()
      * @uses \CMS\PhpBackup\Core\LogLevel::toString()
      */
     public function testDebugLogEntry()
     {
-        $errorMessage = 'This is an error message';
-        $this->logger->debug($errorMessage);
+        $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
+        $this->logger->setLogLevel(LogLevel::DEBUG);
+        $this->logger->debug($message);
 
         // Assert that the log entry is written to the file
         self::assertFileExists(self::LOG_FILE_PATH);
         $log_file_content = file_get_contents(self::LOG_FILE_PATH);
         self::assertStringStartsWith(LogLevel::DEBUG->name, $log_file_content);
-        self::assertStringEndsWith($errorMessage . "\n", $log_file_content);
+        self::assertStringEndsWith($message . "\n", $log_file_content);
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Core;
+namespace CMS\PhpBackup\Tests\Helper;
 
-use CMS\PhpBackup\Core\FileCrypt;
+use CMS\PhpBackup\Helper\FileCrypt;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\FileNotWriteableException;
 use CMS\PhpBackup\Helper\FileHelper;
