@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Tests\Step;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\SendFileStep;
+use CMS\PhpBackup\Step\SendFileStep;
 use CMS\PhpBackup\Step\StepResult;
 
 /**
@@ -22,6 +22,7 @@ final class SendFileStepTest extends TestCaseWithAppConfig
     private string $workDirRemote;
     private string $fileMappingPath;
     private array $archives;
+    private array $data = [];
 
     protected function setUp(): void
     {
@@ -42,7 +43,7 @@ final class SendFileStepTest extends TestCaseWithAppConfig
         ];
 
         $this->setUpAppConfig('config_full_valid');
-        $this->setStepData(['archives' => $this->archives, 'backupDirectory' => self::WORK_DIR_LOCAL]);
+        $this->data = ['archives' => $this->archives, 'backupDirectory' => self::WORK_DIR_LOCAL];
     }
 
     protected function tearDown(): void
@@ -63,8 +64,9 @@ final class SendFileStepTest extends TestCaseWithAppConfig
         FileHelper::deleteDirectory($this->workDirRemote);
         self::assertDirectoryDoesNotExist($this->workDirRemote);
 
-        $sendRemoteStep = new SendFileStep($this->remoteHandler);
-        $sendRemoteStep->execute();
+        $step = new SendFileStep($this->remoteHandler);
+        $step->setData($this->data);
+        $step->execute();
 
         self::assertRemoteStorage($this->archives);
     }
@@ -72,11 +74,11 @@ final class SendFileStepTest extends TestCaseWithAppConfig
     /**
      * @covers \CMS\PhpBackup\Step\SendFileStep::execute()
      */
-    public function testExecute()
+    public function testReturnValue()
     {
-        $sendRemoteStep = new SendFileStep($this->remoteHandler);
-
-        $result = $sendRemoteStep->execute();
+        $step = new SendFileStep($this->remoteHandler);
+        $step->setData($this->data);
+        $result = $step->execute();
 
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);
@@ -92,13 +94,11 @@ final class SendFileStepTest extends TestCaseWithAppConfig
         $archives = [];
         foreach ($this->archives as $file => $content) {
             $archives[$file] = $content;
-            $this->setStepData(['archives' => $archives, 'backupDirectory' => self::WORK_DIR_LOCAL]);
+            $this->data['archives'] = $archives;
 
-            $sendRemoteStep = new SendFileStep($this->remoteHandler);
-            $result = $sendRemoteStep->execute();
-
-            self::assertInstanceOf(StepResult::class, $result);
-            self::assertFalse($result->repeat);
+            $step = new SendFileStep($this->remoteHandler);
+            $step->setData($this->data);
+            $step->execute();
 
             self::assertRemoteStorage($archives);
         }
@@ -112,10 +112,12 @@ final class SendFileStepTest extends TestCaseWithAppConfig
         $files = [TEST_FIXTURES_FILE_1, TEST_FIXTURES_FILE_2];
         $ts = $this->setupRemoteStorage($files);
 
-        $sendRemoteStep = new SendFileStep($this->remoteHandler);
-        $sendRemoteStep->execute();
+        $step = new SendFileStep($this->remoteHandler);
+        $step->setData($this->data);
+        $step->execute();
 
         self::assertRemoteStorage($this->archives);
+
         foreach ($ts as $path => $fileTime) {
             self::assertSame($fileTime, filemtime($path), "File {$path} was modified.");
         }
@@ -130,8 +132,9 @@ final class SendFileStepTest extends TestCaseWithAppConfig
         $filesInFileMapping = [TEST_FIXTURES_FILE_1];
         $ts = $this->setupRemoteStorage($filesUploaded, $filesInFileMapping);
 
-        $sendRemoteStep = new SendFileStep($this->remoteHandler);
-        $sendRemoteStep->execute();
+        $step = new SendFileStep($this->remoteHandler);
+        $step->setData($this->data);
+        $step->execute();
 
         self::assertRemoteStorage($this->archives);
 
@@ -152,8 +155,9 @@ final class SendFileStepTest extends TestCaseWithAppConfig
     {
         $this->setupRemoteStorage([]);
 
-        $sendRemoteStep = new SendFileStep($this->remoteHandler);
-        $sendRemoteStep->execute();
+        $step = new SendFileStep($this->remoteHandler);
+        $step->setData($this->data);
+        $step->execute();
 
         self::assertRemoteStorage($this->archives);
     }

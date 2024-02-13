@@ -8,7 +8,7 @@ use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Step\StepConfig;
+use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
 
@@ -119,6 +119,8 @@ final class StepStub1 extends AbstractStep
     {
         return new StepResult('Result: Hello ' . self::class, false);
     }
+
+    protected function sanitizeData(): void {}
 }
 final class StepStub2 extends AbstractStep
 {
@@ -131,6 +133,8 @@ final class StepStub2 extends AbstractStep
     {
         return new StepResult('Result: Hello ' . self::class, false);
     }
+
+    protected function sanitizeData(): void {}
 }
 final class StepStub3 extends AbstractStep
 {
@@ -147,4 +151,6 @@ final class StepStub3 extends AbstractStep
 
         return new StepResult('Result: Hello ' . self::class, !self::$repeat);
     }
+
+    protected function sanitizeData(): void {}
 }

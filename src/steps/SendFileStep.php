@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Step\Remote;
+namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
-use CMS\PhpBackup\Step\StepResult;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class SendFileStep extends AbstractRemoteStep
+final class SendFileStep extends AbstractStep
 {
     private const FILE_MAPPING_NAME = 'file_mapping.json';
     private readonly string $backupDir;
@@ -30,10 +29,6 @@ final class SendFileStep extends AbstractRemoteStep
     public function __construct(AbstractRemoteHandler $remoteHandler)
     {
         parent::__construct($remoteHandler);
-
-        $this->backupDir = $this->stepData['backupDirectory'];
-        $this->backupDirName = basename($this->backupDir);
-        $this->archives = &$this->stepData['archives'];
     }
 
     protected function getRequiredDataKeys(): array
@@ -48,7 +43,10 @@ final class SendFileStep extends AbstractRemoteStep
      */
     protected function _execute(): StepResult
     {
-        $this->remote->connect();
+        $this->backupDir = $this->data['backupDirectory'];
+        $this->backupDirName = basename($this->backupDir);
+        $this->archives = &$this->data['archives'];
+
         $this->getUploadedFiles();
         $this->createBaseDirectory();
 
@@ -67,6 +65,8 @@ final class SendFileStep extends AbstractRemoteStep
 
         return new StepResult('', count($this->archives) !== count($this->uploadedFiles));
     }
+
+    protected function sanitizeData(): void {}
 
     /**
      * Retrieves the list of files already uploaded to the remote server.

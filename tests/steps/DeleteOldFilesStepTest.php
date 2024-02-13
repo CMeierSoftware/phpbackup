@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Step\Remote;
+namespace CMS\PhpBackup\Tests\Step;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\DeleteOldFilesStep;
+use CMS\PhpBackup\Step\DeleteOldFilesStep;
 use CMS\PhpBackup\Step\StepResult;
-use CMS\PhpBackup\Tests\Step\TestCaseWithAppConfig;
 
 /**
  * @internal
@@ -22,6 +21,7 @@ final class DeleteOldFilesStepTest extends TestCaseWithAppConfig
 
     protected function setUp(): void
     {
+        parent::setUp();
         FileHelper::makeDir(self::WORK_DIR_REMOTE_BASE);
         self::assertDirectoryExists(self::WORK_DIR_REMOTE_BASE);
 
@@ -60,9 +60,11 @@ final class DeleteOldFilesStepTest extends TestCaseWithAppConfig
             ]
         );
 
-        $sendRemoteStep = new DeleteOldFilesStep($this->remoteHandler);
+        $step = new DeleteOldFilesStep($this->remoteHandler);
 
-        $result = $sendRemoteStep->execute();
+        $data = [];
+        $step->setData($data);
+        $result = $step->execute();
 
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);

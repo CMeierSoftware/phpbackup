@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Step;
 
-use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Step\AbstractStep;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,6 +22,7 @@ final class AbstractStepTest extends TestCaseWithAppConfig
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->setUpAppConfig('config_full_valid');
     }
 
@@ -33,100 +34,65 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::execute()
      */
-    public function testExecuteNoStepData()
+    public function testExecute()
     {
-        self::assertFileDoesNotExist(self::CONFIG_STEP_RESULT_FILE);
-
         $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
         $step->expects(self::once())->method('_execute')->willReturn($stepResult);
-        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn([]);
 
+        $data = [];
+        $step->setData($data);
         $result = $step->execute();
 
         self::assertSame($stepResult, $result);
-        self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-        self::assertStringEqualsFile(self::CONFIG_STEP_RESULT_FILE, '[]');
     }
 
     /**
      * @covers \CMS\PhpBackup\Step\AbstractStep::execute()
      */
-    public function testAddStepData()
+    public function testDataNotSet()
     {
-        self::assertFileDoesNotExist(self::CONFIG_STEP_RESULT_FILE);
-
-        $stepResult = new StepResult('Result', false);
         $step = $this->getMockedHandler();
-        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
-        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn([]);
-
-        $reflectionProp = new \ReflectionProperty($step, 'stepData');
-        $reflectionProp->setAccessible(true);
-        $reflectionProp->setValue($step, ['key' => 'value', 'key2' => 't']);
-
-        $result = $step->execute();
-
-        self::assertSame($stepResult, $result);
-        self::assertStepResultFile(self::CONFIG_STEP_EXPECTED_FILE);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Step\AbstractStep::execute()
-     */
-    public function testExecuteExistingStepData()
-    {
-        FileHelper::makeDir(self::CONFIG_TEMP_DIR);
-        copy(self::CONFIG_STEP_EXPECTED_FILE, self::CONFIG_STEP_RESULT_FILE);
-        self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-
-        $stepResult = new StepResult('Result', false);
-        $step = $this->getMockedHandler();
-        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
-        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn([]);
-
-        $result = $step->execute();
-
-        self::assertSame($stepResult, $result);
-        self::assertStepResultFile(self::CONFIG_STEP_EXPECTED_FILE);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Step\AbstractStep::validateStepData()
-     */
-    public function testValidateStepDataKeySuccess()
-    {
-        FileHelper::makeDir(self::CONFIG_TEMP_DIR);
-        copy(self::CONFIG_STEP_EXPECTED_FILE, self::CONFIG_STEP_RESULT_FILE);
-        self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-
-        $stepResult = new StepResult('Result', false);
-        $step = $this->getMockedHandler();
-        $step->expects(self::once())->method('_execute')->willReturn($stepResult);
-        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn(['key']);
-
-        $result = $step->execute();
-
-        self::assertSame($stepResult, $result);
-        self::assertStepResultFile(self::CONFIG_STEP_EXPECTED_FILE);
-    }
-
-    /**
-     * @covers \CMS\PhpBackup\Step\AbstractStep::validateStepData()
-     */
-    public function testValidateStepDataKeyMissing()
-    {
-        FileHelper::makeDir(self::CONFIG_TEMP_DIR);
-        copy(self::CONFIG_STEP_EXPECTED_FILE, self::CONFIG_STEP_RESULT_FILE);
-        self::assertFileExists(self::CONFIG_STEP_RESULT_FILE);
-
-        $stepResult = new StepResult('Result', false);
-        $step = $this->getMockedHandler();
-        $step->expects(self::never())->method('_execute')->willReturn($stepResult);
-        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn(['missing']);
 
         self::expectException(\InvalidArgumentException::class);
         $step->execute();
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Step\AbstractStep::validateData()
+     */
+    public function testValidateDataKeySuccess()
+    {
+        $step = $this->getMockedHandler();
+
+        $prop = new \ReflectionProperty($step::class, 'data');
+        $prop->setValue($step, ['key' => 'value']);
+
+        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn(['key']);
+
+        $method = new \ReflectionMethod($step::class, 'validateData');
+        $method->setAccessible(true);
+
+        self::assertTrue($method->invokeArgs($step, []));
+    }
+
+    /**
+     * @covers \CMS\PhpBackup\Step\AbstractStep::validateData()
+     */
+    public function testValidateDataKeyMissing()
+    {
+        $step = $this->getMockedHandler();
+
+        $prop = new \ReflectionProperty($step::class, 'data');
+        $prop->setValue($step, ['key' => 'value']);
+
+        $step->expects(self::once())->method('getRequiredDataKeys')->willReturn(['missing']);
+
+        $method = new \ReflectionMethod($step::class, 'validateData');
+        $method->setAccessible(true);
+
+        self::expectException(\InvalidArgumentException::class);
+        $method->invokeArgs($step, []);
     }
 
     /**
@@ -191,6 +157,8 @@ final class AbstractStepTest extends TestCaseWithAppConfig
     }
 
     /**
+     * @large
+     *
      * @covers \CMS\PhpBackup\Step\AbstractStep::isTimeoutClose()
      */
     public function testIsTimeoutClose()
@@ -215,10 +183,11 @@ final class AbstractStepTest extends TestCaseWithAppConfig
         self::assertTrue($step->isTimeoutClose());
     }
 
-    private function getMockedHandler(): AbstractStep|MockObject
+    private function getMockedHandler(?AbstractRemoteHandler $remote = null): AbstractStep|MockObject
     {
         $mockBuilder = $this->getMockBuilder(AbstractStep::class);
         $mockBuilder->onlyMethods(['_execute', 'getRequiredDataKeys']);
+        $mockBuilder->setConstructorArgs([$remote]);
 
         return $mockBuilder->getMockForAbstractClass();
     }

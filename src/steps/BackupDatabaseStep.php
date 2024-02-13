@@ -7,12 +7,13 @@ namespace CMS\PhpBackup\Step;
 use CMS\PhpBackup\Backup\DatabaseBackupCreator;
 use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class DatabaseBackupStep extends AbstractStep
+final class BackupDatabaseStep extends AbstractStep
 {
     private readonly array $dbConfig;
     private readonly string $encryptionKey;
@@ -20,9 +21,9 @@ final class DatabaseBackupStep extends AbstractStep
     /**
      * DatabaseBackupStep constructor.
      */
-    public function __construct()
+    public function __construct(?AbstractRemoteHandler $remoteHandler)
     {
-        parent::__construct();
+        parent::__construct($remoteHandler);
 
         $this->encryptionKey = $this->config->getBackupSettings()['encryptionKey'];
         $this->dbConfig = $this->config->getBackupDatabase();
@@ -46,12 +47,12 @@ final class DatabaseBackupStep extends AbstractStep
             return new StepResult('No database defined. Skip step.', false);
         }
 
-        $bundles = &$this->stepData['bundles'];
+        $bundles = &$this->data['bundles'];
 
-        if (!isset($this->stepData['archives'])) {
-            $this->stepData['archives'] = [];
+        if (!isset($this->data['archives'])) {
+            $this->data['archives'] = [];
         }
-        $archives = &$this->stepData['archives'];
+        $archives = &$this->data['archives'];
 
         $this->logger->info("Starting database dump of ({$this->dbConfig['host']}, {$this->dbConfig['dbname']})");
 
@@ -82,6 +83,8 @@ final class DatabaseBackupStep extends AbstractStep
         return new StepResult($backupFileName, false);
     }
 
+    protected function sanitizeData(): void {}
+
     /**
      * Moves the file to the backup Directory and logs the action.
      *
@@ -91,7 +94,7 @@ final class DatabaseBackupStep extends AbstractStep
      */
     private function moveToBackupDirectory(string $file): string
     {
-        $backupDirectory = rtrim($this->stepData['backupDirectory'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $backupDirectory = rtrim($this->data['backupDirectory'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $newFile = $backupDirectory . basename($file);
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);

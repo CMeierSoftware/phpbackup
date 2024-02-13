@@ -8,12 +8,13 @@ use CMS\PhpBackup\Backup\FileBackupCreator;
 use CMS\PhpBackup\Core\FileCrypt;
 use CMS\PhpBackup\Exceptions\MaximalAttemptsReachedException;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class DirectoryBackupStep extends AbstractStep
+final class BackupDirectoryStep extends AbstractStep
 {
     private array $bundles;
     private array $archives;
@@ -25,9 +26,9 @@ final class DirectoryBackupStep extends AbstractStep
     /**
      * DirectoryBackupStep constructor.
      */
-    public function __construct()
+    public function __construct(?AbstractRemoteHandler $remoteHandler)
     {
-        parent::__construct();
+        parent::__construct(null);
 
         $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->excludeDirs = $this->config->getBackupDirectory()['exclude'];
@@ -46,14 +47,14 @@ final class DirectoryBackupStep extends AbstractStep
      */
     protected function _execute(): StepResult
     {
-        if (!isset($this->stepData['archives'])) {
-            $this->stepData['archives'] = [];
+        if (!isset($this->data['archives'])) {
+            $this->data['archives'] = [];
         }
 
-        $cntBundles = count($this->stepData['bundles']);
-        $cntArchives = count($this->stepData['archives']);
+        $cntBundles = count($this->data['bundles']);
+        $cntArchives = count($this->data['archives']);
 
-        for ($idx = count($this->stepData['archives']); $idx < $cntBundles; ++$idx) {
+        for ($idx = count($this->data['archives']); $idx < $cntBundles; ++$idx) {
             if ($this->isTimeoutClose()) {
                 break;
             }
@@ -64,7 +65,7 @@ final class DirectoryBackupStep extends AbstractStep
 
             $this->backupBundle($idx);
             $this->resetAttemptsCount();
-            $cntArchives = count($this->stepData['archives']);
+            $cntArchives = count($this->data['archives']);
 
             $this->logger->info("Archived and encrypted bundle {$cntArchives} of {$cntBundles} bundles.");
         }
@@ -72,11 +73,13 @@ final class DirectoryBackupStep extends AbstractStep
         return new StepResult('', $cntArchives < $cntBundles);
     }
 
+    protected function sanitizeData(): void {}
+
     private function backupBundle(int $bundleIndex): void
     {
         $f = new FileBackupCreator($this->excludeDirs);
 
-        $backupFileName = $f->backupOnly($this->srcDir, $this->stepData['bundles'][$bundleIndex]);
+        $backupFileName = $f->backupOnly($this->srcDir, $this->data['bundles'][$bundleIndex]);
 
         $this->logger->debug("Archive files to '{$backupFileName}'");
 
@@ -85,7 +88,7 @@ final class DirectoryBackupStep extends AbstractStep
         }
 
         $backupFileName = $this->moveToBackupDirectory($backupFileName, "archive_part_{$bundleIndex}.zip");
-        $this->stepData['archives'][basename($backupFileName)] = $this->stepData['bundles'][$bundleIndex];
+        $this->data['archives'][basename($backupFileName)] = $this->data['bundles'][$bundleIndex];
     }
 
     /**
@@ -98,7 +101,7 @@ final class DirectoryBackupStep extends AbstractStep
      */
     private function moveToBackupDirectory(string $file, string $newName): string
     {
-        $backupDirectory = rtrim($this->stepData['backupDirectory'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $backupDirectory = rtrim($this->data['backupDirectory'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $newFile = $backupDirectory . $newName;
         FileHelper::makeDir($backupDirectory);
         FileHelper::moveFile($file, $newFile);

@@ -2,25 +2,30 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Step\Remote;
+namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
-use CMS\PhpBackup\Step\StepResult;
 
 if (!defined('ABS_PATH')) {
     return;
 }
 
-final class ListBackupsStep extends AbstractRemoteStep
+final class DeleteOldFilesStep extends AbstractStep
 {
+    private readonly int $keepBackupDays;
+    private readonly int $keepBackupAmount;
+
     /**
-     * SendRemoteStep constructor.
+     * DeleteOldFilesStep constructor.
      *
      * @param AbstractRemoteHandler $remoteHandler remote handler for file transfer
      */
     public function __construct(AbstractRemoteHandler $remoteHandler)
     {
         parent::__construct($remoteHandler);
+
+        $this->keepBackupDays = (int) $this->config->getBackupSettings()['keepBackupDays'];
+        $this->keepBackupAmount = (int) $this->config->getBackupSettings()['keepBackupAmount'];
     }
 
     protected function getRequiredDataKeys(): array
@@ -36,8 +41,10 @@ final class ListBackupsStep extends AbstractRemoteStep
     protected function _execute(): StepResult
     {
         $this->remote->connect();
-        $result = $this->remote->dirList('.');
+        $result = $this->remote->deleteOld('', $this->keepBackupDays, $this->keepBackupAmount);
 
         return new StepResult($result, false);
     }
+
+    protected function sanitizeData(): void {}
 }

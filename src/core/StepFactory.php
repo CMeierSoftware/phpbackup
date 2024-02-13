@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Step;
+namespace CMS\PhpBackup\Core;
 
-use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Remote\Backblaze;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Ajax\AbstractAjaxStep;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteStep;
+use CMS\PhpBackup\Step\AbstractStep;
+use CMS\PhpBackup\Step\Cron\AbstractCronStep;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -28,27 +27,23 @@ final class StepFactory
      * @param string $stepClass the class name of the step to be created
      * @param string $remoteHandler the class name of the remote handler (optional)
      *
-     * @return AbstractAjaxStep|AbstractRemoteStep|AbstractStep the created instance of AbstractStep
+     * @return AbstractStep the created instance of AbstractStep
      *
      * @throws \InvalidArgumentException if the specified step class does not exist
      * @throws \Exception if the specified remote handler method does not exist
      */
-    public static function build(string $stepClass, string $remoteHandler = ''): AbstractAjaxStep|AbstractRemoteStep|AbstractStep
+    public static function build(string $stepClass, string $remoteHandler = ''): AbstractStep
     {
         if (!class_exists($stepClass)) {
             throw new \InvalidArgumentException("Class '{$stepClass}' does not exist.");
         }
 
-        if (!empty($remoteHandler)) {
-            $remote = self::buildRemoteHandler($remoteHandler);
+        $remote = empty($remoteHandler) ? null : self::buildRemoteHandler($remoteHandler);
 
-            return new $stepClass($remote);
-        }
-
-        return new $stepClass();
+        return new $stepClass($remote);
     }
 
-    public static function getRemoteClasses(array $remoteHandler): array
+    public static function getRemoteClassNames(array $remoteHandler): array
     {
         $namespace = substr(AbstractRemoteHandler::class, 0, strrpos(AbstractRemoteHandler::class, '\\') + 1);
         $remoteClasses = array_map(
@@ -87,6 +82,9 @@ final class StepFactory
         return implode('\\', $p);
     }
 
+    /**
+     * Extracts the Class name from a full class name with namespace.
+     */
     public static function extractClassName(string $cls): string
     {
         $p = explode('\\', $cls);

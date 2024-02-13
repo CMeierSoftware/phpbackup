@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Step;
 
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
+use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Step\Remote\AbstractRemoteStep;
-use CMS\PhpBackup\Step\StepConfig;
+use CMS\PhpBackup\Core\StepConfig;
 
 /**
  * @internal
@@ -17,23 +18,26 @@ use CMS\PhpBackup\Step\StepConfig;
 final class StepConfigTest extends TestCaseWithAppConfig
 {
     private $stepMock;
-    private $remoteMock;
 
     protected function setUp(): void
     {
         $this->setUpAppConfig('config_full_valid');
-        $this->stepMock = $this->getMockForAbstractClass(AbstractStep::class);
-        $this->remoteMock = $this->getMockForAbstractClass(AbstractRemoteHandler::class);
+        $this->stepMock = $this->getMockForAbstractClass(AbstractStep::class, [null]);
+
+        FileHelper::makeDir(TEST_WORK_DIR);
     }
 
     protected function tearDown(): void
     {
+        FileHelper::deleteDirectory(TEST_WORK_DIR);
         parent::tearDown();
     }
 
     public function testValidParameter()
     {
-        $step = new StepConfig($this->stepMock::class, 0, $this->remoteMock::class);
+        $remoteMock = $this->getMockForAbstractClass(AbstractRemoteHandler::class);
+
+        $step = new StepConfig($this->stepMock::class, 0, $remoteMock::class);
 
         self::assertInstanceOf(StepConfig::class, $step);
     }
@@ -47,6 +51,15 @@ final class StepConfigTest extends TestCaseWithAppConfig
         new StepConfig($step);
     }
 
+    /**
+     * @dataProvider provideInvalidClassNameCases
+     */
+    public function testInvalidRemoteClass(string $remote)
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        new StepConfig($this->stepMock::class, 0, $remote);
+    }
+
     public static function provideInvalidClassNameCases(): iterable
     {
         return [['nonExistent'], [\stdClass::class], ['null']];
@@ -56,15 +69,6 @@ final class StepConfigTest extends TestCaseWithAppConfig
     {
         $this->expectException(\UnexpectedValueException::class);
         new StepConfig($this->stepMock::class, -1);
-    }
-
-    /**
-     * @dataProvider provideInvalidClassNameCases
-     */
-    public function testInvalidRemoteClass(string $remote)
-    {
-        $this->expectException(\UnexpectedValueException::class);
-        new StepConfig($this->stepMock::class, 0, $remote);
     }
 
     /**
@@ -85,8 +89,10 @@ final class StepConfigTest extends TestCaseWithAppConfig
      */
     public function testGetRemoteStepObject()
     {
-        $remoteStepMock = $this->getMockForAbstractClass(AbstractRemoteStep::class, [$this->remoteMock]);
-        $stepConfig = new StepConfig($remoteStepMock::class, 0, $this->remoteMock::class);
+        $remote = new Local(TEST_WORK_DIR);
+
+        $remoteStepMock = $this->getMockForAbstractClass(AbstractStep::class, [$remote]);
+        $stepConfig = new StepConfig($remoteStepMock::class, 0, $remote::class);
 
         $obj = $stepConfig->getStepObject();
 

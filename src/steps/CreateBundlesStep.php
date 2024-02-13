@@ -6,6 +6,7 @@ namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Core\FileBundleCreator;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -21,9 +22,9 @@ final class CreateBundlesStep extends AbstractStep
     /**
      * CreateBundlesStep constructor.
      */
-    public function __construct()
+    public function __construct(?AbstractRemoteHandler $remoteHandler)
     {
-        parent::__construct();
+        parent::__construct(null);
 
         $this->srcDir = $this->config->getBackupDirectory()['src'];
         $this->excludeDirs = $this->config->getBackupDirectory()['exclude'];
@@ -38,18 +39,20 @@ final class CreateBundlesStep extends AbstractStep
 
     protected function _execute(): StepResult
     {
-        $this->stepData['bundles'] = [];
+        $this->data['bundles'] = [];
         FileBundleCreator::createFileBundles(
             $this->srcDir,
             $this->maxArchiveSize,
-            $this->stepData['bundles'],
+            $this->data['bundles'],
             $this->excludeDirs
         );
 
         $backupDirectory = TEMP_DIR . $this->config->getAppName() . (new \DateTime())->format('_Y-m-d_H-i-s') . DIRECTORY_SEPARATOR;
         FileHelper::makeDir($backupDirectory);
-        $this->stepData['backupDirectory'] = $backupDirectory;
+        $this->data['backupDirectory'] = $backupDirectory;
 
         return new StepResult($backupDirectory, false);
     }
+
+    protected function sanitizeData(): void {}
 }

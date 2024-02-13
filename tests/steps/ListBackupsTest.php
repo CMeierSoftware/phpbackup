@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Step\Remote;
+namespace CMS\PhpBackup\Tests\Step;
 
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
-use CMS\PhpBackup\Step\Remote\ListBackupsStep;
-use CMS\PhpBackup\Tests\Step\TestCaseWithAppConfig;
+use CMS\PhpBackup\Step\ListBackupsStep;
 
 /**
  * @internal
@@ -44,9 +43,11 @@ final class ListBackupsTest extends TestCaseWithAppConfig
     {
         $this->setUpAppConfig('config_full_valid', []);
 
-        $sendRemoteStep = new ListBackupsStep($this->remoteHandler);
+        $step = new ListBackupsStep($this->remoteHandler);
+        $data = [];
+        $step->setData($data);
+        $result = $step->execute();
 
-        $result = $sendRemoteStep->execute();
         self::assertFalse($result->repeat);
         self::assertSame($this->backupFolder, $result->returnValue);
     }

@@ -19,7 +19,10 @@ abstract class TestCaseWithAppConfig extends TestCase
     protected const CONFIG_TEMP_DIR = CONFIG_DIR . 'temp_app' . DIRECTORY_SEPARATOR;
     protected const TEST_DIR = TEST_WORK_DIR;
 
-    protected AppConfig $config;
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
 
     protected function tearDown(): void
     {
@@ -52,17 +55,7 @@ abstract class TestCaseWithAppConfig extends TestCase
             self::replaceConfigValue($tag['tag'], $tag['value']);
         }
 
-        $this->config = AppConfig::loadAppConfig('app');
-    }
-
-    protected function setStepData(array $data)
-    {
-        $this->config->saveTempData('StepData', $data);
-    }
-
-    protected function getStepData(): array
-    {
-        return $this->config->readTempData('StepData');
+        AppConfig::loadAppConfig('app');
     }
 
     private function replaceConfigValue(string $tag, string $newValue)

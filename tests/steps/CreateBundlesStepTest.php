@@ -17,6 +17,8 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->setUpAppConfig(
             'config_create_bundle_step_test',
             [['tag' => 'src', 'value' => '../tests/work']]
@@ -30,14 +32,26 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
         parent::tearDown();
     }
 
-    public function testBackupDirectoryCreation()
+    public function testReturnValue()
     {
-        $step = new CreateBundlesStep();
-
+        $step = new CreateBundlesStep(null);
+        $data = [];
+        $step->setData($data);
         $result = $step->execute();
 
         self::assertInstanceOf(StepResult::class, $result);
         self::assertFalse($result->repeat);
+        self::assertDirectoryExists($result->returnValue);
+    }
+
+    public function testBackupDirectoryCreation()
+    {
+        $step = new CreateBundlesStep(null);
+
+        $data = [];
+        $step->setData($data);
+        $result = $step->execute();
+
         self::assertDirectoryExists($result->returnValue);
     }
 
@@ -66,11 +80,13 @@ final class CreateBundlesStepTest extends TestCaseWithAppConfig
             ],
         ];
 
-        $step = new CreateBundlesStep();
+        $step = new CreateBundlesStep(null);
 
+        $data = [];
+        $step->setData($data);
         $step->execute();
 
-        $fileBundles = $this->getStepData()['bundles'];
+        $fileBundles = $data['bundles'];
 
         self::assertNotEmpty($fileBundles);
         self::assertCount(count($expectedResult), $fileBundles);

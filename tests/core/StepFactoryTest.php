@@ -2,34 +2,51 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Tests\Step;
+namespace CMS\PhpBackup\Tests\Core;
 
+use CMS\PhpBackup\Core\AppConfig;
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Step\StepFactory;
+use CMS\PhpBackup\Core\StepFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
  * @covers \CMS\PhpBackup\Step\StepFactory
  */
-final class StepFactoryTest extends TestCaseWithAppConfig
+final class StepFactoryTest extends TestCase
 {
+protected const CONFIG_FILE = CONFIG_DIR . 'app.xml';
     protected function setUp(): void
     {
-        $this->setUpAppConfig('config_full_valid');
+        copy(TEST_FIXTURES_CONFIG_DIR . "config_full_valid.xml", self::CONFIG_FILE);
+        self::assertFileExists(self::CONFIG_FILE);
+       
+        AppConfig::loadAppConfig('app');
     }
 
     protected function tearDown(): void
     {
+        FileHelper::deleteFile(self::CONFIG_FILE);
         parent::tearDown();
     }
 
-    public function testBuild()
+    public function testBuildWithoutRemote()
     {
-        $stepClass = $this->getMockForAbstractClass(AbstractStep::class);
+        $stepClass = $this->getMockForAbstractClass(AbstractStep::class, [null]);
 
         $result = StepFactory::build($stepClass::class);
+
+        self::assertInstanceOf($stepClass::class, $result);
+    }
+
+    public function testBuildWithRemote()
+    {
+        $stepClass = $this->getMockForAbstractClass(AbstractStep::class, [null]);
+
+        $result = StepFactory::build($stepClass::class, 'local');
 
         self::assertInstanceOf($stepClass::class, $result);
     }
@@ -75,7 +92,7 @@ final class StepFactoryTest extends TestCaseWithAppConfig
     public function testBuildRemoteClassWithNonExistingClass()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Method 'createNonexistingclass' does not exist in class CMS\\PhpBackup\\Step\\StepFactory");
+        $this->expectExceptionMessage("Method 'createNonexistingclass' does not exist in class CMS\\PhpBackup\\Core\\StepFactory");
 
         $stepClass = 'NonExistingClass';
 
@@ -83,12 +100,12 @@ final class StepFactoryTest extends TestCaseWithAppConfig
     }
 
     /**
-     * @covers \CMS\PhpBackup\Step\StepFactory::testGetRemoteClasses()
+     * @covers \CMS\PhpBackup\Step\StepFactory::getRemoteClassNames()
      */
-    public function testGetRemoteClasses()
+    public function testGetRemoteClassNames()
     {
         $handler = ['local', 'Local', 'LOCAL', Local::class, 'invalid'];
-        $classes = StepFactory::getRemoteClasses($handler);
+        $classes = StepFactory::getRemoteClassNames($handler);
 
         self::assertSame(array_fill(0, 4, Local::class), $classes);
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Core;
 
-use CMS\PhpBackup\Step\StepConfig;
+use CMS\PhpBackup\Core\StepConfig;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -14,12 +14,14 @@ final class StepManager
     private readonly string $stepFile;
     private readonly array $steps;
     private ?int $currentStepIdx = null;
+    private readonly AppConfig  $config;
 
     public function __construct(array $steps)
     {
         $this->validateSteps($steps);
         $this->steps = $steps;
-        $this->stepFile = AppConfig::loadAppConfig()->getTempDir() . DIRECTORY_SEPARATOR . 'last.step';
+        $this->config = AppConfig::loadAppConfig();
+        $this->stepFile = $this->config->getTempDir() . DIRECTORY_SEPARATOR . 'last.step';
     }
 
     public function executeNextStep(): mixed
@@ -30,7 +32,13 @@ final class StepManager
             return null;
         }
 
-        $result = $currentStep->getStepObject()->execute();
+        $data = $this->config->readTempData('StepData');
+
+        $step = $currentStep->getStepObject();
+        $step->setData($data);
+        $result = $step->execute();
+        
+        $this->config->saveTempData('StepData', $data);
 
         $this->saveCurrentStep($result->repeat);
 

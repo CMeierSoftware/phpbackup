@@ -46,12 +46,11 @@ final class StepResultTest extends TestCase
     public function testCreateNewInstanceWithReturnValueOnly()
     {
         $returnValue = 'test';
-        $expectedRepeat = false;
         $expectedString = "ReturnValue: {$returnValue}, Repeat: false";
         $stepResult = new StepResult($returnValue);
 
+        self::assertFalse($stepResult->repeat);
         self::assertSame($returnValue, $stepResult->returnValue);
-        self::assertSame($expectedRepeat, $stepResult->repeat);
         self::assertSame($expectedString, $stepResult->__toString());
     }
 }

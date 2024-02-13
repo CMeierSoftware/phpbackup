@@ -7,6 +7,7 @@ namespace CMS\PhpBackup\Step;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -20,7 +21,8 @@ abstract class AbstractStep
     protected const MAX_ATTEMPTS = 3;
     protected readonly FileLogger $logger;
     protected readonly AppConfig $config;
-    protected array $stepData = [];
+    protected array $data;
+    protected readonly ?AbstractRemoteHandler $remote;
     private float $lastExeTs;
     private float $maxElapsedTime = 0;
     private readonly float $timeoutTs;
@@ -28,19 +30,19 @@ abstract class AbstractStep
     /**
      * AbstractStep constructor.
      */
-    public function __construct()
+    public function __construct(?AbstractRemoteHandler $remoteHandler)
     {
         $this->logger = FileLogger::getInstance();
         $this->config = AppConfig::loadAppConfig();
-
-        try {
-            $this->stepData = $this->config->readTempData('StepData');
-        } catch (FileNotFoundException) {
-            $this->logger->info('No StepData found. Starting empty.');
-        }
+        $this->remote = $remoteHandler;
 
         $this->lastExeTs = microtime(true);
         $this->timeoutTs = 0 === (int) ini_get('max_execution_time') ? 0 : microtime(true) + ini_get('max_execution_time');
+    }
+
+    public function setData(array &$data): void
+    {
+        $this->data = &$data;
     }
 
     /**
@@ -52,13 +54,14 @@ abstract class AbstractStep
     {
         $this->logger->info('Execute ' . $this->classDetails());
 
-        $this->validateStepData();
+        $this->validateData();
+        $this->sanitizeData();
 
-        $result = $this->_execute();
+        if (null !== $this->remote) {
+            $this->remote->connect();
+        }
 
-        $this->config->saveTempData('StepData', $this->stepData);
-
-        return $result;
+        return $this->_execute();
     }
 
     /**
@@ -92,7 +95,7 @@ abstract class AbstractStep
 
     protected function classDetails(): string
     {
-        return $this::class;
+        return $this::class . (null === $this->remote) ? '' : ' Remote: ' . $this->remote::class;
     }
 
     /**
@@ -107,6 +110,9 @@ abstract class AbstractStep
      *
      * @return array list of required step data keys
      */
+    abstract protected function getRequiredDataKeys(): array;
+
+    abstract protected function sanitizeData(): void;
 
     /**
      * Increment the attempts count in the watchdog data.
@@ -127,7 +133,7 @@ abstract class AbstractStep
         $this->updateWatchdog(['attempts' => 0, 'last_attempt_time' => null]);
     }
 
-    protected function getAttemptCount(): int
+    private function getAttemptCount(): int
     {
         try {
             $watchdogData = $this->config->readTempData('send_remote_watchdog');
@@ -138,17 +144,21 @@ abstract class AbstractStep
         return (int) ($watchdogData['attempts'] ?? 0);
     }
 
-    abstract protected function getRequiredDataKeys(): array;
-
-    private function validateStepData()
+    private function validateData(): bool
     {
+        if (!isset($this->data)) {
+            throw new \InvalidArgumentException('Data must be set before executing step.');
+        }
+
         $requiredKeys = $this->getRequiredDataKeys();
 
-        $missingKeys = array_diff($requiredKeys, array_keys($this->stepData));
+        $missingKeys = array_diff($requiredKeys, array_keys($this->data));
 
         if (!empty($missingKeys)) {
             throw new \InvalidArgumentException('Missing required keys: ' . implode(', ', $missingKeys));
         }
+
+        return true;
     }
 
     private function updateWatchdog($data)

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CMS\PhpBackup\Step;
+namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
+use CMS\PhpBackup\Step\AbstractStep;
 
 if (!defined('ABS_PATH')) {
     return;
