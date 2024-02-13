@@ -7,11 +7,11 @@ namespace CMS\PhpBackup\App;
 use CMS\PhpBackup\Core\FileLogger;
 use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
-use CMS\PhpBackup\Step\DatabaseBackupStep;
-use CMS\PhpBackup\Step\DirectoryBackupStep;
-use CMS\PhpBackup\Step\Remote\DeleteOldFilesStep;
-use CMS\PhpBackup\Step\Remote\SendFileStep;
-use CMS\PhpBackup\Step\StepConfig;
+use CMS\PhpBackup\Step\BackupDatabaseStep;
+use CMS\PhpBackup\Step\DeleteOldFilesStep;
+use CMS\PhpBackup\Step\BackupDirectoryStep;
+use CMS\PhpBackup\Step\SendFileStep;
+use CMS\PhpBackup\Core\StepConfig;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -28,8 +28,8 @@ class BackupRunner extends AbstractRunner
         FileLogger::getInstance()->debug("Repeat delay {$repeatDelay} day(s) or {$repeatDelaySecs} seconds.");
 
         $steps[] = new StepConfig(CreateBundlesStep::class, $repeatDelaySecs);
-        $steps[] = new StepConfig(DirectoryBackupStep::class);
-        $steps[] = new StepConfig(DatabaseBackupStep::class);
+        $steps[] = new StepConfig(BackupDirectoryStep::class);
+        $steps[] = new StepConfig(BackupDatabaseStep::class);
 
         $steps = array_merge($steps, $this->getRemoteStepsFor(SendFileStep::class));
         $steps = array_merge($steps, $this->getRemoteStepsFor(DeleteOldFilesStep::class));
