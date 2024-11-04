@@ -73,8 +73,17 @@ class Backblaze extends AbstractRemoteHandler
             'BucketId' => $this->bucketId,
             'Body' => fopen($localFilePath, 'r'),
         ];
-
-        $file = $this->connection->upload($options);
+        
+        try {
+            $file = $this->connection->upload($options);
+        } catch (\GuzzleHttp\Exception\ServerException $ex) {
+            if ($ex->getCode() === '503') {
+                $this->connection->authorizeAccount(true);
+                $file = $this->connection->upload($options);
+            } else {
+                throw $ex;
+            }
+        }
 
         return !empty($file);
     }
