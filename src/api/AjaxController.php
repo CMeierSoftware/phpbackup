@@ -26,7 +26,7 @@ final class AjaxController
 
             list($nonce, $step, $data) = self::getSanitizedPostData();
 
-            if (empty($nonce) || empty($step) || empty($data)) {
+            if (empty($nonce) || empty($step)) {
                 throw new \InvalidArgumentException('Invalid request parameters.', 400);
             }
 

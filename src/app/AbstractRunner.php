@@ -9,10 +9,10 @@ if (!defined('ABS_PATH')) {
 }
 
 use CMS\PhpBackup\Core\StepConfig;
-use CMS\PhpBackup\Step\StepFactory;
+use CMS\PhpBackup\Core\StepFactory;
 use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Helper\FileLogger;
-use CMS\PhpBackup\Core\LogLevel;
+use CMS\PhpBackup\Helper\LogLevel;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\SystemLocker;
 

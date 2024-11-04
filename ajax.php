@@ -13,7 +13,6 @@ if (!defined('ABS_PATH')) {
 use CMS\PhpBackup\Api\AjaxController;
 
 session_start();
-$ajaxController = new AjaxController();
 
 // Handle the request
-$ajaxController->handleRequest();
+AjaxController::handleRequest();

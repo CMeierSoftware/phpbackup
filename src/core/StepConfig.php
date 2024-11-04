@@ -66,7 +66,7 @@ final class StepConfig
     private function validateClass(string $class, string $parentClass)
     {
         if (!class_exists($class) || !is_subclass_of($class, $parentClass)) {
-            throw new \UnexpectedValueException("All entries in the array must be classes extending {$parentClass}, {$class} is not.");
+            throw new \UnexpectedValueException("The class '{$class}' is not a child of the class '{$parentClass}'.");
         }
     }
 }
