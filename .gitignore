@@ -1,6 +1,7 @@
-.vscode
-.phpunit.cache
+.vscode/
+.phpunit.cache/
 /vendor/
 /config/
 /temp/
 /tests/work/
+.env

@@ -6,12 +6,16 @@ define('CMS_DEBUG', false);
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..\\defines.php';
 
+if (!defined('_TEST_DIR')) {
+    define('_TEST_DIR', ABS_PATH . 'tests' . DIRECTORY_SEPARATOR);
+}
+
 if (!defined('TEST_WORK_DIR')) {
-    define('TEST_WORK_DIR', ABS_PATH . 'tests' . DIRECTORY_SEPARATOR . 'work' . DIRECTORY_SEPARATOR);
+    define('TEST_WORK_DIR', _TEST_DIR . 'work' . DIRECTORY_SEPARATOR);
 }
 
 if (!defined('TEST_FIXTURES_DIR')) {
-    define('TEST_FIXTURES_DIR', ABS_PATH . 'tests' . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR);
+    define('TEST_FIXTURES_DIR', _TEST_DIR . 'fixtures' . DIRECTORY_SEPARATOR);
 }
 if (!defined('TEST_FIXTURES_FILE_DIR')) {
     define('TEST_FIXTURES_FILE_DIR', TEST_FIXTURES_DIR . 'files' . DIRECTORY_SEPARATOR);
@@ -40,3 +44,7 @@ if (!defined('TEST_FIXTURES_FILE_3')) {
     define('TEST_FIXTURES_FILE_3', TEST_FIXTURES_FILE_DIR . 'file3.txt');
     Assert::assertFileExists(TEST_FIXTURES_FILE_3);
 }
+
+use Dotenv\Dotenv;
+$dotenv = Dotenv::createImmutable(_TEST_DIR);
+$dotenv->load();
