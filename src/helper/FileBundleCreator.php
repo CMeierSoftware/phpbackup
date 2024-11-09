@@ -24,7 +24,7 @@ final class FileBundleCreator
 
         $this->sizeLimit = $sizeLimitInMB * 1024 * 1024; // Convert MB to bytes
 
-        $this->excludes = array_map(static fn (string $path): string => rtrim($path, $separator), $excludedDirs);
+        $this->excludes = array_map(fn (string $path): string => $this->rootDir . DIRECTORY_SEPARATOR . rtrim($path, $separator), $excludedDirs);
 
         $this->bundles = &$refBundles;
 
@@ -65,7 +65,7 @@ final class FileBundleCreator
         list($files, $dirs) = $this->listDirSortedByFileSize($directory);
 
         $this->packFiles($files);
-
+        
         foreach (array_diff($dirs, $this->excludes) as $dir) {
             $this->packDirectory($dir);
         }
