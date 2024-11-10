@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Step;
 
+use CMS\PhpBackup\Core\StepFactory;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
@@ -23,9 +24,9 @@ final class DeleteOldFilesStep extends AbstractStep
     public function __construct(AbstractRemoteHandler $remoteHandler)
     {
         parent::__construct($remoteHandler);
-
-        $this->keepBackupDays = (int) $this->config->getBackupSettings()['keepBackupDays'];
-        $this->keepBackupAmount = (int) $this->config->getBackupSettings()['keepBackupAmount'];
+        $remoteClassName = strtolower(StepFactory::extractClassName($remoteHandler::class));
+        $this->keepBackupDays = (int) $this->config->getRemoteSettings($remoteClassName)['keepBackupDays'];
+        $this->keepBackupAmount = (int) $this->config->getRemoteSettings($remoteClassName)['keepBackupAmount'];
     }
 
     protected function getRequiredDataKeys(): array

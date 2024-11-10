@@ -19,18 +19,20 @@
             <executeEveryDays>5</executeEveryDays>
             <maxArchiveSize>5</maxArchiveSize>
             <encryptionKey>some_random_Key</encryptionKey>
-            <keepBackupAmount>2</keepBackupAmount>
-            <keepBackupDays>0</keepBackupDays>
         </settings>
     </backup>
     <remote>
         <local>
             <rootDir></rootDir>
+            <keepBackupAmount>2</keepBackupAmount>
+            <keepBackupDays>0</keepBackupDays>
         </local>
         <backblaze>
             <accountId>some_id</accountId>
             <applicationKey>some_key</applicationKey>
             <bucketName>some_name</bucketName>
+            <keepBackupAmount>2</keepBackupAmount>
+            <keepBackupDays>0</keepBackupDays>
         </backblaze>
     </remote>
 </config>

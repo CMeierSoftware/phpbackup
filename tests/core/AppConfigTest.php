@@ -155,8 +155,6 @@ final class AppConfigTest extends TestCase
             'executeEveryDays' => '5',
             'maxArchiveSize' => '5',
             'encryptionKey' => 'some_random_Key',
-            'keepBackupAmount' => '2',
-            'keepBackupDays' => '0',
         ];
 
         $actualConfig = $this->config->getBackupSettings();
@@ -170,8 +168,12 @@ final class AppConfigTest extends TestCase
     public function testRemoteConfigAll(): void
     {
         $expectedConfig = [
-            'local' => ['rootDir' => ''],
-            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name'],
+            'local' => ['rootDir' => '',
+            'keepBackupAmount' => '2',
+            'keepBackupDays' => '0',],
+            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
+            'keepBackupAmount' => '2',
+            'keepBackupDays' => '0',],
         ];
 
         $actualConfig = $this->config->getRemoteSettings();
@@ -184,7 +186,9 @@ final class AppConfigTest extends TestCase
      */
     public function testRemoteConfigSpecific(): void
     {
-        $expectedConfig = ['rootDir' => ''];
+        $expectedConfig = ['rootDir' => '',
+        'keepBackupAmount' => '2',
+        'keepBackupDays' => '0',];
 
         $actualConfig = $this->config->getRemoteSettings('local');
 
@@ -198,9 +202,11 @@ final class AppConfigTest extends TestCase
     {
         $expectedConfig = [
             'accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
+            'keepBackupAmount' => '2',
+            'keepBackupDays' => '0',
         ];
 
-        $actualConfig = $this->config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
+        $actualConfig = $this->config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName','keepBackupAmount', 'keepBackupDays']);
 
         self::assertSame($expectedConfig, $actualConfig);
     }
@@ -220,8 +226,12 @@ final class AppConfigTest extends TestCase
     public function testRemoteConfigRequiredOnAll(): void
     {
         $expectedConfig = [
-            'local' => ['rootDir' => ''],
-            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name'],
+            'local' => ['rootDir' => '',
+            'keepBackupAmount' => '2',
+            'keepBackupDays' => '0',],
+            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
+            'keepBackupAmount' => '2',
+            'keepBackupDays' => '0',],
         ];
 
         $actualConfig = $this->config->getRemoteSettings('', ['something']);
