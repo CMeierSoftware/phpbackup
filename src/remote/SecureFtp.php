@@ -11,7 +11,9 @@ final class SecureFtp extends AbstractRemoteHandler
     private readonly string $ftpUserName;
     private readonly string $ftpUserPass;
     private readonly int $ftpPort;
+    private readonly string $remoteRootPath;
     private const SKIP_DIRS = ['.', '..'];
+    private const UNIX_SEPARATOR = '/';
 
     /**
      * FtpHandler constructor.
@@ -19,7 +21,7 @@ final class SecureFtp extends AbstractRemoteHandler
      * @param string $ftpServer the FTP server address
      * @param int $ftpPort the FTP server port (default is 22)
      */
-    public function __construct(string $ftpServer, string $ftpUserName, string $ftpUserPass, int $ftpPort = 22)
+    public function __construct(string $ftpServer, string $ftpUserName, string $ftpUserPass, string $remoteRootPath = '', int $ftpPort = 22)
     {
         parent::__construct();
 
@@ -27,6 +29,10 @@ final class SecureFtp extends AbstractRemoteHandler
         $this->ftpUserName = $ftpUserName;
         $this->ftpUserPass = $ftpUserPass;
         $this->ftpPort = $ftpPort;
+        $this->logger->info("SFTP Connection to '{$this->ftpServer}' as '{$this->ftpUserName}'.");
+
+        $this->remoteRootPath = $this->buildAbsPath($remoteRootPath);
+        $this->logger->info("SecureFtp base directory '{$this->remoteRootPath}'.");
     }
 
     /**
@@ -66,37 +72,51 @@ final class SecureFtp extends AbstractRemoteHandler
 
     protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
-        $this->goto($remoteFilePath);
-        return $this->connection->put(basename($remoteFilePath), $localFilePath, SFTP::SOURCE_LOCAL_FILE);
+        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
+        return $this->goto($remoteFilePath) && $this->connection->put(basename($remoteFilePath), $localFilePath, SFTP::SOURCE_LOCAL_FILE);
     }
 
     protected function _fileDownload(string $localFilePath, string $remoteFilePath): bool
     {
-        $this->goto($remoteFilePath);
-        return $this->connection->get(basename($remoteFilePath), $localFilePath);
+        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
+        return $this->goto($remoteFilePath) && $this->connection->get(basename($remoteFilePath), $localFilePath);
     }
 
     protected function _fileDelete(string $remoteFilePath): bool
     {
-        $this->goto($remoteFilePath);
-        return $this->connection->delete(basename($remoteFilePath));
+        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
+
+        return $this->goto($remoteFilePath) && $this->connection->delete(basename($remoteFilePath));
     }
 
     protected function _fileExists(string $remoteFilePath): bool
     {
-        $path = $this->isFilePath($remoteFilePath) ? $remoteFilePath: dirname($remoteFilePath);
-        return $this->goto($path, false) && $this->connection->file_exists(basename($remoteFilePath));
+        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
+        
+        return $this->goto(dirname($remoteFilePath)) && $this->connection->file_exists(basename($remoteFilePath));
     }
 
     protected function _dirCreate(string $remoteFilePath): bool
     {
-        return $this->goto($remoteFilePath) && $this->connection->mkdir(basename($remoteFilePath));
+        $directories = array_filter(explode(DIRECTORY_SEPARATOR, $remoteFilePath));
+        $currentPath = '';
+
+        foreach ($directories as $dir) {
+            $currentPath .= $dir . self::UNIX_SEPARATOR;
+    
+            if (!$this->_fileExists($currentPath)) {
+                $this->goto(dirname($this->buildAbsPath($currentPath)));
+                if (!$this->connection->mkdir($dir)) {
+                    return false;
+                }
+            }
+        }
+    
+        return true;
     }
 
     protected function _dirDelete(string $remotePath): bool
     {
-        $this->goto($remotePath);
-        // Delete each file in the directory
         foreach ($this->dirList($remotePath) as $item) {
             if (in_array($item, self::SKIP_DIRS)) {
                 continue;
@@ -115,20 +135,20 @@ final class SecureFtp extends AbstractRemoteHandler
 
     protected function _dirList(string $remotePath): array
     {
+        $remotePath = $this->buildAbsPath($remotePath);
         $this->goto($remotePath);
         $items = $this->connection->nlist('.');
 
         return array_filter($items, static fn($item): bool => !in_array($item, self::SKIP_DIRS));
     }
 
-    private function goto(string $destinationPath, bool $createDirs = true): bool
+    private function goto(string $destinationPath): bool
     {
-        // Check if the destination is a file and get the directory path
         if ($this->isFilePath($destinationPath)) {
             $destinationPath = dirname($destinationPath);
         }
 
-        $directories = array_filter(explode(DIRECTORY_SEPARATOR, $destinationPath));
+        $directories = array_filter(explode(self::UNIX_SEPARATOR, $destinationPath));
 
         // Change to root directory
         $this->connection->chdir('/');
@@ -136,14 +156,57 @@ final class SecureFtp extends AbstractRemoteHandler
         // Traverse through directories and create any that don't exist
         foreach ($directories as $dir) {
             if (!$this->connection->file_exists($dir) || !$this->connection->is_dir($dir)) {
-                if ($createDirs) {
-                    $this->connection->mkdir($dir);
-                } else {
-                    return false;
-                }
+                return false;
             }
+
             $this->connection->chdir($dir);
         }
         return true;
+        // // Check if the destination is a file and get the directory path
+        // $destDirs = array_filter(explode(self::UNIX_SEPARATOR, $destinationPath));
+        
+        // $currentPath = $this->connection->pwd();
+        // $currentDirs = array_filter(explode(self::UNIX_SEPARATOR, $currentPath));
+
+        // $commonDirs = [];
+        // $n = reset($destDirs);
+        // foreach ($currentDirs as $dir) {
+        //     if ($dir === $n) {
+        //         $commonDirs[] = $dir;
+        //     } else {
+        //         break;
+        //     }
+        //     $n = next($destDirs);
+        // }
+
+        // // Change to root directory
+        // if (!$this->connection->chdir(implode(self::UNIX_SEPARATOR, $commonDirs))) {
+        //     return false;
+        // }
+        
+        // var_dump("chdir: '" .implode(self::UNIX_SEPARATOR, $commonDirs)."', pwd (after chdir): '{$this->connection->pwd()}'");
+        // // Traverse through directories and create any that don't exist
+        // while($n !== false) {
+        //     if (!$this->connection->file_exists($n)) {
+        //         return false;
+        //     }
+        //     $this->connection->chdir($n);
+        //     $n = next($destDirs);
+        // }
+
+        // return true;
     }
+
+    // private function convertToUnixPath(string $remotePath): string
+    // {
+    //     return str_replace(DIRECTORY_SEPARATOR, '/', $remotePath);
+    // }    
+    
+    private function buildAbsPath(string $remoteFilePath): string
+    {
+        $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
+        $path = $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
+        return str_replace(DIRECTORY_SEPARATOR, self::UNIX_SEPARATOR, $path);
+    }
+
 }
