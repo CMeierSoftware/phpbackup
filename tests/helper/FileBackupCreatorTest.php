@@ -70,10 +70,10 @@ final class FileBackupCreatorTest extends TestCase
     {
         try {
             $files = [
-                'file1.txt', 
-                'pictures' . DIRECTORY_SEPARATOR . 'pics1.txt', 
-                'pictures' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR . 'others.1.txt', 
-                'pictures' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR . 'others2.txt'
+                'file1.txt',
+                'pictures' . DIRECTORY_SEPARATOR . 'pics1.txt',
+                'pictures' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR . 'others.1.txt',
+                'pictures' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR . 'others2.txt',
             ];
             $filename = $this->backupCreator->backupOnly(TEST_FIXTURES_DIR . 'files', $files);
             self::assertFileExists($filename);

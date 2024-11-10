@@ -168,12 +168,18 @@ final class AppConfigTest extends TestCase
     public function testRemoteConfigAll(): void
     {
         $expectedConfig = [
-            'local' => ['rootDir' => '',
-            'keepBackupAmount' => '2',
-            'keepBackupDays' => '0',],
-            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
-            'keepBackupAmount' => '2',
-            'keepBackupDays' => '0',],
+            'local' => [
+                'rootDir' => '',
+                'keepBackupAmount' => '2',
+                'keepBackupDays' => '0', 
+            ],
+            'backblaze' => [
+                'accountId' => 'some_id', 
+                'applicationKey' => 'some_key', 
+                'bucketName' => 'some_name',
+                'keepBackupAmount' => '2',
+                'keepBackupDays' => '0', 
+            ],
         ];
 
         $actualConfig = $this->config->getRemoteSettings();
@@ -187,8 +193,9 @@ final class AppConfigTest extends TestCase
     public function testRemoteConfigSpecific(): void
     {
         $expectedConfig = ['rootDir' => '',
-        'keepBackupAmount' => '2',
-        'keepBackupDays' => '0',];
+            'keepBackupAmount' => '2',
+            'keepBackupDays' => '0', 
+        ];
 
         $actualConfig = $this->config->getRemoteSettings('local');
 
@@ -206,7 +213,7 @@ final class AppConfigTest extends TestCase
             'keepBackupDays' => '0',
         ];
 
-        $actualConfig = $this->config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName','keepBackupAmount', 'keepBackupDays']);
+        $actualConfig = $this->config->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName', 'keepBackupAmount', 'keepBackupDays']);
 
         self::assertSame($expectedConfig, $actualConfig);
     }
@@ -226,12 +233,24 @@ final class AppConfigTest extends TestCase
     public function testRemoteConfigRequiredOnAll(): void
     {
         $expectedConfig = [
-            'local' => ['rootDir' => '',
-            'keepBackupAmount' => '2',
-            'keepBackupDays' => '0',],
-            'backblaze' => ['accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
-            'keepBackupAmount' => '2',
-            'keepBackupDays' => '0',],
+            'local' => [
+                'rootDir' => '',
+                'keepBackupAmount' => '2',
+                'keepBackupDays' => '0', 
+            ],
+            'backblaze' => [
+                'accountId' => 'some_id', 'applicationKey' => 'some_key', 'bucketName' => 'some_name',
+                'keepBackupAmount' => '2',
+                'keepBackupDays' => '0', 
+            ],
+            'secureftp' => [
+                'rootDir' => '',
+                'FtpServer' => 'abc.ftp.com',
+                'FtpUser' => 'USER',
+                'FtpPassword' => 'xxx',
+                'keepBackupAmount' => '2',
+                'keepBackupDays' => '0', 
+            ],
         ];
 
         $actualConfig = $this->config->getRemoteSettings('', ['something']);

@@ -14,7 +14,6 @@ final class SecureFtp extends AbstractRemoteHandler
     private readonly string $ftpUserName;
     private readonly string $ftpUserPass;
     private readonly int $ftpPort;
-    private readonly string $remoteRootPath;
 
     /**
      * FtpHandler constructor.
