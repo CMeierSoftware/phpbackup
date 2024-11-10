@@ -72,27 +72,21 @@ final class SecureFtp extends AbstractRemoteHandler
 
     protected function _fileUpload(string $localFilePath, string $remoteFilePath): bool
     {
-        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
         return $this->goto($remoteFilePath) && $this->connection->put(basename($remoteFilePath), $localFilePath, SFTP::SOURCE_LOCAL_FILE);
     }
 
     protected function _fileDownload(string $localFilePath, string $remoteFilePath): bool
     {
-        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
         return $this->goto($remoteFilePath) && $this->connection->get(basename($remoteFilePath), $localFilePath);
     }
 
     protected function _fileDelete(string $remoteFilePath): bool
     {
-        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
-
         return $this->goto($remoteFilePath) && $this->connection->delete(basename($remoteFilePath));
     }
 
     protected function _fileExists(string $remoteFilePath): bool
     {
-        $remoteFilePath = $this->buildAbsPath($remoteFilePath);
-        
         return $this->goto(dirname($remoteFilePath)) && $this->connection->file_exists(basename($remoteFilePath));
     }
 
@@ -105,7 +99,7 @@ final class SecureFtp extends AbstractRemoteHandler
             $currentPath .= $dir . self::UNIX_SEPARATOR;
     
             if (!$this->_fileExists($currentPath)) {
-                $this->goto(dirname($this->buildAbsPath($currentPath)));
+                $this->goto(dirname($currentPath));
                 if (!$this->connection->mkdir($dir)) {
                     return false;
                 }
@@ -123,19 +117,17 @@ final class SecureFtp extends AbstractRemoteHandler
             }
             $fullPath = $remotePath . DIRECTORY_SEPARATOR . $item;
             if ($this->isFilePath($fullPath)) {
-                $this->_fileDelete($fullPath);
+                $this->fileDelete($fullPath);
             } else {
-                $this->_dirDelete($fullPath); // Recursive call for nested directories
+                $this->dirDelete($fullPath); // Recursive call for nested directories
             }
         }
         
-        // Delete the directory itself
-        return $this->connection->rmdir('.');
+        return $this->goto($remotePath) && $this->connection->rmdir('.');
     }
 
     protected function _dirList(string $remotePath): array
     {
-        $remotePath = $this->buildAbsPath($remotePath);
         $this->goto($remotePath);
         $items = $this->connection->nlist('.');
 
@@ -147,6 +139,7 @@ final class SecureFtp extends AbstractRemoteHandler
         if ($this->isFilePath($destinationPath)) {
             $destinationPath = dirname($destinationPath);
         }
+        $destinationPath = $this->buildAbsPath($destinationPath);
 
         $directories = array_filter(explode(self::UNIX_SEPARATOR, $destinationPath));
 
@@ -195,13 +188,7 @@ final class SecureFtp extends AbstractRemoteHandler
         // }
 
         // return true;
-    }
-
-    // private function convertToUnixPath(string $remotePath): string
-    // {
-    //     return str_replace(DIRECTORY_SEPARATOR, '/', $remotePath);
-    // }    
-    
+    }   
     private function buildAbsPath(string $remoteFilePath): string
     {
         $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
