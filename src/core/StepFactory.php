@@ -7,6 +7,7 @@ namespace CMS\PhpBackup\Core;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Remote\Backblaze;
 use CMS\PhpBackup\Remote\Local;
+use CMS\PhpBackup\Remote\SecureFtp;
 use CMS\PhpBackup\Step\AbstractStep;
 
 if (!defined('ABS_PATH')) {
@@ -98,7 +99,7 @@ final class StepFactory
      */
     private static function createLocal(): Local
     {
-        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('local', ['rootDir']);
+        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('local', ['rootDir', 'keepBackupAmount', 'keepBackupDays']);
 
         return new Local(AppConfig::toAbsolutePath($cfg['rootDir']));
     }
@@ -110,8 +111,20 @@ final class StepFactory
      */
     private static function createBackblaze(): Backblaze
     {
-        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName']);
+        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('backblaze', ['accountId', 'applicationKey', 'bucketName', 'keepBackupAmount', 'keepBackupDays']);
 
         return new Backblaze($cfg['accountId'], $cfg['applicationKey'], $cfg['bucketName']);
+    }
+
+    /**
+     * Creates a SFTP remote handler instance.
+     *
+     * @return SecureFtp the created instance of SecureFtp remote handler
+     */
+    private static function createSecureftp(): SecureFtp
+    {
+        $cfg = AppConfig::loadAppConfig()->getRemoteSettings('secureftp', ['FtpServer', 'FtpUser', 'FtpPassword', 'keepBackupAmount', 'keepBackupDays']);
+
+        return new SecureFtp($cfg['FtpServer'], $cfg['FtpUser'], $cfg['FtpPassword'], $cfg['rootDir']);
     }
 }

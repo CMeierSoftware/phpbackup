@@ -34,5 +34,13 @@
             <keepBackupAmount>2</keepBackupAmount>
             <keepBackupDays>0</keepBackupDays>
         </backblaze>
+        <secureftp>
+            <rootDir></rootDir>
+            <FtpServer>abc.ftp.com</FtpServer>
+            <FtpUser>USER</FtpUser>
+            <FtpPassword>xxx</FtpPassword>
+            <keepBackupAmount>2</keepBackupAmount>
+            <keepBackupDays>0</keepBackupDays>
+        </secureftp>
     </remote>
 </config>
