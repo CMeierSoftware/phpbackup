@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\App;
 
+use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Helper\FileLogger;
+use CMS\PhpBackup\Step\BackupDatabaseStep;
+use CMS\PhpBackup\Step\BackupDirectoryStep;
 use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
-use CMS\PhpBackup\Step\BackupDatabaseStep;
 use CMS\PhpBackup\Step\DeleteOldFilesStep;
-use CMS\PhpBackup\Step\BackupDirectoryStep;
 use CMS\PhpBackup\Step\SendFileStep;
-use CMS\PhpBackup\Core\StepConfig;
 
 if (!defined('ABS_PATH')) {
     return;

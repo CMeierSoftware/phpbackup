@@ -11,7 +11,6 @@ use CMS\PhpBackup\Helper\FileHelper;
  */
 class Local extends AbstractRemoteHandler
 {
-
     public function __construct(string $remoteRootPath)
     {
         parent::__construct($remoteRootPath);

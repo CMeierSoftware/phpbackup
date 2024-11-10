@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 define('CMS_DEBUG', false);
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . '..\\defines.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'defines.php';
 
 if (!defined('_TEST_DIR')) {
     define('_TEST_DIR', ABS_PATH . 'tests' . DIRECTORY_SEPARATOR);
@@ -46,5 +46,6 @@ if (!defined('TEST_FIXTURES_FILE_3')) {
 }
 
 use Dotenv\Dotenv;
+
 $dotenv = Dotenv::createImmutable(_TEST_DIR);
 $dotenv->load();

@@ -1,6 +1,6 @@
 <?php
 
-// declare(strict_types=1);
+declare(strict_types=1);
 
 // namespace CMS\PhpBackup\Remote;
 
@@ -100,7 +100,7 @@
 //     protected function _dirDelete(string $remotePath): bool
 //     {
 //         throw new \Exception("Implement me", 1);
-        
+
 //     }
 
 //     protected function _dirList(string $remotePath): array

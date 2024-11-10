@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Helper;
 
-use CMS\PhpBackup\Helper\DatabaseBackupCreator;
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
+use CMS\PhpBackup\Helper\DatabaseBackupCreator;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 

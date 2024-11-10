@@ -337,7 +337,7 @@ final class AppConfigTest extends TestCase
      */
     public function testSaveAndReadTempDataDirSepInTypeName()
     {
-        $type = 'test\\test';
+        $type = 'test' . DIRECTORY_SEPARATOR . 'test';
         $data = ['key' => 'value'];
 
         $this->config->saveTempData($type, $data);

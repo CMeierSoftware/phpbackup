@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Remote;
 
 use CMS\PhpBackup\Helper\FileHelper;
+use GuzzleHttp\Exception\ServerException;
 use obregonco\B2\Bucket;
 use obregonco\B2\Client;
 
@@ -73,11 +74,11 @@ class Backblaze extends AbstractRemoteHandler
             'BucketId' => $this->bucketId,
             'Body' => fopen($localFilePath, 'r'),
         ];
-        
+
         try {
             $file = $this->connection->upload($options);
-        } catch (\GuzzleHttp\Exception\ServerException $ex) {
-            if ($ex->getCode() === '503') {
+        } catch (ServerException $ex) {
+            if ('503' === $ex->getCode()) {
                 $this->connection->authorizeAccount(true);
                 $file = $this->connection->upload($options);
             } else {
@@ -183,6 +184,15 @@ class Backblaze extends AbstractRemoteHandler
         return $result;
     }
 
+    protected function buildAbsPath(string $remoteFilePath): string
+    {
+        return '';
+        $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
+        $path = $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
+
+        return str_replace(DIRECTORY_SEPARATOR, self::UNIX_SEPARATOR, $path);
+    }
+
     /**
      * Maps the provided bucket name to the appropriate bucket ID.
      *
@@ -205,13 +215,5 @@ class Backblaze extends AbstractRemoteHandler
     private function sanitizePath(string $path): string
     {
         return ltrim($path, '/');
-    }
-    
-    protected function buildAbsPath(string $remoteFilePath): string
-    {
-        return '';
-        $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
-        $path = $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
-        return str_replace(DIRECTORY_SEPARATOR, self::UNIX_SEPARATOR, $path);
     }
 }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Step;
 
+use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Core\StepConfig;
 
 /**
  * @internal

@@ -8,13 +8,13 @@ if (!defined('ABS_PATH')) {
     return;
 }
 
+use CMS\PhpBackup\Core\AppConfig;
 use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Core\StepFactory;
-use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Helper\FileLogger;
-use CMS\PhpBackup\Helper\LogLevel;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Core\SystemLocker;
+use CMS\PhpBackup\Helper\FileLogger;
+use CMS\PhpBackup\Helper\LogLevel;
 
 /**
  * Class AbstractRunner.

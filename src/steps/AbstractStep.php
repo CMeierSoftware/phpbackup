@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Step;
 
 use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 
 if (!defined('ABS_PATH')) {
@@ -93,12 +93,6 @@ abstract class AbstractStep
         return $isClose;
     }
 
-    private function classDetails(): string
-    {
-        $remote = (null === $this->remote) ? '' : ' Remote: ' . $this->remote::class;
-        return $this::class . $remote;
-    }
-
     /**
      * Abstract method to be implemented by child classes.
      *
@@ -132,6 +126,13 @@ abstract class AbstractStep
     protected function resetAttemptsCount()
     {
         $this->updateWatchdog(['attempts' => 0, 'last_attempt_time' => null]);
+    }
+
+    private function classDetails(): string
+    {
+        $remote = (null === $this->remote) ? '' : ' Remote: ' . $this->remote::class;
+
+        return $this::class . $remote;
     }
 
     private function getAttemptCount(): int

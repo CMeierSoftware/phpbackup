@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Helper;
 
-use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Exceptions\ShellCommandUnavailableException;
 
 if (!defined('ABS_PATH')) {

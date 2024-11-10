@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Helper;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
-use CMS\PhpBackup\Helper\FileHelper;
 
 /**
  * The FileBundleCreator class helps create bundles of files from a directory based on a size limit.
@@ -65,7 +64,7 @@ final class FileBundleCreator
         list($files, $dirs) = $this->listDirSortedByFileSize($directory);
 
         $this->packFiles($files);
-        
+
         foreach (array_diff($dirs, $this->excludes) as $dir) {
             $this->packDirectory($dir);
         }

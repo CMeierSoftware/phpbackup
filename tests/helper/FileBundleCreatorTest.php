@@ -114,7 +114,7 @@ final class FileBundleCreatorTest extends TestCase
         $sizeLimitInMB = 1;
 
         $fileBundles = [];
-        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles, ['sub\\sub']);
+        FileBundleCreator::createFileBundles(self::TEST_DIR, $sizeLimitInMB, $fileBundles, ['sub\sub']);
 
         self::assertSame($expectedResult, $fileBundles);
     }
@@ -126,12 +126,12 @@ final class FileBundleCreatorTest extends TestCase
     {
         self::markTestSkipped('Run only manually.');
         FileHelper::makeDir(self::TEST_DIR . 'sub');
-        FileHelper::makeDir(self::TEST_DIR . 'sub\\sub');
+        FileHelper::makeDir(self::TEST_DIR . 'sub' . DIRECTORY_SEPARATOR. 'sub');
 
         for ($i = 0; $i < 100; ++$i) {
-            $this->createTestFile(self::TEST_DIR . "{$i}.txt", 10);
-            $this->createTestFile(self::TEST_DIR . "sub\\{$i}.txt", 10);
-            $this->createTestFile(self::TEST_DIR . "sub\\sub\\{$i}.txt", 10);
+            $this->createTestFile(self::TEST_DIR . '{$i}.txt', 10);
+            $this->createTestFile(self::TEST_DIR . 'sub' . DIRECTORY_SEPARATOR. '{$i}.txt', 10);
+            $this->createTestFile(self::TEST_DIR . 'sub' . DIRECTORY_SEPARATOR. 'sub' . DIRECTORY_SEPARATOR. '{$i}.txt', 10);
         }
 
         $sizeLimitInMB = 1;

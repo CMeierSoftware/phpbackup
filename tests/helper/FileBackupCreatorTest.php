@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Helper;
 
-use CMS\PhpBackup\Helper\FileBackupCreator;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
+use CMS\PhpBackup\Helper\FileBackupCreator;
 use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -69,7 +69,12 @@ final class FileBackupCreatorTest extends TestCase
     public function testBackupOnly(): void
     {
         try {
-            $files = ['file1.txt', 'pictures\\pics1.txt', 'pictures\\others\\others.1.txt', 'pictures\\others\\others2.txt'];
+            $files = [
+                'file1.txt', 
+                'pictures' . DIRECTORY_SEPARATOR . 'pics1.txt', 
+                'pictures' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR . 'others.1.txt', 
+                'pictures' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR . 'others2.txt'
+            ];
             $filename = $this->backupCreator->backupOnly(TEST_FIXTURES_DIR . 'files', $files);
             self::assertFileExists($filename);
             self::assertStringStartsWith(TEMP_DIR . 'backup_files', $filename);

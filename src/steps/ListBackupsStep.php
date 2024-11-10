@@ -42,7 +42,5 @@ final class ListBackupsStep extends AbstractStep
         return new StepResult($result, false);
     }
 
-    protected function sanitizeData(): void
-    {
-    }
+    protected function sanitizeData(): void {}
 }

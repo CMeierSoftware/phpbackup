@@ -6,7 +6,6 @@ namespace CMS\PhpBackup\Core;
 
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Helper\FileLogger;
-use CMS\PhpBackup\Core\StepConfig;
 
 if (!defined('ABS_PATH')) {
     return;
@@ -16,7 +15,7 @@ final class StepManager
     private readonly string $stepFile;
     private readonly array $steps;
     private ?int $currentStepIdx = null;
-    private readonly AppConfig  $config;
+    private readonly AppConfig $config;
 
     public function __construct(array $steps)
     {
@@ -34,7 +33,7 @@ final class StepManager
             return null;
         }
 
-        try {   
+        try {
             $data = $this->config->readTempData('StepData');
         } catch (FileNotFoundException) {
             $data = [];
@@ -43,7 +42,7 @@ final class StepManager
         $step = $currentStep->getStepObject();
         $step->setData($data);
         $result = $step->execute();
-        
+
         $this->config->saveTempData('StepData', $data);
 
         $this->saveCurrentStep($result->repeat);

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Helper;
 
-use CMS\PhpBackup\Helper\FileHelper;
-
 if (!defined('ABS_PATH')) {
     return;
 }

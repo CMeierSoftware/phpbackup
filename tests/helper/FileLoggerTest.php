@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Tests\Helper;
 
+use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Helper\LogLevel;
-use CMS\PhpBackup\Helper\FileHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class FileLoggerTest extends TestCase
 {
-    private const LOG_FILE_PATH = TEST_WORK_DIR . '\\f.log';
+    private const LOG_FILE_PATH = TEST_WORK_DIR . DIRECTORY_SEPARATOR . 'f.log';
 
     private FileLogger $logger;
 
@@ -113,7 +113,7 @@ final class FileLoggerTest extends TestCase
     public function testActiveEchoLogEntry()
     {
         $message = 'This is an error message for test ' . uniqid(__FUNCTION__);
-        
+
         $this->logger->activateEchoLogs();
         ob_start();
         $this->logger->error($message);

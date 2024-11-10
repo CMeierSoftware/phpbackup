@@ -8,7 +8,6 @@ use CMS\PhpBackup\Remote\AbstractRemoteHandler;
 use CMS\PhpBackup\Remote\Backblaze;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Step\Cron\AbstractCronStep;
 
 if (!defined('ABS_PATH')) {
     return;

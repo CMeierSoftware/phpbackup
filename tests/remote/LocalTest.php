@@ -90,7 +90,7 @@ final class LocalTest extends TestCase
         self::assertFileExists(self::WORK_DIR_REMOTE . $destFile);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
 
-        $destFile = 'sub\\file.txt';
+        $destFile = 'sub' . DIRECTORY_SEPARATOR . 'file.txt';
         self::assertTrue($this->remote->fileUpload(self::TEST_FILE1_SRC, $destFile));
         self::assertFileExists(self::WORK_DIR_REMOTE . $destFile);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_REMOTE . $destFile);
@@ -110,7 +110,7 @@ final class LocalTest extends TestCase
         self::assertFileEquals(self::WORK_DIR_REMOTE . $file, self::WORK_DIR_LOCAL . $file);
         self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $file);
 
-        $file = 'sub\\file.txt';
+        $file = 'sub' . DIRECTORY_SEPARATOR . 'file.txt';
         self::assertTrue($this->remote->fileDownload(self::WORK_DIR_LOCAL . $file, $file));
         self::assertFileExists(self::WORK_DIR_LOCAL . $file);
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
@@ -130,7 +130,7 @@ final class LocalTest extends TestCase
         self::assertTrue($this->remote->fileDelete($file));
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $file);
 
-        $file = 'sub\\file.txt';
+        $file = 'sub' . DIRECTORY_SEPARATOR . 'file.txt';
         self::assertFileExists(self::WORK_DIR_REMOTE . $file);
         self::assertTrue($this->remote->fileDelete($file));
         self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $file);

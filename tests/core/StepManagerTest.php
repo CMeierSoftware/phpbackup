@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests\Core;
 
 use CMS\PhpBackup\Core\AppConfig;
+use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Core\StepManager;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Step\StepResult;
 use PHPUnit\Framework\TestCase;
 

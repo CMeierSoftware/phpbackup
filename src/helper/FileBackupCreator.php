@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Helper;
 
-use CMS\PhpBackup\Helper\FileHelper;
-
 if (!defined('ABS_PATH')) {
     return;
 }
 
-use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use PhpZip\Constants\ZipCompressionLevel;
 use PhpZip\Util\Iterator\IgnoreFilesRecursiveFilterIterator;

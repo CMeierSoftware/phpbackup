@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests\Core;
 
 use CMS\PhpBackup\Core\AppConfig;
+use CMS\PhpBackup\Core\StepFactory;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\AbstractStep;
-use CMS\PhpBackup\Core\StepFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,12 +18,13 @@ use PHPUnit\Framework\TestCase;
  */
 final class StepFactoryTest extends TestCase
 {
-protected const CONFIG_FILE = CONFIG_DIR . 'app.xml';
+    protected const CONFIG_FILE = CONFIG_DIR . 'app.xml';
+
     protected function setUp(): void
     {
-        copy(TEST_FIXTURES_CONFIG_DIR . "config_full_valid.xml", self::CONFIG_FILE);
+        copy(TEST_FIXTURES_CONFIG_DIR . 'config_full_valid.xml', self::CONFIG_FILE);
         self::assertFileExists(self::CONFIG_FILE);
-       
+
         AppConfig::loadAppConfig('app');
     }
 

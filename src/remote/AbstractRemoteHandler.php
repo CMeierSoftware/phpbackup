@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace CMS\PhpBackup\Remote;
 
-use CMS\PhpBackup\Helper\FileLogger;
 use CMS\PhpBackup\Exceptions\FileAlreadyExistsException;
 use CMS\PhpBackup\Exceptions\FileNotFoundException;
 use CMS\PhpBackup\Exceptions\RemoteStorageNotConnectedException;
 use CMS\PhpBackup\Helper\FileHelper;
+use CMS\PhpBackup\Helper\FileLogger;
 
 /**
  * Class AbstractRemoteHandler - Abstract class for handling remote operations.
@@ -20,11 +20,10 @@ abstract class AbstractRemoteHandler
     protected FileLogger $logger;
     protected readonly string $remoteRootPath;
 
-
     public function __construct(string $remoteRootPath)
     {
         $this->logger = FileLogger::getInstance();
-        
+
         $this->remoteRootPath = $remoteRootPath;
         $this->logger->info("Base directory '{$this->remoteRootPath}'.");
     }
