@@ -35,7 +35,7 @@ final class StepConfigTest extends TestCaseWithAppConfig
 
     public function testValidParameter()
     {
-        $remoteMock = $this->getMockForAbstractClass(AbstractRemoteHandler::class);
+        $remoteMock = $this->getMockForAbstractClass(AbstractRemoteHandler::class, ['']);
 
         $step = new StepConfig($this->stepMock::class, 0, $remoteMock::class);
 

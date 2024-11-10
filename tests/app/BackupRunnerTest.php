@@ -6,18 +6,18 @@ namespace CMS\PhpBackup\Tests\App;
 
 use CMS\PhpBackup\App\BackupRunner;
 use CMS\PhpBackup\Core\AppConfig;
-use CMS\PhpBackup\Core\LogLevel;
+use CMS\PhpBackup\Core\StepConfig;
 use CMS\PhpBackup\Helper\FileHelper;
 use CMS\PhpBackup\Helper\FileLogger;
+use CMS\PhpBackup\Helper\LogLevel;
 use CMS\PhpBackup\Remote\Backblaze;
 use CMS\PhpBackup\Remote\Local;
 use CMS\PhpBackup\Step\BackupDatabaseStep;
 use CMS\PhpBackup\Step\BackupDirectoryStep;
 use CMS\PhpBackup\Step\CleanUpStep;
 use CMS\PhpBackup\Step\CreateBundlesStep;
-use CMS\PhpBackup\Step\Remote\DeleteOldFilesStep;
-use CMS\PhpBackup\Step\Remote\SendFileStep;
-use CMS\PhpBackup\Step\StepConfig;
+use CMS\PhpBackup\Step\DeleteOldFilesStep;
+use CMS\PhpBackup\Step\SendFileStep;
 use PHPUnit\Framework\TestCase;
 
 /**

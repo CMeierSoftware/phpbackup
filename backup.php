@@ -42,7 +42,7 @@ foreach ($apps as $appName) {
         exit($msg);
     }
 
-    $runner = new BackupRunner($cfg);
+    $runner = new BackupRunner();
 
     if ($runner->run()) {
         break;
