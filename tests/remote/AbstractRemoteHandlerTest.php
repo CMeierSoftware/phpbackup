@@ -508,6 +508,7 @@ final class AbstractRemoteHandlerTest extends TestCase
     {
         // Create a partial mock of AbstractRemoteHandler
         $mockBuilder = $this->getMockBuilder(AbstractRemoteHandler::class);
+        $mockBuilder->setConstructorArgs(['']);
         $mockBuilder->onlyMethods([
             '_fileUpload', '_fileDownload', '_fileExists', '_fileDelete',
             '_dirCreate', '_dirList', '_dirDelete',

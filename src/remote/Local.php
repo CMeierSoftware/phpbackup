@@ -11,14 +11,11 @@ use CMS\PhpBackup\Helper\FileHelper;
  */
 class Local extends AbstractRemoteHandler
 {
-    private readonly string $remoteRootPath;
 
     public function __construct(string $remoteRootPath)
     {
-        parent::__construct();
+        parent::__construct($remoteRootPath);
 
-        $this->remoteRootPath = $remoteRootPath;
-        $this->logger->info("Local base directory '{$this->remoteRootPath}'.");
         FileHelper::makeDir($this->remoteRootPath);
     }
 
@@ -86,7 +83,7 @@ class Local extends AbstractRemoteHandler
         return scandir($this->buildAbsPath($remoteFilePath));
     }
 
-    private function buildAbsPath(string $remoteFilePath): string
+    protected function buildAbsPath(string $remoteFilePath): string
     {
         return $this->remoteRootPath . DIRECTORY_SEPARATOR . ltrim($remoteFilePath, DIRECTORY_SEPARATOR);
     }

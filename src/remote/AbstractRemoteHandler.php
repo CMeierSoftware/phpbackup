@@ -18,10 +18,15 @@ abstract class AbstractRemoteHandler
     public array $fileExistsCache = [];
     protected mixed $connection = null;
     protected FileLogger $logger;
+    protected readonly string $remoteRootPath;
 
-    public function __construct()
+
+    public function __construct(string $remoteRootPath)
     {
         $this->logger = FileLogger::getInstance();
+        
+        $this->remoteRootPath = $remoteRootPath;
+        $this->logger->info("Base directory '{$this->remoteRootPath}'.");
     }
 
     /**
@@ -360,6 +365,8 @@ abstract class AbstractRemoteHandler
      * @see AbstractRemoteHandler::dirList()
      */
     abstract protected function _dirList(string $remotePath): array;
+
+    abstract protected function buildAbsPath(string $remoteFilePath): string;
 
     /**
      * Checks if the provided remote path belongs to a file.

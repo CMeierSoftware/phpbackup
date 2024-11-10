@@ -18,7 +18,7 @@ class Backblaze extends AbstractRemoteHandler
 
     public function __construct(string $keyId, string $applicationKey, string $bucketName)
     {
-        parent::__construct();
+        parent::__construct('');
         $this->accountId = substr($keyId, 3, 12);
         $this->keyId = $keyId;
         $this->applicationKey = $applicationKey;
@@ -205,5 +205,13 @@ class Backblaze extends AbstractRemoteHandler
     private function sanitizePath(string $path): string
     {
         return ltrim($path, '/');
+    }
+    
+    protected function buildAbsPath(string $remoteFilePath): string
+    {
+        return '';
+        $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
+        $path = $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
+        return str_replace(DIRECTORY_SEPARATOR, self::UNIX_SEPARATOR, $path);
     }
 }

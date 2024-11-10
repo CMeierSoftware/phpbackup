@@ -23,16 +23,13 @@ final class SecureFtp extends AbstractRemoteHandler
      */
     public function __construct(string $ftpServer, string $ftpUserName, string $ftpUserPass, string $remoteRootPath = '', int $ftpPort = 22)
     {
-        parent::__construct();
+        parent::__construct($remoteRootPath);
 
         $this->ftpServer = $ftpServer;
         $this->ftpUserName = $ftpUserName;
         $this->ftpUserPass = $ftpUserPass;
         $this->ftpPort = $ftpPort;
         $this->logger->info("SFTP Connection to '{$this->ftpServer}' as '{$this->ftpUserName}'.");
-
-        $this->remoteRootPath = $this->buildAbsPath($remoteRootPath);
-        $this->logger->info("SecureFtp base directory '{$this->remoteRootPath}'.");
     }
 
     /**
@@ -189,7 +186,7 @@ final class SecureFtp extends AbstractRemoteHandler
 
         // return true;
     }   
-    private function buildAbsPath(string $remoteFilePath): string
+    protected function buildAbsPath(string $remoteFilePath): string
     {
         $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
         $path = $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
