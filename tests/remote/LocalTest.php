@@ -153,15 +153,19 @@ final class LocalTest extends TestCase
      */
     public function testDirectoryCreateSuccess()
     {
-        $dirs = ['a\\b\\c', 'foo\\b\\c\\', 'foo\\b\\c\\'];
+        $dirs = [
+            'a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c', 
+            'foo' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR, 
+            'foo' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR,
+            'bar' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR . 'test.txt',
+        ];
+
         foreach ($dirs as $dir) {
-            $this->remote->dirCreate($dir);
-            self::assertFileExists(self::WORK_DIR_REMOTE . $dir);
+            self::assertTrue($this->remote->dirCreate($dir));
+            self::assertFileExists($dir);
         }
 
-        $this->remote->dirCreate('bar\b\\c\\test.txt');
-        self::assertFileExists(self::WORK_DIR_REMOTE . 'bar\b\\c\\');
-        self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . 'bar\b\\c\\test.txt');
+        self::assertFileDoesNotExist('bar' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR . 'test.txt');
     }
 
     /**

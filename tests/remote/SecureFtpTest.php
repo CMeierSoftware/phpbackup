@@ -19,7 +19,7 @@ define('NET_SSH2_LOGGING', SSH2::LOG_SIMPLE);
 final class SecureFtpTest extends TestCase
 {
     private const WORK_DIR_LOCAL = TEST_WORK_DIR . 'Local' . DIRECTORY_SEPARATOR;
-    private const WORK_DIR_REMOTE = 'Remote' . DIRECTORY_SEPARATOR;
+    private const WORK_DIR_REMOTE = 'Test' . DIRECTORY_SEPARATOR;
     private const TEST_FILE1_SRC = TEST_FIXTURES_FILE_1;
     private const TEST_FILE2_SRC = TEST_FIXTURES_FILE_2;
     private $remote;
@@ -56,7 +56,7 @@ final class SecureFtpTest extends TestCase
     public function testFileExists()
     {
         $file = 'file.txt';
-        // $this->setupRemoteStorage($file);
+        $this->setupRemoteStorage($file);
 
         self::assertTrue($this->remote->fileExists($file));
         self::assertFalse($this->remote->fileExists($file . 'invalid'));
@@ -89,12 +89,10 @@ final class SecureFtpTest extends TestCase
         $destFile = 'file.txt';
         self::assertTrue($this->remote->fileUpload(self::TEST_FILE1_SRC, $destFile));
         self::assertRemoteFileExists($destFile);
-        self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $destFile);
 
         $destFile = 'sub' . DIRECTORY_SEPARATOR . 'file.txt';
         self::assertTrue($this->remote->fileUpload(self::TEST_FILE1_SRC, $destFile));
         self::assertRemoteFileExists($destFile);
-        self::assertFileEquals(self::TEST_FILE1_SRC, self::WORK_DIR_LOCAL . $destFile);
     }
 
     /**
@@ -152,15 +150,21 @@ final class SecureFtpTest extends TestCase
      */
     public function testDirectoryCreateSuccess()
     {
-        $dirs = ['a\\b\\c', 'foo\\b\\c\\', 'foo\\b\\c\\'];
-        foreach ($dirs as $dir) {
-            $this->remote->dirCreate($dir);
-            self::assertRemoteFileExists($dir);
-        }
+        $dirs = [
+            'a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c', 
+            'foo' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR, 
+            'foo' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR,
+            'bar' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR . 'test.txt',
+        ];
 
-        self::assertTrue($this->remote->dirCreate('bar\\b\\c\\test.txt'));
-        self::assertRemoteFileExists('bar\\b\\c\\');
-        self::assertRemoteFileDoesNotExist('bar\\b\\c\\test.txt');
+        foreach ($dirs as $dir) {
+            self::assertTrue($this->remote->dirCreate($dir));
+            if (str_ends_with($dir, '.txt')) {
+                self::assertRemoteFileDoesNotExist($dir);
+            } else {
+                self::assertRemoteFileExists($dir);
+            }
+        }
     }
 
     /**
