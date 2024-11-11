@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CMS\PhpBackup\Tests\Remote;
 
 use CMS\PhpBackup\Helper\FileHelper;
-use CMS\PhpBackup\Remote\SecureFtp;
+use CMS\PhpBackup\Remote\Secureftp;
 use phpseclib3\Net\SSH2;
 use PHPUnit\Framework\TestCase;
 
@@ -14,9 +14,9 @@ define('NET_SSH2_LOGGING', SSH2::LOG_SIMPLE);
 /**
  * @internal
  *
- * @covers \CMS\PhpBackup\Remote\SecureFtp
+ * @covers \CMS\PhpBackup\Remote\Secureftp
  */
-final class SecureFtpTest extends TestCase
+final class SecureftpTest extends TestCase
 {
     private const WORK_DIR_LOCAL = TEST_WORK_DIR . 'Local' . DIRECTORY_SEPARATOR;
     private const WORK_DIR_REMOTE = 'Test' . DIRECTORY_SEPARATOR;
@@ -29,7 +29,7 @@ final class SecureFtpTest extends TestCase
         FileHelper::makeDir(self::WORK_DIR_LOCAL);
         self::assertDirectoryExists(self::WORK_DIR_LOCAL);
 
-        $this->remote = new SecureFtp($_ENV['SFTP_TEST_SERVER'], $_ENV['SFTP_TEST_USER'], $_ENV['SFTP_TEST_PASSWORD'], self::WORK_DIR_REMOTE);
+        $this->remote = new Secureftp($_ENV['SFTP_TEST_SERVER'], $_ENV['SFTP_TEST_USER'], $_ENV['SFTP_TEST_PASSWORD'], self::WORK_DIR_REMOTE);
         self::assertTrue($this->remote->connect());
     }
 
@@ -40,18 +40,18 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::deleteDirectory()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::deleteDirectory()
      */
     public function testCreateRootDirIfNotExists(): void
     {
         self::assertTrue($this->remote->dirDelete('.'));
         self::assertRemoteFileDoesNotExist('.');
-        new SecureFtp($_ENV['SFTP_TEST_SERVER'], $_ENV['SFTP_TEST_USER'], $_ENV['SFTP_TEST_PASSWORD'], self::WORK_DIR_REMOTE);
+        new Secureftp($_ENV['SFTP_TEST_SERVER'], $_ENV['SFTP_TEST_USER'], $_ENV['SFTP_TEST_PASSWORD'], self::WORK_DIR_REMOTE);
         self::assertRemoteFileExists('.');
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::fileExists()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::fileExists()
      */
     public function testFileExists()
     {
@@ -82,7 +82,7 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::fileUpload()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::fileUpload()
      */
     public function testFileUploadSuccess()
     {
@@ -96,7 +96,7 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::fileDownload()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::fileDownload()
      */
     public function testFileDownloadSuccess()
     {
@@ -116,7 +116,7 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::fileDelete()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::fileDelete()
      */
     public function testFileDeleteSuccess()
     {
@@ -134,7 +134,7 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::dirList()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::dirList()
      */
     public function testDirectoryListSuccess()
     {
@@ -146,7 +146,7 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::dirCreate()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::dirCreate()
      */
     public function testDirectoryCreateSuccess()
     {
@@ -168,7 +168,7 @@ final class SecureFtpTest extends TestCase
     }
 
     /**
-     * @covers \CMS\PhpBackup\Remote\SecureFtp::dirDelete()
+     * @covers \CMS\PhpBackup\Remote\Secureftp::dirDelete()
      */
     public function testDirectoryDeleteSuccess()
     {

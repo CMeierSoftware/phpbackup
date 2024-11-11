@@ -6,7 +6,7 @@ namespace CMS\PhpBackup\Remote;
 
 use phpseclib3\Net\SFTP;
 
-final class SecureFtp extends AbstractRemoteHandler
+final class Secureftp extends AbstractRemoteHandler
 {
     private const SKIP_DIRS = ['.', '..'];
     private const UNIX_SEPARATOR = '/';
