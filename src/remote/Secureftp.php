@@ -9,7 +9,6 @@ use phpseclib3\Net\SFTP;
 final class Secureftp extends AbstractRemoteHandler
 {
     private const SKIP_DIRS = ['.', '..'];
-    private const UNIX_SEPARATOR = '/';
     private readonly string $ftpServer;
     private readonly string $ftpUserName;
     private readonly string $ftpUserPass;
@@ -133,10 +132,10 @@ final class Secureftp extends AbstractRemoteHandler
 
     protected function buildAbsPath(string $remoteFilePath): string
     {
-        $path = ltrim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
-        $path = $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
+        $path = trim($this->remoteRootPath ?? '', ' /\\' . DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($remoteFilePath, ' /\\' . DIRECTORY_SEPARATOR);
+        return $this->isFilePath($path) ? $path : $path . DIRECTORY_SEPARATOR;
 
-        return str_replace(DIRECTORY_SEPARATOR, self::UNIX_SEPARATOR, $path);
+        // return str_replace(DIRECTORY_SEPARATOR, self::UNIX_SEPARATOR, $path);
     }
 
     private function goto(string $destinationPath): bool
@@ -146,7 +145,7 @@ final class Secureftp extends AbstractRemoteHandler
         }
         $destinationPath = $this->buildAbsPath($destinationPath);
 
-        $directories = array_filter(explode(self::UNIX_SEPARATOR, $destinationPath));
+        $directories = array_filter(explode(DIRECTORY_SEPARATOR, $destinationPath));
 
         // Change to root directory
         $this->connection->chdir('/');

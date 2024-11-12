@@ -162,10 +162,12 @@ final class LocalTest extends TestCase
 
         foreach ($dirs as $dir) {
             self::assertTrue($this->remote->dirCreate($dir));
-            self::assertFileExists($dir);
+            if (str_ends_with($dir, '.txt')) {
+                self::assertFileDoesNotExist(self::WORK_DIR_REMOTE . $dir);
+            } else {
+                self::assertFileExists(self::WORK_DIR_REMOTE . $dir);
+            }
         }
-
-        self::assertFileDoesNotExist('bar' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR . 'test.txt');
     }
 
     /**
