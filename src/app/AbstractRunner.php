@@ -141,7 +141,11 @@ abstract class AbstractRunner
     {
         $this->logger = FileLogger::getInstance();
         $this->logger->setLogFile($this->config->getTempDir() . 'debug.log');
-        $this->logger->setLogLevel(LogLevel::INFO);
+        if (defined('CMS_is_debug_mode') && CMS_is_debug_mode()) {
+            $this->logger->setLogLevel(LogLevel::DEBUG);
+        } else {
+            $this->logger->setLogLevel(LogLevel::INFO);
+        }
         $this->logger->activateEchoLogs();
     }
 }
