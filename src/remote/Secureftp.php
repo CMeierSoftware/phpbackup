@@ -92,7 +92,7 @@ final class Secureftp extends AbstractRemoteHandler
         $currentPath = '';
 
         foreach ($directories as $dir) {
-            $currentPath .= $dir . self::UNIX_SEPARATOR;
+            $currentPath .= $dir . '/';
 
             if (!$this->_fileExists($currentPath)) {
                 $this->goto(dirname($currentPath));
